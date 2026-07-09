@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Onboarding 3: Fast & Easy - Phone scanning -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="280dp"
+    android:height="280dp"
+    android:viewportWidth="280"
+    android:viewportHeight="280">
+
+    <!-- Background circles -->
+    <path
+        android:pathData="M140,140m-110,0a110,110 0,1 1,220 0a110,110 0,1 1,-220 0"
+        android:fillColor="#0D1B3E"/>
+    <path
+        android:pathData="M140,140m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0"
+        android:fillColor="#0F2050"/>
+
+    <!-- Phone body -->
+    <path
+        android:pathData="M105,68 L175,68 Q183,68 183,76 L183,204 Q183,212 175,212 L105,212 Q97,212 97,204 L97,76 Q97,68 105,68 Z"
+        android:fillColor="#131F45"/>
+    <path
+        android:pathData="M105,68 L175,68 Q183,68 183,76 L183,204 Q183,212 175,212 L105,212 Q97,212 97,204 L97,76 Q97,68 105,68 Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#3B6BF8"
+        android:strokeWidth="2"/>
+
+    <!-- Phone screen -->
+    <path
+        android:pathData="M107,82 L173,82 L173,198 L107,198 Z"
+        android:fillColor="#0A1535"/>
+
+    <!-- Phone notch -->
+    <path
+        android:pathData="M128,68 L152,68 Q155,68 155,72 L155,74 Q155,78 152,78 L128,78 Q125,78 125,74 L125,72 Q125,68 128,68 Z"
+        android:fillColor="#0A0F1E"/>
+
+    <!-- Screen content: QR code mini -->
+    <path
+        android:pathData="M118,98 L118,128 Q118,130 120,130 L150,130 Q152,130 152,128 L152,98 Q152,96 150,96 L120,96 Q118,96 118,98 Z"
+        android:fillColor="#131F45"/>
+    <path
+        android:pathData="M118,98 L118,128 Q118,130 120,130 L150,130 Q152,130 152,128 L152,98 Q152,96 150,96 L120,96 Q118,96 118,98 Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#3B6BF8"
+        android:strokeWidth="1"/>
+
+    <!-- Mini QR corners on screen -->
+    <path android:pathData="M122,100 L122,107 M122,100 L129,100" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="2" android:strokeLineCap="round"/>
+    <path android:pathData="M148,100 L148,107 M148,100 L141,100" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="2" android:strokeLineCap="round"/>
+    <path android:pathData="M122,126 L122,119 M122,126 L129,126" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="2" android:strokeLineCap="round"/>
+    <path android:pathData="M148,126 L148,119 M148,126 L141,126" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="2" android:strokeLineCap="round"/>
+
+    <!-- Mini QR dots -->
+    <path android:pathData="M127,108 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#3B6BF8"/>
+    <path android:pathData="M133,108 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#1A2D5A"/>
+    <path android:pathData="M139,108 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#3B6BF8"/>
+    <path android:pathData="M127,114 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#1A2D5A"/>
+    <path android:pathData="M133,114 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#3B6BF8"/>
+    <path android:pathData="M139,114 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#3B6BF8"/>
+    <path android:pathData="M127,120 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#3B6BF8"/>
+    <path android:pathData="M133,120 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#3B6BF8"/>
+    <path android:pathData="M139,120 m0,0 a2,2 0,1,0 4,0 a2,2 0,1,0 -4,0" android:fillColor="#1A2D5A"/>
+
+    <!-- Scan confirmed text area -->
+    <path
+        android:pathData="M112,140 L168,140 Q170,140 170,142 L170,152 Q170,154 168,154 L112,154 Q110,154 110,152 L110,142 Q110,140 112,140 Z"
+        android:fillColor="#00C896"
+        android:fillAlpha="0.2"/>
+
+    <!-- Check icon in confirmed bar -->
+    <path
+        android:pathData="M116,146 L120,150 L128,142"
+        android:fillColor="#00000000"
+        android:strokeColor="#00E5C3"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"/>
+
+    <!-- "Marked!" text placeholder lines -->
+    <path android:pathData="M133,144 L162,144" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="2" android:strokeLineCap="round"/>
+    <path android:pathData="M133,150 L150,150" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="1.5" android:strokeLineCap="round" android:strokeAlpha="0.5"/>
+
+    <!-- Timer / speed indicator -->
+    <path
+        android:pathData="M112,164 L168,164 Q170,164 170,166 L170,182 Q170,184 168,184 L112,184 Q110,184 110,182 L110,166 Q110,164 112,164 Z"
+        android:fillColor="#0F1A3E"/>
+
+    <!-- Speed bolt -->
+    <path
+        android:pathData="M132,176 L138,168 L138,173 L145,173 L139,181 L139,176 Z"
+        android:fillColor="#F5A623"/>
+
+    <!-- "3 sec" text placeholder -->
+    <path android:pathData="M150,170 L164,170" android:fillColor="#00000000" android:strokeColor="#6B7280" android:strokeWidth="2" android:strokeLineCap="round"/>
+    <path android:pathData="M150,176 L160,176" android:fillColor="#00000000" android:strokeColor="#6B7280" android:strokeWidth="1.5" android:strokeLineCap="round"/>
+
+    <!-- Floating speed lines - left of phone -->
+    <path android:pathData="M60,120 L80,120" android:fillColor="#00000000" android:strokeColor="#3B6BF8" android:strokeWidth="2" android:strokeLineCap="round" android:strokeAlpha="0.7"/>
+    <path android:pathData="M68,130 L83,130" android:fillColor="#00000000" android:strokeColor="#3B6BF8" android:strokeWidth="1.5" android:strokeLineCap="round" android:strokeAlpha="0.5"/>
+    <path android:pathData="M72,140 L85,140" android:fillColor="#00000000" android:strokeColor="#3B6BF8" android:strokeWidth="1" android:strokeLineCap="round" android:strokeAlpha="0.3"/>
+
+    <!-- Floating speed lines - right of phone -->
+    <path android:pathData="M200,120 L220,120" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="2" android:strokeLineCap="round" android:strokeAlpha="0.7"/>
+    <path android:pathData="M197,130 L212,130" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="1.5" android:strokeLineCap="round" android:strokeAlpha="0.5"/>
+    <path android:pathData="M195,140 L208,140" android:fillColor="#00000000" android:strokeColor="#00E5C3" android:strokeWidth="1" android:strokeLineCap="round" android:strokeAlpha="0.3"/>
+
+    <!-- Stars -->
+    <path android:pathData="M55,80 L56.5,76 L58,80 L62,81.5 L58,83 L56.5,87 L55,83 L51,81.5 Z" android:fillColor="#3B6BF8" android:fillAlpha="0.8"/>
+    <path android:pathData="M222,80 L223,77 L224,80 L227,81 L224,82 L223,85 L222,82 L219,81 Z" android:fillColor="#00E5C3" android:fillAlpha="0.8"/>
+    <path android:pathData="M215,195 L216,192 L217,195 L220,196 L217,197 L216,200 L215,197 L212,196 Z" android:fillColor="#3B6BF8" android:fillAlpha="0.6"/>
+    <path android:pathData="M60,185 L61,182 L62,185 L65,186 L62,187 L61,190 L60,187 L57,186 Z" android:fillColor="#F5A623" android:fillAlpha="0.6"/>
+
+</vector>

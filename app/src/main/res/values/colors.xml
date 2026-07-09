@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="primary">#4A90E2</color>
+    <color name="gray">#888888</color>
+
+    <color name="bg_dark">#0A0F1E</color>
+    <color name="bg_card">#111827</color>
+    <color name="accent_blue">#3B6BF8</color>
+    <color name="accent_teal">#00E5C3</color>
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_muted">#6B7280</color>
+    <color name="dot_inactive">#2A2F45</color>
+
+
+
+
+    <!-- Role card backgrounds -->
+    <color name="card_admin_bg">#0D1729</color>
+    <color name="card_teacher_bg">#0A1A18</color>
+    <color name="card_student_bg">#130D1E</color>
+
+    <!-- Icon backgrounds -->
+    <color name="icon_admin_bg">#1A2545</color>
+    <color name="icon_teacher_bg">#0F2922</color>
+    <color name="icon_student_bg">#1E1030</color>
+
+    <!-- Purple accent for student -->
+    <color name="accent_purple">#A855F7</color>
+
+
+        <!-- Base -->
+        <color name="bg_primary">#0D0D0D</color>
+        <color name="bg_card_alt">#151C1D</color>
+
+        <!-- Accent (matches NexaPriv / FAUGET & co. branding) -->
+        <color name="accent_cyan">#00E5FF</color>
+        <color name="accent_cyan_soft">#3300E5FF</color>
+
+        <!-- Text -->
+        <color name="text_secondary">#9E9E9E</color>
+
+        <!-- Status -->
+        <color name="status_present">#00E5A0</color>
+        <color name="status_absent">#FF5C5C</color>
+        <color name="status_pending">#FFC24B</color>
+        <color name="warning_amber">#FFB347</color>
+
+        <!-- Misc -->
+        <color name="bottom_nav_selected">#00E5FF</color>
+        <color name="bottom_nav_unselected">#6B6B6B</color>
+    <color name="colorPrimary">#2563EB</color>
+
+    <color name="colorPrimaryDark">#1D4ED8</color>
+
+    <color name="colorAccent">#38BDF8</color>
+    <color name="backgroundColor">#F1F5F9</color>
+   <!-- <color name="backgroundColor">#0F172A</color>  -->
+
+    <color name="cardColor">#FFFFFF</color>
+
+    <color name="textPrimary">#111827</color>
+
+    <color name="textSecondary">#6B7280</color>
+
+    <color name="green">#22C55E</color>
+
+    <color name="red">#EF4444</color>
+
+    <color name="orange">#F59E0B</color>
+
+    <color name="purple">#7C3AED</color>
+
+    </resources>

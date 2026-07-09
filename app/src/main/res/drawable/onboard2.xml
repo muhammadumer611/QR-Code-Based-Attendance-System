@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Onboarding 2: Security Shield - No Proxy Attendance -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="280dp"
+    android:height="280dp"
+    android:viewportWidth="280"
+    android:viewportHeight="280">
+
+    <!-- Background circle -->
+    <path
+        android:pathData="M140,140m-110,0a110,110 0,1 1,220 0a110,110 0,1 1,-220 0"
+        android:fillColor="#0D1B3E"/>
+    <path
+        android:pathData="M140,140m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0"
+        android:fillColor="#0F2050"/>
+
+    <!-- Shield body -->
+    <path
+        android:pathData="M140,58 L195,80 L195,130 Q195,168 140,192 Q85,168 85,130 L85,80 Z"
+        android:fillColor="#131F45"/>
+
+    <!-- Shield border -->
+    <path
+        android:pathData="M140,58 L195,80 L195,130 Q195,168 140,192 Q85,168 85,130 L85,80 Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#3B6BF8"
+        android:strokeWidth="2"/>
+
+    <!-- Shield inner glow fill -->
+    <path
+        android:pathData="M140,70 L185,89 L185,130 Q185,161 140,181 Q95,161 95,130 L95,89 Z"
+        android:fillColor="#0A1535"/>
+
+    <!-- Lock body -->
+    <path
+        android:pathData="M120,130 L160,130 Q165,130 165,135 L165,160 Q165,165 160,165 L120,165 Q115,165 115,160 L115,135 Q115,130 120,130 Z"
+        android:fillColor="#1E3A7A"/>
+    <path
+        android:pathData="M120,130 L160,130 Q165,130 165,135 L165,160 Q165,165 160,165 L120,165 Q115,165 115,160 L115,135 Q115,130 120,130 Z"
+        android:fillColor="#00000000"
+        android:strokeColor="#3B6BF8"
+        android:strokeWidth="1.5"/>
+
+    <!-- Lock shackle -->
+    <path
+        android:pathData="M125,130 L125,118 Q125,108 140,108 Q155,108 155,118 L155,130"
+        android:fillColor="#00000000"
+        android:strokeColor="#3B6BF8"
+        android:strokeWidth="4"
+        android:strokeLineCap="round"/>
+
+    <!-- Lock keyhole -->
+    <path
+        android:pathData="M140,143 m0,0 a6,6 0,1,0 12,0 a6,6 0,1,0 -12,0"
+        android:fillColor="#00E5C3"/>
+    <path
+        android:pathData="M140,149 L140,158"
+        android:fillColor="#00000000"
+        android:strokeColor="#00E5C3"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"/>
+
+    <!-- Cross/X marks (no proxy) - left -->
+    <path
+        android:pathData="M65,105 L75,115 M75,105 L65,115"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF4757"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"/>
+    <!-- X circle -->
+    <path
+        android:pathData="M62,102 m0,0 a12,12 0,1,0 24,0 a12,12 0,1,0 -24,0"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF4757"
+        android:strokeWidth="1.5"
+        android:fillAlpha="0.2"/>
+
+    <!-- Cross/X mark right -->
+    <path
+        android:pathData="M205,105 L215,115 M215,105 L205,115"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF4757"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"/>
+    <path
+        android:pathData="M202,102 m0,0 a12,12 0,1,0 24,0 a12,12 0,1,0 -24,0"
+        android:fillColor="#00000000"
+        android:strokeColor="#FF4757"
+        android:strokeWidth="1.5"/>
+
+    <!-- Check marks (verified) -->
+    <path
+        android:pathData="M66,160 L72,167 L84,152"
+        android:fillColor="#00000000"
+        android:strokeColor="#00E5C3"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"/>
+    <path
+        android:pathData="M62,157 m0,0 a12,12 0,1,0 24,0 a12,12 0,1,0 -24,0"
+        android:fillColor="#00000000"
+        android:strokeColor="#00E5C3"
+        android:strokeWidth="1.5"/>
+
+    <path
+        android:pathData="M196,160 L202,167 L214,152"
+        android:fillColor="#00000000"
+        android:strokeColor="#00E5C3"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"/>
+    <path
+        android:pathData="M192,157 m0,0 a12,12 0,1,0 24,0 a12,12 0,1,0 -24,0"
+        android:fillColor="#00000000"
+        android:strokeColor="#00E5C3"
+        android:strokeWidth="1.5"/>
+
+    <!-- Stars/sparkles -->
+    <path
+        android:pathData="M55,75 L57,70 L59,75 L64,77 L59,79 L57,84 L55,79 L50,77 Z"
+        android:fillColor="#3B6BF8"
+        android:fillAlpha="0.7"/>
+    <path
+        android:pathData="M220,195 L221.5,191 L223,195 L227,196.5 L223,198 L221.5,202 L220,198 L216,196.5 Z"
+        android:fillColor="#00E5C3"
+        android:fillAlpha="0.7"/>
+    <path
+        android:pathData="M228,85 L229,82 L230,85 L233,86 L230,87 L229,90 L228,87 L225,86 Z"
+        android:fillColor="#3B6BF8"
+        android:fillAlpha="0.5"/>
+
+</vector>

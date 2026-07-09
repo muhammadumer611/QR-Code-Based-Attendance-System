@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">QRCodeAttendance</string>
+
+    <string name="dashboard">Dashboard</string>
+
+    <string name="students">Students</string>
+
+    <string name="teachers">Teachers</string>
+
+    <string name="departments">Departments</string>
+
+    <string name="subjects">Subjects</string>
+
+    <string name="attendance">Attendance</string>
+
+    <string name="reports">Reports</string>
+
+    <string name="schedule">Schedule</string>
+
+    <string name="settings">Settings</string>
+
+    <string name="logout">Logout</string>
+</resources>
