@@ -11,7 +11,7 @@ class ActivityAdminDashboard : AppCompatActivity() {
     private lateinit var binding: ActivityAdminDashboardBinding
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+
         binding = ActivityAdminDashboardBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
