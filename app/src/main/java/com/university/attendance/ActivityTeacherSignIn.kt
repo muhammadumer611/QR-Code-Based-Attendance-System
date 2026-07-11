@@ -13,5 +13,5 @@ class ActivityTeacherSignIn : BaseAuthActivity() {
     override val badgeBg = R.drawable.bg_badge_teal
     override val tagBg = R.drawable.bg_tag_teal
     override fun getOppositeScreen() = ActivityTeacherSignUp::class.java
-    override fun getDashboardScreen() = MainActivity::class.java
+    override fun getDashboardScreen() = ActivityTeacherDashboard::class.java
 }

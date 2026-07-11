@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "222605717351",
+    "project_id": "qr-code-attendance-syste-ed43f",
+    "storage_bucket": "qr-code-attendance-syste-ed43f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:222605717351:android:1b9c034ce15a75a61d09c2",
+        "android_client_info": {
+          "package_name": "com.university.attendance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBT3af4qz8b0spYG7zpP2wkChmpOWsuMw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

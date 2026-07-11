@@ -96,8 +96,24 @@
         <color name="successGreen">#00E676</color>
         <color name="warningOrange">#FFB300</color>
         <color name="dangerRed">#FF3B5C</color>
+    <color name="teacherPrimary">#059669</color>
+
+    <color name="teacherPrimaryDark">#047857</color>
+
+    <color name="teacherSecondary">#06B6D4</color>
+
+    <color name="teacherBackground">#F8FAFC</color>
+
+    <color name="teacherCard">#FFFFFF</color>
+
+    <color name="teacherSuccess">#22C55E</color>
+
+    <color name="teacherWarning">#F59E0B</color>
+
+    <color name="teacherDanger">#EF4444</color>
 
 
-
-
+    <color name="cyanAccent">#00E5FF</color>
+    <color name="cyanAccentDim">#4D00E5FF</color>
+    <color name="glassCard">#1A1F26</color>
     </resources>

@@ -12,6 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QRCodeAttendance">
         <activity
+            android:name=".ActivityTeacherDashboard"
+            android:exported="false" />
+        <activity
             android:name=".ActivityAdminDashboard"
             android:exported="false" />
         <activity

@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/nav_dashboard"
+        android:icon="@drawable/ic_dashboard"
+        android:title="Dashboard"/>
+
+    <item
+        android:id="@+id/nav_qr_attendance"
+        android:icon="@drawable/ic_qr_code"
+        android:title="Take Attendance"/>
+
+    <item
+        android:id="@+id/nav_manual"
+        android:icon="@drawable/ic_edit"
+        android:title="Manual Attendance"/>
+
+    <item
+        android:id="@+id/nav_students"
+        android:icon="@drawable/ic_students"
+        android:title="Students"/>
+
+    <item
+        android:id="@+id/nav_notes"
+        android:icon="@drawable/ic_upload"
+        android:title="Upload Notes"/>
+
+    <item
+        android:id="@+id/nav_assignment"
+        android:icon="@drawable/ic_assignment"
+        android:title="Assignments"/>
+
+    <item
+        android:id="@+id/nav_results"
+        android:icon="@drawable/ic_results"
+        android:title="Results"/>
+
+    <item
+        android:id="@+id/nav_reports"
+        android:icon="@drawable/ic_reporsts"
+        android:title="Reports"/>
+
+    <item
+        android:id="@+id/nav_settings"
+        android:icon="@drawable/ic_settings"
+        android:title="Settings"/>
+
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/ic_logout"
+        android:title="Logout"/>
+
+</menu>
