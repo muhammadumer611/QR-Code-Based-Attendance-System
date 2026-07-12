@@ -9,11 +9,23 @@ import android.widget.EditText
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FieldValue
 import com.university.attendance.databinding.ActivityAuthBaseBinding
 
 abstract class BaseAuthActivity : AppCompatActivity() {
 
     protected lateinit var binding: ActivityAuthBaseBinding
+
+    protected lateinit var auth: FirebaseAuth
+    protected lateinit var db: FirebaseFirestore
+
+    protected lateinit var etFirstName: EditText
+    protected lateinit var etLastName: EditText
+    protected lateinit var etEmail: EditText
+    protected lateinit var etPassword: EditText
 
     abstract val role: String
     abstract val isSignUp: Boolean
@@ -40,6 +52,9 @@ abstract class BaseAuthActivity : AppCompatActivity() {
         binding = ActivityAuthBaseBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        auth = FirebaseAuth.getInstance()
+        db = FirebaseFirestore.getInstance()
+
         setupTheme()
         setupContent()
         setupFields()
@@ -50,13 +65,20 @@ abstract class BaseAuthActivity : AppCompatActivity() {
             finish()
         }
 
-        // Main button — seedha dashboard pe
+        // Main button
         binding.btnMain.setOnClickListener {
             it.animate().scaleX(0.96f).scaleY(0.96f).setDuration(80).withEndAction {
                 it.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
-                // Sirf navigate karo, koi validation nahi
-                startActivity(Intent(this, getDashboardScreen()))
-                finish()
+
+                if (role == "ADMIN" && isSignUp) {
+                    registerAdmin {
+                        startActivity(Intent(this, getDashboardScreen()))
+                        finish()
+                    }
+                } else {
+                    startActivity(Intent(this, getDashboardScreen()))
+                    finish()
+                }
             }.start()
         }
 
@@ -131,26 +153,52 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
             }
-            nameRow.addView(makeField("First Name", "John", weight = 1f))
-            nameRow.addView(makeField("Last Name", "Doe", weight = 1f, marginStart = 10))
+            nameRow.addView(
+                makeField(
+                    "First Name",
+                    "Muhammad",
+                    "firstName",
+                    weight = 1f
+                )
+            )
+            nameRow.addView(
+                makeField(
+                    "Last Name",
+                    "Umer",
+                    "lastName",
+                    weight = 1f,
+                    marginStart = 10
+                )
+            )
             container.addView(nameRow)
         }
 
         val emailLabel = when (role) {
             "TEACHER" -> "Faculty Email"
             "STUDENT" -> "Student Email"
-            else      -> "Email Address"
+            else      -> "Official UOL Email"
         }
-        container.addView(makeField(emailLabel, "${role.lowercase()}@university.edu"))
+        val emailHint = when (role) {
+            "ADMIN" -> "admin@uol.edu.pk"
+            else    -> "${role.lowercase()}@university.edu"
+        }
+        container.addView(makeField(emailLabel, emailHint, "email"))
 
         if (isSignUp) {
             when (role) {
-                "TEACHER" -> container.addView(makeField("Department", "Computer Science"))
-                "STUDENT" -> container.addView(makeField("Roll Number", "BSCS-2021-001"))
+                "TEACHER" -> container.addView(makeField("Department", "Computer Science", "department"))
+                "STUDENT" -> container.addView(makeField("Roll Number", "BSCS-2021-001", "rollNumber"))
             }
         }
 
-        container.addView(makeField("Password", "••••••••", isPassword = true))
+        container.addView(
+            makeField(
+                "Password",
+                "********",
+                "password",
+                true
+            )
+        )
 
         if (!isSignUp) {
             val forgot = TextView(this).apply {
@@ -170,6 +218,7 @@ abstract class BaseAuthActivity : AppCompatActivity() {
     private fun makeField(
         label: String,
         hint: String,
+        key: String,
         isPassword: Boolean = false,
         weight: Float = 0f,
         marginStart: Int = 0
@@ -219,6 +268,14 @@ abstract class BaseAuthActivity : AppCompatActivity() {
             )
         }
 
+        // EditText ko reference variables me save karo
+        when (key) {
+            "firstName" -> etFirstName = field
+            "lastName"  -> etLastName = field
+            "email"     -> etEmail = field
+            "password"  -> etPassword = field
+        }
+
         wrapper.addView(labelView)
         wrapper.addView(field)
         return wrapper
@@ -240,5 +297,98 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                 .setInterpolator(DecelerateInterpolator())
                 .start()
         }
+    }
+
+    protected fun validateAdmin(): Boolean {
+
+        if (etFirstName.text.toString().trim().isEmpty()) {
+            etFirstName.error = "Enter First Name"
+            return false
+        }
+
+        if (etLastName.text.toString().trim().isEmpty()) {
+            etLastName.error = "Enter Last Name"
+            return false
+        }
+
+        val email = etEmail.text.toString().trim()
+
+        if (email.isEmpty()) {
+            etEmail.error = "Enter Email"
+            return false
+        }
+
+        if (!email.lowercase().endsWith("@uol.edu.pk")) {
+            etEmail.error = "Only Official UOL Email Allowed"
+            return false
+        }
+
+        val password = etPassword.text.toString()
+
+        if (password.length < 8) {
+            etPassword.error = "Password must be at least 8 characters"
+            return false
+        }
+
+        return true
+    }
+
+    protected fun registerAdmin(
+        onSuccess: () -> Unit
+    ) {
+
+        if (!validateAdmin()) return
+
+        val first = etFirstName.text.toString().trim()
+        val last = etLastName.text.toString().trim()
+        val email = etEmail.text.toString().trim()
+        val password = etPassword.text.toString()
+
+        auth.createUserWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+
+                val uid = auth.currentUser!!.uid
+
+                val admin = hashMapOf(
+                    "uid" to uid,
+                    "firstName" to first,
+                    "lastName" to last,
+                    "email" to email,
+                    "role" to "ADMIN",
+                    "university" to "University Of Lahore",
+                    "isActive" to true,
+                    "createdAt" to FieldValue.serverTimestamp()
+                )
+
+                db.collection("admins")
+                    .document(uid)
+                    .set(admin)
+                    .addOnSuccessListener {
+
+                        auth.currentUser?.sendEmailVerification()
+
+                        Toast.makeText(
+                            this,
+                            "Admin Account Created Successfully",
+                            Toast.LENGTH_LONG
+                        ).show()
+
+                        onSuccess()
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(
+                            this,
+                            it.message,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+            }
+            .addOnFailureListener {
+                Toast.makeText(
+                    this,
+                    it.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
     }
 }
