@@ -13,6 +13,6 @@ class ActivityStudentSignUp : BaseAuthActivity() {
     override val roleIcon = "🎓"
     override val badgeBg = R.drawable.bg_badge_purple
     override val tagBg = R.drawable.bg_tag_purple
-    override fun getOppositeScreen() = ActivityStudentSignIn::class.java
-    override fun getDashboardScreen() = MainActivity::class.java
+    override fun getOppositeScreen() = ActivityAdminDashboard::class.java
+    override fun getDashboardScreen() = ActivityAdminSignIn::class.java
 }

@@ -15,5 +15,5 @@ class ActivityAdminSignUp : BaseAuthActivity() {
     override val tagBg = R.drawable.bg_tag_blue
 
     override fun getOppositeScreen() = ActivityAdminSignIn::class.java
-    override fun getDashboardScreen() = MainActivity::class.java
+    override fun getDashboardScreen() = ActivityAdminSignIn::class.java
 }

@@ -47,4 +47,10 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // QR Code generation (Teacher side — session QR banane ke liye)
+    implementation("com.google.zxing:core:3.5.3")
+
+    // QR Code scanning (Student side — camera se scan karne ke liye)
+    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
 }

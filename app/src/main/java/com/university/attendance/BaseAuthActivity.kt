@@ -75,6 +75,11 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                         startActivity(Intent(this, getDashboardScreen()))
                         finish()
                     }
+                } else if (role == "ADMIN" && !isSignUp) {
+                    signInAdmin {
+                        startActivity(Intent(this, getDashboardScreen()))
+                        finish()
+                    }
                 } else {
                     startActivity(Intent(this, getDashboardScreen()))
                     finish()
@@ -384,6 +389,96 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                     }
             }
             .addOnFailureListener {
+                Toast.makeText(
+                    this,
+                    it.message,
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+    }
+
+    protected fun validateAdminSignIn(): Boolean {
+
+        val email = etEmail.text.toString().trim()
+
+        if (email.isEmpty()) {
+            etEmail.error = "Enter Email"
+            return false
+        }
+
+        if (!email.lowercase().endsWith("@uol.edu.pk")) {
+            etEmail.error = "Only Official UOL Email Allowed"
+            return false
+        }
+
+        val password = etPassword.text.toString()
+
+        if (password.isEmpty()) {
+            etPassword.error = "Enter Password"
+            return false
+        }
+
+        return true
+    }
+
+    protected fun signInAdmin(
+        onSuccess: () -> Unit
+    ) {
+
+        if (!validateAdminSignIn()) return
+
+        val email = etEmail.text.toString().trim()
+        val password = etPassword.text.toString()
+
+        binding.btnMain.isEnabled = false
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+
+                val uid = auth.currentUser!!.uid
+
+                db.collection("admins")
+                    .document(uid)
+                    .get()
+                    .addOnSuccessListener { document ->
+
+                        binding.btnMain.isEnabled = true
+
+                        if (!document.exists()) {
+                            auth.signOut()
+                            Toast.makeText(
+                                this,
+                                "No Admin Account Found With This Email",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            return@addOnSuccessListener
+                        }
+
+                        val isActive = document.getBoolean("isActive") ?: false
+
+                        if (!isActive) {
+                            auth.signOut()
+                            Toast.makeText(
+                                this,
+                                "This Admin Account Has Been Deactivated",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            return@addOnSuccessListener
+                        }
+
+                        onSuccess()
+                    }
+                    .addOnFailureListener {
+                        binding.btnMain.isEnabled = true
+                        Toast.makeText(
+                            this,
+                            it.message,
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+            }
+            .addOnFailureListener {
+                binding.btnMain.isEnabled = true
                 Toast.makeText(
                     this,
                     it.message,
