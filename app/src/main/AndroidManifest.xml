@@ -1,8 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -13,6 +17,9 @@
         android:roundIcon="@drawable/img"
         android:supportsRtl="true"
         android:theme="@style/Theme.QRCodeAttendance">
+        <activity
+            android:name=".ActivityAddStudent"
+            android:exported="false" />
         <activity
             android:name=".ActivityTeacherDashboard"
             android:exported="false" />

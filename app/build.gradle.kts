@@ -53,4 +53,27 @@ dependencies {
 
     // QR Code scanning (Student side — camera se scan karne ke liye)
     implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+
+
+//
+//   </-- # Add these to app/build.gradle.kts (module-level), inside dependencies { } block
+//    # ----------------------------------------------------------------------------
+//    # Skip any line below if you already have that exact dependency (avoid duplicates,
+//    # since duplicate declarations were the earlier symbol-resolution issue you had). -->
+
+    //1. Coroutines <-> Firebase Task bridge (needed for `.await()` used in StudentRepository)
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+
+    // 2. ViewModel + LiveData (needed for AddStudentViewModel)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.4")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.4")
+
+   // # 3. Firestore (skip if already present via your Firebase BOM)
+
+//    # ----------------------------------------------------------------------------
+//    # HOW TO CHECK IF YOU ALREADY HAVE THESE:
+//    # Open app/build.gradle.kts -> look inside dependencies { ... } for lines
+//    # containing "lifecycle-viewmodel", "coroutines-play-services", or "firestore".
+//    # If found, don't add it again -- that exact duplication is what caused your
+//    # earlier IDE symbol resolution errors.
 }
