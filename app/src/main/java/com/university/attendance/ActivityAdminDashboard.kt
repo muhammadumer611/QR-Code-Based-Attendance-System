@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.university.attendance.databinding.ActivityAdminDashboardBinding
-import com.university.attendance.ActivityAddStudent
 
 class ActivityAdminDashboard : AppCompatActivity() {
     private lateinit var binding: ActivityAdminDashboardBinding
@@ -21,6 +20,11 @@ class ActivityAdminDashboard : AppCompatActivity() {
         // Student Management card -> opens Add Student screen
         binding.cardStudentManagement.setOnClickListener {
             startActivity(Intent(this, ActivityAddStudent::class.java))
+        }
+
+        // Teacher Management card -> opens Add Teacher screen
+        binding.cardTeacherManagement.setOnClickListener {
+            startActivity(Intent(this, ActivityAddTeacher::class.java))
         }
     }
 }

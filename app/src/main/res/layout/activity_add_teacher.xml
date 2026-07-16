@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_add_teacher.xml
+
+    Two-step Add Teacher form:
+      - stepOneContainer: Department / Designation / Main Subject
+      - stepTwoContainer: Full Name / Father Name / CNIC / Father CNIC / Contact Number
+
+    Uses the SAME color/drawable resources as activity_admin_dashboard.xml
+    (bg_glass_card, colorPrimary, textPrimary, etc.) so it matches your
+    existing dark glassmorphism theme exactly.
+-->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/backgroundColor"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_marginTop="12dp">
+
+            <ImageView
+                android:id="@+id/btnBackHeader"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:padding="10dp"
+                android:background="@drawable/bg_icon_circle_glass"
+                android:src="@drawable/ic_arrow"
+                app:tint="@color/textPrimary" />
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="14dp"
+                android:text="Add Teacher"
+                android:textColor="@color/textPrimary"
+                android:textSize="22sp"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvStepIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Step 1 of 2 — Department &amp; Role"
+            android:textColor="@color/colorPrimary"
+            android:textSize="13sp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="18dp" />
+
+        <!-- ============ STEP 1 CONTAINER ============ -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/stepOneContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_glass_card"
+                android:padding="18dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Department"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="6dp" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/etDepartment"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Select Department"
+                    android:inputType="none"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textTertiary"
+                    android:background="@drawable/bg_search_glass"
+                    android:padding="12dp"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Designation"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="6dp" />
+
+                <AutoCompleteTextView
+                    android:id="@+id/etDesignation"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Select Designation"
+                    android:inputType="none"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textTertiary"
+                    android:background="@drawable/bg_search_glass"
+                    android:padding="12dp"
+                    android:layout_marginBottom="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Main Subject"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="6dp" />
+
+                <EditText
+                    android:id="@+id/etMainSubject"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="e.g. Data Structures &amp; Algorithms"
+                    android:inputType="textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textTertiary"
+                    android:background="@drawable/bg_search_glass"
+                    android:padding="12dp"
+                    android:layout_marginBottom="8dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNextStep"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="Next"
+                    android:textColor="@color/backgroundColor"
+                    android:textStyle="bold"
+                    android:textAllCaps="false"
+                    app:cornerRadius="14dp"
+                    app:backgroundTint="@color/colorPrimary"
+                    android:layout_marginTop="14dp" />
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- ============ STEP 2 CONTAINER ============ -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/stepTwoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardCornerRadius="22dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="0dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_glass_card"
+                android:padding="18dp">
+
+                <EditText
+                    android:id="@+id/etFullName"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Full Name"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textTertiary"
+                    android:background="@drawable/bg_search_glass"
+                    android:padding="12dp"
+                    android:layout_marginBottom="14dp" />
+
+                <EditText
+                    android:id="@+id/etFatherName"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Father Name"
+                    android:inputType="textPersonName|textCapWords"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textTertiary"
+                    android:background="@drawable/bg_search_glass"
+                    android:padding="12dp"
+                    android:layout_marginBottom="14dp" />
+
+                <EditText
+                    android:id="@+id/etCnicNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="CNIC Number (XXXXX-XXXXXXX-X)"
+                    android:inputType="number"
+                    android:maxLength="15"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textTertiary"
+                    android:background="@drawable/bg_search_glass"
+                    android:padding="12dp"
+                    android:layout_marginBottom="14dp" />
+
+                <EditText
+                    android:id="@+id/etFatherCnicNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Father CNIC Number"
+                    android:inputType="number"
+                    android:maxLength="15"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textTertiary"
+                    android:background="@drawable/bg_search_glass"
+                    android:padding="12dp"
+                    android:layout_marginBottom="14dp" />
+
+                <EditText
+                    android:id="@+id/etContactNumber"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:hint="Contact Number (03XXXXXXXXX)"
+                    android:inputType="phone"
+                    android:maxLength="11"
+                    android:textColor="@color/textPrimary"
+                    android:textColorHint="@color/textTertiary"
+                    android:background="@drawable/bg_search_glass"
+                    android:padding="12dp"
+                    android:layout_marginBottom="8dp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginTop="14dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnBackStep"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="Back"
+                        android:textColor="@color/colorPrimary"
+                        android:textAllCaps="false"
+                        app:cornerRadius="14dp"
+                        app:strokeColor="@color/colorPrimary"
+                        app:strokeWidth="1dp"
+                        app:backgroundTint="@android:color/transparent"
+                        android:layout_marginEnd="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSaveTeacher"
+                        android:layout_width="0dp"
+                        android:layout_height="52dp"
+                        android:layout_weight="1"
+                        android:text="Save Teacher"
+                        android:textColor="@color/backgroundColor"
+                        android:textStyle="bold"
+                        android:textAllCaps="false"
+                        app:cornerRadius="14dp"
+                        app:backgroundTint="@color/colorPrimary"
+                        android:layout_marginStart="8dp" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Loading indicator, shown while saving to Firestore -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:indeterminateTint="@color/colorPrimary"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</androidx.core.widget.NestedScrollView>
