@@ -646,6 +646,7 @@
                     <!-- Subjects -->
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardSubjects"
                         android:layout_width="0dp"
                         android:layout_height="160dp"
                         android:layout_columnWeight="1"

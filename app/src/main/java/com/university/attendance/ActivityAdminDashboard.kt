@@ -31,5 +31,10 @@ class ActivityAdminDashboard : AppCompatActivity() {
         binding.cardDepartments.setOnClickListener {
             startActivity(Intent(this, ActivityDepartmentManagement::class.java))
         }
+
+        // Subjects card -> opens Subject Management (CRUD) screen
+        binding.cardSubjects.setOnClickListener {
+            startActivity(Intent(this, ActivitySubjectManagement::class.java))
+        }
     }
 }

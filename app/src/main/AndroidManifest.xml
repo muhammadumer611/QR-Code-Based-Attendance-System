@@ -18,6 +18,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QRCodeAttendance">
         <activity
+            android:name=".ActivitySubjectManagement"
+            android:exported="false" />
+        <activity
             android:name=".ActivityDepartmentManagement"
             android:exported="false" />
         <activity
