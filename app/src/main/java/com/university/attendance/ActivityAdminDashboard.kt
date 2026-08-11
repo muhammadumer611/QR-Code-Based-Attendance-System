@@ -36,5 +36,8 @@ class ActivityAdminDashboard : AppCompatActivity() {
         binding.cardSubjects.setOnClickListener {
             startActivity(Intent(this, ActivitySubjectManagement::class.java))
         }
+        binding.stdattendance.setOnClickListener {
+            startActivity(Intent(this, ActivityAttendanceDepartmentList::class.java))
+        }
     }
 }

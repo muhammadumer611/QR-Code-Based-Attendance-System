@@ -21,6 +21,22 @@
             android:name=".ActivitySubjectManagement"
             android:exported="false" />
         <activity
+            android:name=".ActivityAttendanceDepartmentList"
+            android:exported="false"
+             />
+        <activity
+            android:name=".ActivityAttendanceClassList"
+            android:exported="false"
+             />
+        <activity
+            android:name=".ActivityAttendanceStudentList"
+            android:exported="false"
+            />
+        <activity
+            android:name=".ActivityStudentAttendanceDetail"
+            android:exported="false"
+            />
+        <activity
             android:name=".ActivityDepartmentManagement"
             android:exported="false" />
         <activity
