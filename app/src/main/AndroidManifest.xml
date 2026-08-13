@@ -37,7 +37,20 @@
             android:exported="false"
             />
         <activity
+            android:name=".ActivityManualAttendanceFilter"
+            android:exported="false"
+            />
+        <activity
+            android:name=".ActivityDailyOverview"
+            android:exported="false"
+            />
+
+        <activity
             android:name=".ActivityTeacherSubjectAssignment"
+            android:exported="false"
+            />
+        <activity
+            android:name=".ActivityManualAttendanceRegister"
             android:exported="false"
             />
         <activity
