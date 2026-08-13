@@ -37,6 +37,10 @@
             android:exported="false"
             />
         <activity
+            android:name=".ActivityTeacherSubjectAssignment"
+            android:exported="false"
+            />
+        <activity
             android:name=".ActivityDepartmentManagement"
             android:exported="false" />
         <activity

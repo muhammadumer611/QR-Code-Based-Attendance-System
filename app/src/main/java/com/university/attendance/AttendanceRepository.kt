@@ -11,6 +11,12 @@ import kotlinx.coroutines.tasks.await
  * teachers) and reads from "attendance_records" for actual present marks.
  * Absent is never read from Firestore -- it's calculated, per the
  * architecture plan.
+ *
+ * UPDATED: Subject.teacherId/teacherName (set via the Teacher-Subject
+ * Assignment screen) is now used directly for "Taught by" -- the earlier
+ * placeholder that guessed the first teacher found in the department has
+ * been removed, since a university has a distinct teacher per subject,
+ * not one teacher per department.
  */
 class AttendanceRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
@@ -60,21 +66,13 @@ class AttendanceRepository(
 
     /**
      * Builds the full subject-wise attendance summary for one student:
-     *   1. Find every subject offered for this student's department+program
-     *      (matches how Subject Management scopes subjects).
-     *   2. For each subject, find the teacher (first teacher found in the
-     *      same department -- see note below).
+     *   1. Find every subject offered for this student's department+program.
+     *   2. Read the teacher DIRECTLY from that subject's teacherName field
+     *      (set via Teacher-Subject Assignment) -- shows "Not assigned"
+     *      if no teacher has been assigned to that subject yet.
      *   3. Pull this student's "present" attendance_records for that subject.
      *   4. Determine totalClassesHeld = distinct dates ANY student in this
-     *      class has a present record for that subject (i.e. how many
-     *      times the class actually met, going by observed activity).
-     *
-     * NOTE on teacher matching: since Teacher <-> Subject assignment
-     * doesn't exist as its own feature yet, this picks the first teacher
-     * in the student's department as a placeholder "Taught by". Once a
-     * proper Teacher-Subject assignment feature is built, replace the
-     * getTeacherForSubject() lookup below with a real assignment lookup --
-     * everything else in this method stays the same.
+     *      class has a present record for that subject.
      */
     suspend fun getSubjectWiseAttendance(student: Student): List<SubjectAttendanceSummary> {
         val subjectsSnapshot = subjectsRef
@@ -88,9 +86,8 @@ class AttendanceRepository(
         }
 
         return subjects.map { subject ->
-            val teacherName = getTeacherNameForDepartment(subject.departmentName)
+            val teacherName = subject.teacherName.ifBlank { "Not assigned" }
 
-            // This student's present records for this subject
             val studentRecordsSnapshot = attendanceRef
                 .whereEqualTo("studentId", student.studentId)
                 .whereEqualTo("subjectId", subject.subjectId)
@@ -100,11 +97,6 @@ class AttendanceRepository(
                 .mapNotNull { it.getString("date") }
                 .sortedDescending()
 
-            // How many times has this class met for this subject at all?
-            // (distinct dates across ANY student's present record for this
-            // subject+class -- this is our best available signal of how
-            // many sessions were actually held, until session tracking
-            // exists as its own feature.)
             val classSessionsSnapshot = attendanceRef
                 .whereEqualTo("classId", student.classId)
                 .whereEqualTo("subjectId", subject.subjectId)
@@ -136,14 +128,5 @@ class AttendanceRepository(
             .get()
             .await()
         return snapshot.documents.firstOrNull()?.id ?: ""
-    }
-
-    private suspend fun getTeacherNameForDepartment(departmentName: String): String {
-        val snapshot = firestore.collection("teachers")
-            .whereEqualTo("departmentName", departmentName)
-            .limit(1)
-            .get()
-            .await()
-        return snapshot.documents.firstOrNull()?.getString("fullName") ?: "Not assigned"
     }
 }

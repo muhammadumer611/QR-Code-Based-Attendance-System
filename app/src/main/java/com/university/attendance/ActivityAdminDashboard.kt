@@ -36,8 +36,29 @@ class ActivityAdminDashboard : AppCompatActivity() {
         binding.cardSubjects.setOnClickListener {
             startActivity(Intent(this, ActivitySubjectManagement::class.java))
         }
-        binding.stdattendance.setOnClickListener {
+
+        // Attendance card -> opens Attendance drill-down flow
+        // (Department -> Class -> Student -> Subject-wise attendance)
+        binding.cardAttendance.setOnClickListener {
             startActivity(Intent(this, ActivityAttendanceDepartmentList::class.java))
+        }
+
+        // Manual Update card -> opens Manual Attendance flow
+        // (Department -> Class -> Subject -> Date -> Register -> Save)
+//        binding.cardManualUpdate.setOnClickListener {
+//            startActivity(Intent(this, ActivityManualAttendanceFilter::class.java))
+//        }
+//
+//        // Daily Overview card -> opens the full day's class overview
+//        // across every department/session (Held vs Not Marked)
+//        binding.cardDailyOverview.setOnClickListener {
+//            startActivity(Intent(this, ActivityDailyOverview::class.java))
+//        }
+
+        // Teacher-Subject Assignment card -> opens the assignment screen
+        // (pick a teacher, check/uncheck which subjects they teach)
+        binding.cardTeacherAssignment.setOnClickListener {
+            startActivity(Intent(this, ActivityTeacherSubjectAssignment::class.java))
         }
     }
 }
