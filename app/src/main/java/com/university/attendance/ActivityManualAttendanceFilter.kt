@@ -3,6 +3,7 @@ package com.university.attendance
 import android.app.DatePickerDialog
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ArrayAdapter
 import android.widget.Toast
@@ -13,11 +14,6 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
-/**
- * Screen: Admin -> Manual Update -> Filter screen (Department -> Class ->
- * Subject -> Date). Once all 4 are picked, "Open Register" launches
- * ActivityManualAttendanceRegister for that exact combination.
- */
 class ActivityManualAttendanceFilter : AppCompatActivity() {
 
     private lateinit var binding: ActivityManualAttendanceFilterBinding
@@ -42,46 +38,58 @@ class ActivityManualAttendanceFilter : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this)[ManualAttendanceViewModel::class.java]
 
+        binding.etDepartment.threshold = 1
+        binding.etClass.threshold = 1
+        binding.etSubject.threshold = 1
+
         binding.btnBackHeader.setOnClickListener { finish() }
 
-        setupDropdownListeners()
-        observeViewModel()
-
-        viewModel.loadDepartments()
-    }
-
-    private fun setupDropdownListeners() {
         binding.etDepartment.setOnItemClickListener { _, _, position, _ ->
+            Log.d("ManualFilter", "Department item clicked, position=$position, listSize=${departmentList.size}")
             selectedDepartment = departmentList.getOrNull(position)
+            Log.d("ManualFilter", "selectedDepartment=${selectedDepartment?.name}")
+
             selectedClass = null
             selectedSubject = null
             binding.etClass.setText("", false)
             binding.etSubject.setText("", false)
+            binding.etClass.setAdapter(null)
+            binding.etSubject.setAdapter(null)
 
             selectedDepartment?.let { dept ->
+                Log.d("ManualFilter", "Calling loadClasses(${dept.name})")
                 viewModel.loadClasses(dept.name)
             }
         }
 
         binding.etClass.setOnItemClickListener { _, _, position, _ ->
+            Log.d("ManualFilter", "Class item clicked, position=$position, listSize=${classList.size}")
             selectedClass = classList.getOrNull(position)
+            Log.d("ManualFilter", "selectedClass=${selectedClass?.classId}")
+
             selectedSubject = null
             binding.etSubject.setText("", false)
+            binding.etSubject.setAdapter(null)
 
             val dept = selectedDepartment
             val cls = selectedClass
             if (dept != null && cls != null) {
+                Log.d("ManualFilter", "Calling loadSubjects(${dept.departmentId}, ${cls.programName})")
                 viewModel.loadSubjects(dept.departmentId, cls.programName)
             }
         }
 
         binding.etSubject.setOnItemClickListener { _, _, position, _ ->
+            Log.d("ManualFilter", "Subject item clicked, position=$position, listSize=${subjectList.size}")
             selectedSubject = subjectList.getOrNull(position)
+            Log.d("ManualFilter", "selectedSubject=${selectedSubject?.subjectName}")
         }
 
         binding.etDate.setOnClickListener { showDatePicker() }
-
         binding.btnOpenRegister.setOnClickListener { attemptOpenRegister() }
+
+        observeViewModel()
+        viewModel.loadDepartments()
     }
 
     private fun showDatePicker() {
@@ -97,7 +105,7 @@ class ActivityManualAttendanceFilter : AppCompatActivity() {
             calendar.get(Calendar.MONTH),
             calendar.get(Calendar.DAY_OF_MONTH)
         ).apply {
-            datePicker.maxDate = System.currentTimeMillis() // can't mark attendance for a future date
+            datePicker.maxDate = System.currentTimeMillis()
         }.show()
     }
 
@@ -134,19 +142,25 @@ class ActivityManualAttendanceFilter : AppCompatActivity() {
                 if (state is ManualAttendanceViewModel.UiState.Loading) View.VISIBLE else View.GONE
 
             if (state is ManualAttendanceViewModel.UiState.Error) {
+                Log.d("ManualFilter", "uiState Error: ${state.message}")
                 Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
             }
         }
 
         viewModel.departments.observe(this) { departments ->
+            Log.d("ManualFilter", "departments.observe fired, count=${departments.size}")
             departmentList = departments
             binding.etDepartment.setAdapter(
                 ArrayAdapter(this, android.R.layout.simple_dropdown_item_1line, departments.map { it.name })
             )
-            binding.etDepartment.setOnClickListener { binding.etDepartment.showDropDown() }
+            binding.etDepartment.setOnClickListener {
+                Log.d("ManualFilter", "Department field clicked, showing dropdown")
+                binding.etDepartment.showDropDown()
+            }
         }
 
         viewModel.classes.observe(this) { classes ->
+            Log.d("ManualFilter", "classes.observe fired, count=${classes.size}")
             classList = classes
             binding.etClass.setAdapter(
                 ArrayAdapter(
@@ -155,10 +169,18 @@ class ActivityManualAttendanceFilter : AppCompatActivity() {
                     classes.map { "${it.programName} - Section ${it.section} (${it.session})" }
                 )
             )
-            binding.etClass.setOnClickListener { binding.etClass.showDropDown() }
+            binding.etClass.setOnClickListener {
+                Log.d("ManualFilter", "Class field clicked, adapter count=${classList.size}, showing dropdown")
+                binding.etClass.showDropDown()
+            }
+
+            if (classes.isEmpty() && selectedDepartment != null) {
+                Toast.makeText(this, "No classes found for this department.", Toast.LENGTH_SHORT).show()
+            }
         }
 
         viewModel.subjects.observe(this) { subjects ->
+            Log.d("ManualFilter", "subjects.observe fired, count=${subjects.size}")
             subjectList = subjects
             binding.etSubject.setAdapter(
                 ArrayAdapter(
@@ -167,7 +189,10 @@ class ActivityManualAttendanceFilter : AppCompatActivity() {
                     subjects.map { "${it.courseCode} - ${it.subjectName}" }
                 )
             )
-            binding.etSubject.setOnClickListener { binding.etSubject.showDropDown() }
+            binding.etSubject.setOnClickListener {
+                Log.d("ManualFilter", "Subject field clicked, adapter count=${subjectList.size}, showing dropdown")
+                binding.etSubject.showDropDown()
+            }
 
             if (subjects.isEmpty() && selectedClass != null) {
                 Toast.makeText(this, "No subjects found for this class's program.", Toast.LENGTH_SHORT).show()

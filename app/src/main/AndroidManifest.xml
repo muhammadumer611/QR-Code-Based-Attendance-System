@@ -41,6 +41,14 @@
             android:exported="false"
             />
         <activity
+            android:name=".ActivityReports"
+            android:exported="false"
+            />
+        <activity
+            android:name=".ActivitySchedule"
+            android:exported="false"
+            />
+        <activity
             android:name=".ActivityDailyOverview"
             android:exported="false"
             />
