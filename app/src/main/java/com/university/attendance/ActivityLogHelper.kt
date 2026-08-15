@@ -30,7 +30,7 @@ object ActivityLogHelper {
 
     suspend fun log(type: String, title: String, description: String) {
         try {
-            val activityLog = ActivityLog(type = type, title = title, description = description)
+            val activityLog = Log(type = type, title = title, description = description)
             firestore.collection("activity_logs").document().set(activityLog.toMap()).await()
 
             val notification = AppNotification(type = type, title = title, description = description)

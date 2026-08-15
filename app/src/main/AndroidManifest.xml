@@ -18,53 +18,44 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QRCodeAttendance">
         <activity
+            android:name=".ActivityAdminProfile"
+            android:exported="false" />
+        <activity
             android:name=".ActivitySubjectManagement"
             android:exported="false" />
         <activity
             android:name=".ActivityAttendanceDepartmentList"
-            android:exported="false"
-             />
+            android:exported="false" />
         <activity
             android:name=".ActivityAttendanceClassList"
-            android:exported="false"
-             />
+            android:exported="false" />
         <activity
             android:name=".ActivityAttendanceStudentList"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".ActivityStudentAttendanceDetail"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".ActivityManualAttendanceFilter"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".ActivityNotifications"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".ActivityReports"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".ActivitySchedule"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".ActivityDailyOverview"
-            android:exported="false"
-            />
-
+            android:exported="false" />
         <activity
             android:name=".ActivityTeacherSubjectAssignment"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".ActivityManualAttendanceRegister"
-            android:exported="false"
-            />
+            android:exported="false" />
         <activity
             android:name=".ActivityDepartmentManagement"
             android:exported="false" />
