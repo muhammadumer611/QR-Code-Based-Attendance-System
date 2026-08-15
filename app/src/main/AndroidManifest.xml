@@ -41,6 +41,10 @@
             android:exported="false"
             />
         <activity
+            android:name=".ActivityNotifications"
+            android:exported="false"
+            />
+        <activity
             android:name=".ActivityReports"
             android:exported="false"
             />
