@@ -64,18 +64,22 @@ class ActivityAdminDashboard : AppCompatActivity() {
         }
 
         // Schedule card -> opens the schedule file placeholder screen
-        binding.CardSchedule.setOnClickListener {
+        binding.cardSchedule.setOnClickListener {
             startActivity(Intent(this, ActivitySchedule::class.java))
         }
 
         // Reports card -> opens the reports dashboard
-        binding.CardReports.setOnClickListener {
+        binding.cardReports.setOnClickListener {
             startActivity(Intent(this, ActivityReports::class.java))
         }
 
         // Notification bell -> opens full Notifications screen
         binding.imgNotification.setOnClickListener {
             startActivity(Intent(this, ActivityNotifications::class.java))
+        }
+        // Profile
+        binding.imgProfile.setOnClickListener {
+            startActivity(Intent(this@ActivityAdminDashboard, ActivityAdminProfile::class.java))
         }
 
         setupRecentActivities()
