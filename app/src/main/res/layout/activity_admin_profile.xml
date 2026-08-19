@@ -53,16 +53,26 @@
                 android:layout_width="96dp"
                 android:layout_height="96dp">
 
+                <!--
+                  FIX: removed the 4dp padding (it made the photo smaller
+                  than the circular background, so the circle's left/right
+                  edges peeked out past the photo - the "crescent"
+                  overlap). clipToOutline + outlineProvider="background"
+                  makes Android clip the actual photo pixels to the same
+                  circle shape as the background, so there's no mismatch
+                  regardless of the photo's aspect ratio.
+                -->
                 <ImageView
                     android:id="@+id/imgProfilePhoto"
                     android:layout_width="96dp"
                     android:layout_height="96dp"
                     android:background="@drawable/bg_circle"
-                    android:padding="4dp"
                     android:scaleType="centerCrop"
                     android:src="@drawable/outline_account_circle_24"
                     android:clickable="true"
-                    android:focusable="true" />
+                    android:focusable="true"
+                    android:clipToOutline="true"
+                    android:outlineProvider="background" />
 
                 <FrameLayout
                     android:layout_width="28dp"

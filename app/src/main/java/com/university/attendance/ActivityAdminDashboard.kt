@@ -1,6 +1,7 @@
 package com.university.attendance
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -10,8 +11,10 @@ import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.university.attendance.databinding.ActivityAdminDashboardBinding
 import kotlinx.coroutines.launch
+import java.io.File
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -78,6 +81,10 @@ class ActivityAdminDashboard : AppCompatActivity() {
         // ---------- Live search ----------
         setupSearch()
 
+        // ---------- Header profile name + photo (real data, not the
+        // hardcoded "Administrator" placeholder) ----------
+        loadAdminHeaderInfo()
+
         // ---------- Stats cards (Total Students / Teachers / Departments / Subjects) ----------
         // Display-only, live counts from Firestore -- no navigation on tap.
         loadStats()
@@ -142,6 +149,30 @@ class ActivityAdminDashboard : AppCompatActivity() {
         feedViewModel.loadRecentActivities()
         feedViewModel.loadNotifications()
         loadStats()
+        loadAdminHeaderInfo()
+    }
+
+    /**
+     * Fills the header's name (txtAdminName) and profile photo (imgProfile)
+     * with the real saved values instead of the hardcoded "Administrator"
+     * placeholder -- same source of truth as ActivityAdminProfile:
+     * LocalProfileStore first, falling back to FirebaseAuth display name /
+     * email, so it's never blank.
+     */
+    private fun loadAdminHeaderInfo() {
+        val user = FirebaseAuth.getInstance().currentUser
+        val email = user?.email ?: "admin@university.edu"
+
+        val savedName = LocalProfileStore.getDisplayName(this)
+        val fallbackName = user?.displayName?.takeIf { it.isNotBlank() }
+            ?: email.substringBefore("@").replaceFirstChar { it.uppercase() }
+
+        binding.txtAdminName.text = savedName ?: fallbackName
+
+        val savedPhotoPath = LocalProfileStore.getPhotoPath(this)
+        if (savedPhotoPath != null) {
+            binding.imgProfile.setImageURI(Uri.fromFile(File(savedPhotoPath)))
+        }
     }
 
     /** Fetches live Students/Teachers/Departments/Subjects counts from Firestore and fills the stat cards. */

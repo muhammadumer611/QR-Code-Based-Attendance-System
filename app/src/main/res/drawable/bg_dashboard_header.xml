@@ -1,22 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Base dark gradient -->
+    <!-- Base gradient - colors now come from colors.xml so this flips
+         with the theme (dark navy in values-night, soft light in values) -->
     <item>
         <shape android:shape="rectangle">
             <gradient
                 android:type="linear"
                 android:angle="270"
-                android:startColor="#0F1C2E"
-                android:centerColor="#0C1420"
-                android:endColor="#0A0E14"/>
+                android:startColor="@color/headerGradientStart"
+                android:centerColor="@color/headerGradientCenter"
+                android:endColor="@color/headerGradientEnd"/>
             <corners
                 android:bottomLeftRadius="32dp"
                 android:bottomRightRadius="32dp"/>
         </shape>
     </item>
 
-    <!-- Cyan glow accent, top right -->
+    <!-- Cyan glow accent, top right (kept as-is - it's already a
+         translucent brand-cyan overlay, works fine on both themes) -->
     <item android:gravity="top|end" android:width="260dp" android:height="260dp">
         <shape android:shape="oval">
             <gradient

@@ -14,10 +14,10 @@ import com.university.attendance.databinding.ActivitySettingsBinding
  * Screen: Admin -> Settings.
  *
  * Three sections:
- *   1. Appearance -- shows the current theme (Dark). Only Dark is
- *      supported right now, so this is informational only; the toggle
- *      is disabled with a note, ready to wire up if/when a Light theme
- *      is added later.
+ *   1. Appearance -- Dark/Light toggle, backed by ThemePreferences
+ *      (SharedPreferences + AppCompatDelegate.setDefaultNightMode). The
+ *      screen recreates itself on toggle so the new theme applies right
+ *      away instead of waiting for the next launch.
  *   2. Change Password -- re-authenticates with the current password,
  *      then updates via FirebaseAuth. Required because Firebase requires
  *      a recent sign-in before allowing a password change, for security.
@@ -41,11 +41,22 @@ class ActivitySettings : AppCompatActivity() {
     }
 
     private fun setupAppearanceSection() {
-        // Only Dark theme exists right now -- shown as the selected
-        // state, switch disabled since there's nothing to toggle to yet.
-        binding.switchDarkTheme.isChecked = true
-        binding.switchDarkTheme.isEnabled = false
-        binding.tvThemeNote.text = "Light theme coming soon"
+        val isDark = ThemePreferences.isDarkMode(this)
+        binding.switchDarkTheme.isChecked = isDark
+        binding.switchDarkTheme.isEnabled = true
+        updateThemeNote(isDark)
+
+        binding.switchDarkTheme.setOnCheckedChangeListener { _, checked ->
+            ThemePreferences.setDarkMode(this, checked)
+            updateThemeNote(checked)
+            // Re-applies colors immediately instead of waiting for the
+            // next screen/app launch to pick up the new theme.
+            recreate()
+        }
+    }
+
+    private fun updateThemeNote(isDark: Boolean) {
+        binding.tvThemeNote.text = if (isDark) "Dark theme is on" else "Light theme is on"
     }
 
     private fun setupChangePassword() {
