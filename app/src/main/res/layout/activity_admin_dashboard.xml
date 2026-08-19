@@ -200,6 +200,12 @@
 
                 <!-- ================= STATISTICS ROW 1 ================= -->
 
+                <!-- ================= STATISTICS ROW 1 ================= -->
+                <!-- NOTE: paste this in place of your existing "STATISTICS ROW 1"
+                     block. Only change vs. before: each count TextView now
+                     has an android:id so ActivityAdminDashboard can set the
+                     live Firestore count on it. -->
+
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -241,10 +247,11 @@
                             </FrameLayout>
 
                             <TextView
+                                android:id="@+id/tvTotalStudentsCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:text="1,245"
+                                android:text="0"
                                 android:textColor="@color/textPrimary"
                                 android:textSize="24sp"
                                 android:textStyle="bold"/>
@@ -294,10 +301,11 @@
                             </FrameLayout>
 
                             <TextView
+                                android:id="@+id/tvTotalTeachersCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:text="84"
+                                android:text="0"
                                 android:textColor="@color/textPrimary"
                                 android:textSize="24sp"
                                 android:textStyle="bold"/>
@@ -358,10 +366,11 @@
                             </FrameLayout>
 
                             <TextView
+                                android:id="@+id/tvTotalDepartmentsCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:text="12"
+                                android:text="0"
                                 android:textColor="@color/textPrimary"
                                 android:textSize="24sp"
                                 android:textStyle="bold"/>
@@ -411,10 +420,11 @@
                             </FrameLayout>
 
                             <TextView
+                                android:id="@+id/tvTotalSubjectsCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:layout_marginTop="10dp"
-                                android:text="54"
+                                android:text="0"
                                 android:textColor="@color/textPrimary"
                                 android:textSize="24sp"
                                 android:textStyle="bold"/>
@@ -432,7 +442,6 @@
                     </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
-
                 <!-- ================= ATTENDANCE ANALYTICS ================= -->
 
                 <com.google.android.material.card.MaterialCardView

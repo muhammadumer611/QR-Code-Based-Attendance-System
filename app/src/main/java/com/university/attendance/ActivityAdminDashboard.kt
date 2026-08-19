@@ -8,13 +8,46 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.university.attendance.databinding.ActivityAdminDashboardBinding
+import kotlinx.coroutines.launch
+import java.text.NumberFormat
+import java.util.Locale
 
 class ActivityAdminDashboard : AppCompatActivity() {
     private lateinit var binding: ActivityAdminDashboardBinding
     private lateinit var feedViewModel: DashboardFeedViewModel
     private lateinit var searchViewModel: SearchViewModel
+    private val statsRepository = StatsRepository()
+
+    // ---------------------------------------------------------------
+    // Card filtering (real-time show/hide as the admin types)
+    // ---------------------------------------------------------------
+
+    private data class CardSearchTarget(val keywords: List<String>, val view: View)
+
+    // Built lazily so it's only touched after `binding` is inflated in onCreate.
+    private val cardSearchTargets by lazy {
+        listOf(
+            CardSearchTarget(listOf("student", "students", "student management"), binding.cardStudentManagement),
+            CardSearchTarget(listOf("teacher", "teachers", "teacher management"), binding.cardTeacherManagement),
+            CardSearchTarget(listOf("department", "departments"), binding.cardDepartments),
+            CardSearchTarget(listOf("subject", "subjects"), binding.cardSubjects),
+            CardSearchTarget(listOf("attendance", "manage records"), binding.cardAttendance),
+            CardSearchTarget(listOf("manual", "manual update", "edit attendance"), binding.cardManualUpdate),
+            CardSearchTarget(listOf("daily", "daily overview", "today"), binding.cardDailyOverview),
+            CardSearchTarget(listOf("assign", "assignment", "teacher subject", "assign subjects"), binding.cardTeacherAssignment),
+            CardSearchTarget(listOf("schedule", "timetable"), binding.cardSchedule),
+            CardSearchTarget(listOf("report", "reports", "analytics"), binding.cardReports),
+            CardSearchTarget(listOf("total students"), binding.cardTotalStudents),
+            CardSearchTarget(listOf("total teachers"), binding.cardTotalTeachers),
+            CardSearchTarget(listOf("total departments"), binding.cardTotalDepartments),
+            CardSearchTarget(listOf("total subjects"), binding.cardTotalSubjects),
+            CardSearchTarget(listOf("setting", "settings"), binding.cardSettings),
+            CardSearchTarget(listOf("announcement", "notification", "notifications"), binding.cardAnnouncement),
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,7 +79,8 @@ class ActivityAdminDashboard : AppCompatActivity() {
         setupSearch()
 
         // ---------- Stats cards (Total Students / Teachers / Departments / Subjects) ----------
-        setupStatsCards()
+        // Display-only, live counts from Firestore -- no navigation on tap.
+        loadStats()
 
         // ---------- Quick Action cards ----------
 
@@ -107,7 +141,21 @@ class ActivityAdminDashboard : AppCompatActivity() {
         // announcement preview reflect anything that just happened.
         feedViewModel.loadRecentActivities()
         feedViewModel.loadNotifications()
+        loadStats()
     }
+
+    /** Fetches live Students/Teachers/Departments/Subjects counts from Firestore and fills the stat cards. */
+    private fun loadStats() {
+        lifecycleScope.launch {
+            val stats = statsRepository.getDashboardStats()
+            binding.tvTotalStudentsCount.text = formatCount(stats.studentCount)
+            binding.tvTotalTeachersCount.text = formatCount(stats.teacherCount)
+            binding.tvTotalDepartmentsCount.text = formatCount(stats.departmentCount)
+            binding.tvTotalSubjectsCount.text = formatCount(stats.subjectCount)
+        }
+    }
+
+    private fun formatCount(count: Int): String = NumberFormat.getInstance(Locale.US).format(count)
 
     // ---------------------------------------------------------------
     // Search
@@ -123,46 +171,44 @@ class ActivityAdminDashboard : AppCompatActivity() {
                 val query = s?.toString().orEmpty()
                 searchViewModel.onQueryChanged(query)
                 binding.searchResultsCard.visibility = if (query.isBlank()) View.GONE else View.VISIBLE
+
+                // Real-time filter: as the admin types, only cards whose
+                // keywords match stay visible -- everything else hides
+                // immediately, and clearing the box brings everything back.
+                filterQuickActionCards(query)
             }
         })
 
         searchViewModel.results.observe(this) { results ->
-            binding.recyclerSearchResults.adapter = SearchResultAdapter(results) { result ->
-                // No individual detail screen exists yet -- route to the
-                // matching management screen so Admin can find the full
-                // record there.
-                when (result.resultType) {
-                    SearchResultType.STUDENT -> startActivity(Intent(this, ActivityAddStudent::class.java))
-                    SearchResultType.TEACHER -> startActivity(Intent(this, ActivityAddTeacher::class.java))
-                }
-                binding.etSearch.setText("")
-                binding.searchResultsCard.visibility = View.GONE
-            }
+            // SearchResultAdapter now expands each row in place (contact,
+            // CNIC, department, reg no / main subject) when tapped, instead
+            // of navigating away -- so no click callback is needed here
+            // anymore, and we don't clear/close the dropdown on tap.
+            binding.recyclerSearchResults.adapter = SearchResultAdapter(results)
             binding.searchResultsCard.visibility =
                 if (results.isEmpty() && binding.etSearch.text.isNullOrBlank()) View.GONE else View.VISIBLE
         }
     }
 
-    // ---------------------------------------------------------------
-    // Stats cards
-    // ---------------------------------------------------------------
+    /**
+     * Real-time filter over the dashboard cards (Quick Actions, Stats,
+     * Settings, Announcement). While the admin types, only cards whose
+     * keywords match the query stay visible -- the rest are set to
+     * [View.GONE] so they collapse out of the layout immediately, exactly
+     * like a live filter in any normal app. Clearing the search box (or an
+     * empty/too-short query) brings every card back.
+     */
+    private fun filterQuickActionCards(query: String) {
+        val normalized = query.trim().lowercase()
 
-    private fun setupStatsCards() {
-        // These 4 cards reuse the SAME management screens as the Quick
-        // Action cards below -- there's no separate read-only "browse
-        // all students" list screen yet, so tapping the stat card takes
-        // Admin to the same management screen.
-        binding.cardTotalStudents.setOnClickListener {
-            startActivity(Intent(this, ActivityAddStudent::class.java))
+        if (normalized.isBlank()) {
+            cardSearchTargets.forEach { it.view.visibility = View.VISIBLE }
+            return
         }
-        binding.cardTotalTeachers.setOnClickListener {
-            startActivity(Intent(this, ActivityAddTeacher::class.java))
-        }
-        binding.cardTotalDepartments.setOnClickListener {
-            startActivity(Intent(this, ActivityDepartmentManagement::class.java))
-        }
-        binding.cardTotalSubjects.setOnClickListener {
-            startActivity(Intent(this, ActivitySubjectManagement::class.java))
+
+        cardSearchTargets.forEach { target ->
+            val matches = target.keywords.any { keyword -> keyword.contains(normalized) }
+            target.view.visibility = if (matches) View.VISIBLE else View.GONE
         }
     }
 
