@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.View
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +18,7 @@ import com.university.attendance.databinding.ActivityAdminDashboardBinding
 import kotlinx.coroutines.launch
 import java.io.File
 import java.text.NumberFormat
+import java.util.Calendar
 import java.util.Locale
 
 class ActivityAdminDashboard : AppCompatActivity() {
@@ -80,6 +83,10 @@ class ActivityAdminDashboard : AppCompatActivity() {
 
         // ---------- Live search ----------
         setupSearch()
+
+        // ---------- Nav Drawer: each item navigates somewhere / performs
+        // an action, and the header shows the real saved name + photo ----------
+        setupNavigationDrawer()
 
         // ---------- Header profile name + photo (real data, not the
         // hardcoded "Administrator" placeholder) ----------
@@ -150,6 +157,64 @@ class ActivityAdminDashboard : AppCompatActivity() {
         feedViewModel.loadNotifications()
         loadStats()
         loadAdminHeaderInfo()
+        loadNavHeaderInfo()
+    }
+
+    /**
+     * Wires up every item in the Nav Drawer (drawer_menu.xml) to an actual
+     * action -- most just navigate to the matching screen; Dashboard just
+     * closes the drawer since we're already here; Logout signs out and
+     * clears the back stack.
+     */
+    private fun setupNavigationDrawer() {
+        loadNavHeaderInfo()
+
+        binding.navigationView.setNavigationItemSelectedListener { menuItem ->
+            when (menuItem.itemId) {
+                R.id.nav_dashboard -> { /* already here, just close the drawer below */ }
+                R.id.nav_students -> startActivity(Intent(this, ActivityAddStudent::class.java))
+                R.id.nav_teachers -> startActivity(Intent(this, ActivityAddTeacher::class.java))
+                R.id.nav_departments -> startActivity(Intent(this, ActivityDepartmentManagement::class.java))
+                R.id.nav_subjects -> startActivity(Intent(this, ActivitySubjectManagement::class.java))
+                R.id.nav_attendance -> startActivity(Intent(this, ActivityAttendanceDepartmentList::class.java))
+                R.id.nav_schedule -> startActivity(Intent(this, ActivitySchedule::class.java))
+                R.id.nav_reports -> startActivity(Intent(this, ActivityReports::class.java))
+                R.id.nav_settings -> startActivity(Intent(this, ActivitySettings::class.java))
+                R.id.nav_logout -> performLogout()
+            }
+            binding.drawerLayout.closeDrawer(GravityCompat.START)
+            true
+        }
+    }
+
+    /** Fills the drawer header's photo/name/email -- same saved data as the dashboard header and Profile screen. */
+    private fun loadNavHeaderInfo() {
+        val headerView = binding.navigationView.getHeaderView(0) ?: return
+
+        val user = FirebaseAuth.getInstance().currentUser
+        val email = user?.email ?: "admin@university.edu"
+
+        val savedName = LocalProfileStore.getDisplayName(this)
+        val fallbackName = user?.displayName?.takeIf { it.isNotBlank() }
+            ?: email.substringBefore("@").replaceFirstChar { it.uppercase() }
+
+        headerView.findViewById<TextView>(R.id.tvNavName).text = savedName ?: fallbackName
+        headerView.findViewById<TextView>(R.id.tvNavEmail).text = email
+
+        val savedPhotoPath = LocalProfileStore.getPhotoPath(this)
+        if (savedPhotoPath != null) {
+            headerView.findViewById<ImageView>(R.id.imgNavProfile)
+                .setImageURI(Uri.fromFile(File(savedPhotoPath)))
+        }
+    }
+
+    private fun performLogout() {
+        FirebaseAuth.getInstance().signOut()
+        val intent = Intent(this, ActivityRoleSelection::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        startActivity(intent)
+        finish()
     }
 
     /**
@@ -160,6 +225,8 @@ class ActivityAdminDashboard : AppCompatActivity() {
      * email, so it's never blank.
      */
     private fun loadAdminHeaderInfo() {
+        binding.txtGreeting.text = timeBasedGreeting()
+
         val user = FirebaseAuth.getInstance().currentUser
         val email = user?.email ?: "admin@university.edu"
 
@@ -172,6 +239,17 @@ class ActivityAdminDashboard : AppCompatActivity() {
         val savedPhotoPath = LocalProfileStore.getPhotoPath(this)
         if (savedPhotoPath != null) {
             binding.imgProfile.setImageURI(Uri.fromFile(File(savedPhotoPath)))
+        }
+    }
+
+    /** "Good Morning" before noon, "Good Afternoon" until ~5pm, "Good Evening" after -- based on the device's current clock time. */
+    private fun timeBasedGreeting(): String {
+        val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
+        return when (hour) {
+            in 5..11 -> "Good Morning \uD83D\uDC4B"
+            in 12..16 -> "Good Afternoon \uD83D\uDC4B"
+            in 17..20 -> "Good Evening \uD83D\uDC4B"
+            else -> "Good Night \uD83D\uDC4B"
         }
     }
 
@@ -276,7 +354,7 @@ class ActivityAdminDashboard : AppCompatActivity() {
             }
 
             binding.cardAnnouncement.setOnClickListener {
-                startActivity(Intent(this, ActivityNotifications::class.java))
+                startActivity(Intent(this@ActivityAdminDashboard, ActivityNotifications::class.java))
             }
         }
     }
