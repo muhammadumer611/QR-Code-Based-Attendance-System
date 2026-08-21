@@ -1,103 +1,8 @@
-//package com.university.attendance
-//
-//import com.google.firebase.firestore.FirebaseFirestore
-//import kotlinx.coroutines.tasks.await
-//
-///**
-// * Handles all Firestore read/write operations related to Teachers.
-// *
-// * Collection used: "teachers" -- one document per teacher.
-// *
-// * Department options shown in the Add Teacher form come from the existing
-// * "classes" collection (the same one StudentRepository writes to), so the
-// * department list always matches what's actually used by students/classes
-// * instead of being a hand-typed, possibly-inconsistent value.
-// */
-//class TeacherRepository(
-//    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-//) {
-//
-//    private val teachersRef = firestore.collection("teachers")
-//    private val classesRef = firestore.collection("classes")
-//
-//    sealed class SaveResult {
-//        data class Success(val teacherId: String) : SaveResult()
-//        data class Error(val message: String, val exception: Exception? = null) : SaveResult()
-//    }
-//
-//    /**
-//     * Adds a new teacher to Firestore.
-//     *
-//     * Before saving, checks whether a teacher with the same CNIC already
-//     * exists -- CNIC is a unique national identifier, so this prevents the
-//     * same person being registered twice by mistake.
-//     */
-//    suspend fun addTeacher(teacher: Teacher): SaveResult {
-//        return try {
-//            val duplicateCnic = teachersRef
-//                .whereEqualTo("cnicNumber", teacher.cnicNumber.trim())
-//                .limit(1)
-//                .get()
-//                .await()
-//
-//            if (!duplicateCnic.isEmpty) {
-//                return SaveResult.Error("A teacher with CNIC '${teacher.cnicNumber}' already exists.")
-//            }
-//
-//            val newTeacherRef = teachersRef.document() // auto-generated ID
-//            newTeacherRef.set(teacher.toMap()).await()
-//
-//            SaveResult.Success(teacherId = newTeacherRef.id)
-//        } catch (e: Exception) {
-//            SaveResult.Error(e.message ?: "Unknown error occurred while saving teacher.", e)
-//        }
-//    }
-//
-//    /**
-//     * Fetches the distinct list of department names already used across
-//     * existing classes, so the Add Teacher form's department dropdown always
-//     * reflects real departments (kept consistent with Student data).
-//     */
-//    suspend fun getDistinctDepartments(): List<String> {
-//        val snapshot = classesRef.get().await()
-//        return snapshot.documents
-//            .mapNotNull { it.getString("departmentName") }
-//            .distinct()
-//            .sorted()
-//    }
-//
-//    /** Fetches all teachers belonging to a specific department. */
-//    suspend fun getTeachersByDepartment(departmentName: String): List<Teacher> {
-//        val snapshot = teachersRef
-//            .whereEqualTo("departmentName", departmentName)
-//            .orderBy("fullName")
-//            .get()
-//            .await()
-//
-//        return snapshot.documents.mapNotNull { doc ->
-//            doc.toObject(Teacher::class.java)?.apply { teacherId = doc.id }
-//        }
-//    }
-//
-//    /** Fetches all teachers, useful for an Admin "All Teachers" overview screen. */
-//    suspend fun getAllTeachers(): List<Teacher> {
-//        val snapshot = teachersRef.orderBy("fullName").get().await()
-//        return snapshot.documents.mapNotNull { doc ->
-//            doc.toObject(Teacher::class.java)?.apply { teacherId = doc.id }
-//        }
-//    }
-//}
 package com.university.attendance
 
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-/**
- * Handles all Firestore read/write operations related to Teachers.
- *
- * UPDATED: after a successful addTeacher(), logs an ActivityLog +
- * Notification via ActivityLogHelper.
- */
 class TeacherRepository(
     private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
@@ -107,61 +12,191 @@ class TeacherRepository(
 
     sealed class SaveResult {
         data class Success(val teacherId: String) : SaveResult()
-        data class Error(val message: String, val exception: Exception? = null) : SaveResult()
+        data class Error(
+            val message: String,
+            val exception: Exception? = null
+        ) : SaveResult()
     }
 
     suspend fun addTeacher(teacher: Teacher): SaveResult {
+
         return try {
+
+            // ---------------------------------------------------------
+            // 1. Duplicate CNIC check
+            // ---------------------------------------------------------
+
             val duplicateCnic = teachersRef
-                .whereEqualTo("cnicNumber", teacher.cnicNumber.trim())
+                .whereEqualTo(
+                    "cnicNumber",
+                    teacher.cnicNumber.trim()
+                )
                 .limit(1)
                 .get()
                 .await()
 
             if (!duplicateCnic.isEmpty) {
-                return SaveResult.Error("A teacher with CNIC '${teacher.cnicNumber}' already exists.")
+
+                return SaveResult.Error(
+                    "A teacher with CNIC '${teacher.cnicNumber}' already exists."
+                )
             }
 
-            val newTeacherRef = teachersRef.document()
-            newTeacherRef.set(teacher.toMap()).await()
+            // ---------------------------------------------------------
+            // 2. Generate our own Teacher ID
+            // ---------------------------------------------------------
 
-            // Log this action for Recent Activities + Notifications.
+            val teacherId = TeacherIdGenerator.generate()
+
+            // ---------------------------------------------------------
+            // 3. Create Firestore document using teacherId
+            // ---------------------------------------------------------
+
+            val teacherRef = teachersRef
+                .document(teacherId)
+
+            // ---------------------------------------------------------
+            // 4. Prepare teacher data
+            // ---------------------------------------------------------
+
+            teacher.teacherId = teacherId
+            teacher.authUid = ""
+            teacher.accountLinked = false
+
+            // ---------------------------------------------------------
+            // 5. Save teacher
+            // ---------------------------------------------------------
+
+            teacherRef
+                .set(teacher.toMap())
+                .await()
+
+            // ---------------------------------------------------------
+            // 6. Activity log
+            // ---------------------------------------------------------
+
             ActivityLogHelper.log(
                 type = Type.TEACHER_ADDED,
                 title = "Teacher Added",
-                description = "${teacher.fullName} (${teacher.designation}) added to ${teacher.departmentName}"
+                description =
+                    "${teacher.fullName} (${teacher.designation}) added to ${teacher.departmentName}"
             )
 
-            SaveResult.Success(teacherId = newTeacherRef.id)
+            SaveResult.Success(
+                teacherId = teacherId
+            )
+
         } catch (e: Exception) {
-            SaveResult.Error(e.message ?: "Unknown error occurred while saving teacher.", e)
+
+            SaveResult.Error(
+                e.message ?: "Unknown error occurred while saving teacher.",
+                e
+            )
         }
     }
 
     suspend fun getDistinctDepartments(): List<String> {
-        val snapshot = classesRef.get().await()
+
+        val snapshot = classesRef
+            .get()
+            .await()
+
         return snapshot.documents
-            .mapNotNull { it.getString("departmentName") }
+            .mapNotNull {
+                it.getString("departmentName")
+            }
             .distinct()
             .sorted()
     }
 
-    suspend fun getTeachersByDepartment(departmentName: String): List<Teacher> {
+    suspend fun getTeachersByDepartment(
+        departmentName: String
+    ): List<Teacher> {
+
         val snapshot = teachersRef
-            .whereEqualTo("departmentName", departmentName)
-            .orderBy("fullName")
+            .whereEqualTo(
+                "departmentName",
+                departmentName
+            )
             .get()
             .await()
 
-        return snapshot.documents.mapNotNull { doc ->
-            doc.toObject(Teacher::class.java)?.apply { teacherId = doc.id }
-        }
+        return snapshot.documents
+            .mapNotNull { doc ->
+
+                doc.toObject(Teacher::class.java)
+                    ?.apply {
+                        teacherId = doc.id
+                    }
+            }
+            .sortedBy {
+                it.fullName
+            }
     }
 
     suspend fun getAllTeachers(): List<Teacher> {
-        val snapshot = teachersRef.orderBy("fullName").get().await()
-        return snapshot.documents.mapNotNull { doc ->
-            doc.toObject(Teacher::class.java)?.apply { teacherId = doc.id }
+
+        val snapshot = teachersRef
+            .get()
+            .await()
+
+        return snapshot.documents
+            .mapNotNull { doc ->
+
+                doc.toObject(Teacher::class.java)
+                    ?.apply {
+                        teacherId = doc.id
+                    }
+            }
+            .sortedBy {
+                it.fullName
+            }
+    }
+
+    suspend fun getTeacherById(
+        teacherId: String
+    ): Teacher? {
+
+        val document = teachersRef
+            .document(teacherId)
+            .get()
+            .await()
+
+        return if (document.exists()) {
+
+            document
+                .toObject(Teacher::class.java)
+                ?.apply {
+                    this.teacherId = document.id
+                }
+
+        } else {
+            null
         }
+    }
+
+    suspend fun getTeacherByAuthUid(
+        authUid: String
+    ): Teacher? {
+
+        val snapshot = teachersRef
+            .whereEqualTo(
+                "authUid",
+                authUid
+            )
+            .limit(1)
+            .get()
+            .await()
+
+        return snapshot.documents
+            .firstOrNull()
+            ?.let { document ->
+
+                document
+                    .toObject(Teacher::class.java)
+                    ?.apply {
+                        teacherId = document.id
+                    }
+            }
     }
 }

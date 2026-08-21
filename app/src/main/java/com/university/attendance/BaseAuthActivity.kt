@@ -3,16 +3,16 @@ package com.university.attendance
 import android.content.Intent
 import android.os.Bundle
 import android.view.animation.DecelerateInterpolator
+import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import android.widget.EditText
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
-import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FieldValue
+import com.google.firebase.firestore.FirebaseFirestore
 import com.university.attendance.databinding.ActivityAuthBaseBinding
 
 abstract class BaseAuthActivity : AppCompatActivity() {
@@ -26,6 +26,13 @@ abstract class BaseAuthActivity : AppCompatActivity() {
     protected lateinit var etLastName: EditText
     protected lateinit var etEmail: EditText
     protected lateinit var etPassword: EditText
+
+    // Department field for Teacher sign-up.
+    protected lateinit var etDepartment: EditText
+
+    // Teacher ID field for Teacher sign-up (must match an existing
+    // "teachers/TCH-XXXX" doc created beforehand by Admin).
+    protected lateinit var etTeacherId: EditText
 
     abstract val role: String
     abstract val isSignUp: Boolean
@@ -70,19 +77,35 @@ abstract class BaseAuthActivity : AppCompatActivity() {
             it.animate().scaleX(0.96f).scaleY(0.96f).setDuration(80).withEndAction {
                 it.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
 
-                if (role == "ADMIN" && isSignUp) {
-                    registerAdmin {
+                when {
+                    role == "ADMIN" && isSignUp -> {
+                        registerAdmin {
+                            startActivity(Intent(this, getDashboardScreen()))
+                            finish()
+                        }
+                    }
+                    role == "ADMIN" && !isSignUp -> {
+                        signInAdmin {
+                            startActivity(Intent(this, getDashboardScreen()))
+                            finish()
+                        }
+                    }
+                    role == "TEACHER" && isSignUp -> {
+                        registerTeacher {
+                            startActivity(Intent(this, getDashboardScreen()))
+                            finish()
+                        }
+                    }
+                    role == "TEACHER" && !isSignUp -> {
+                        signInTeacher {
+                            startActivity(Intent(this, getDashboardScreen()))
+                            finish()
+                        }
+                    }
+                    else -> {
                         startActivity(Intent(this, getDashboardScreen()))
                         finish()
                     }
-                } else if (role == "ADMIN" && !isSignUp) {
-                    signInAdmin {
-                        startActivity(Intent(this, getDashboardScreen()))
-                        finish()
-                    }
-                } else {
-                    startActivity(Intent(this, getDashboardScreen()))
-                    finish()
                 }
             }.start()
         }
@@ -113,32 +136,30 @@ abstract class BaseAuthActivity : AppCompatActivity() {
     private fun setupContent() {
         val roleName = role.lowercase().replaceFirstChar { it.uppercase() }
         binding.tvBadgeText.text = roleName
-        binding.tvBadgeText.setTextColor(
-            ContextCompat.getColor(this, accentColor)
-        )
+        binding.tvBadgeText.setTextColor(ContextCompat.getColor(this, accentColor))
 
         if (isSignUp) {
             binding.tvHeading.text = when (role) {
-                "ADMIN"   -> "Create\nAccount"
+                "ADMIN" -> "Create\nAccount"
                 "TEACHER" -> "Join as\nEducator"
-                else      -> "Start Your\nJourney"
+                else -> "Start Your\nJourney"
             }
             binding.tvSubHeading.text = when (role) {
-                "ADMIN"   -> "Set up your admin workspace"
+                "ADMIN" -> "Set up your admin workspace"
                 "TEACHER" -> "Create your teaching account"
-                else      -> "Register your student account"
+                else -> "Register your student account"
             }
             binding.btnMain.text = "Create $roleName Account"
             binding.tvSwitch.text = "Already have an account? Sign In"
         } else {
             binding.tvHeading.text = when (role) {
                 "TEACHER" -> "Welcome\nEducator"
-                else      -> "Welcome\nBack"
+                else -> "Welcome\nBack"
             }
             binding.tvSubHeading.text = when (role) {
-                "ADMIN"   -> "Sign in to your admin panel"
+                "ADMIN" -> "Sign in to your admin panel"
                 "TEACHER" -> "Sign in to manage your classes"
-                else      -> "Sign in to track your attendance"
+                else -> "Sign in to track your attendance"
             }
             binding.btnMain.text = "Sign In as $roleName"
             binding.tvSwitch.text = "Don't have an account? Sign Up"
@@ -158,22 +179,9 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                     LinearLayout.LayoutParams.WRAP_CONTENT
                 )
             }
+            nameRow.addView(makeField("First Name", "Muhammad", "firstName", weight = 1f))
             nameRow.addView(
-                makeField(
-                    "First Name",
-                    "Muhammad",
-                    "firstName",
-                    weight = 1f
-                )
-            )
-            nameRow.addView(
-                makeField(
-                    "Last Name",
-                    "Umer",
-                    "lastName",
-                    weight = 1f,
-                    marginStart = 10
-                )
+                makeField("Last Name", "Umer", "lastName", weight = 1f, marginStart = 10)
             )
             container.addView(nameRow)
         }
@@ -181,29 +189,41 @@ abstract class BaseAuthActivity : AppCompatActivity() {
         val emailLabel = when (role) {
             "TEACHER" -> "Faculty Email"
             "STUDENT" -> "Student Email"
-            else      -> "Official UOL Email"
+            else -> "Official UOL Email"
         }
         val emailHint = when (role) {
             "ADMIN" -> "admin@uol.edu.pk"
-            else    -> "${role.lowercase()}@university.edu"
+            "TEACHER" -> "teacher@uol.edu.pk"
+            else -> "${role.lowercase()}@university.edu"
         }
         container.addView(makeField(emailLabel, emailHint, "email"))
 
         if (isSignUp) {
             when (role) {
-                "TEACHER" -> container.addView(makeField("Department", "Computer Science", "department"))
-                "STUDENT" -> container.addView(makeField("Roll Number", "BSCS-2021-001", "rollNumber"))
+                "TEACHER" -> {
+                    container.addView(
+                        makeField(
+                            "Teacher ID",
+                            "e.g. TCH-7A92BC41",
+                            "teacherId"
+                        )
+                    )
+
+                    container.addView(
+                        makeField(
+                            "Department",
+                            "Computer Science",
+                            "department"
+                        )
+                    )
+                }
+                "STUDENT" -> container.addView(
+                    makeField("Roll Number", "BSCS-2021-001", "rollNumber")
+                )
             }
         }
 
-        container.addView(
-            makeField(
-                "Password",
-                "********",
-                "password",
-                true
-            )
-        )
+        container.addView(makeField("Password", "********", "password", true))
 
         if (!isSignUp) {
             val forgot = TextView(this).apply {
@@ -233,9 +253,8 @@ abstract class BaseAuthActivity : AppCompatActivity() {
         val wrapper = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             layoutParams = if (weight > 0) {
-                LinearLayout.LayoutParams(
-                    0, LinearLayout.LayoutParams.WRAP_CONTENT, weight
-                ).apply { setMargins((marginStart * dp).toInt(), 0, 0, (12 * dp).toInt()) }
+                LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.WRAP_CONTENT, weight)
+                    .apply { setMargins((marginStart * dp).toInt(), 0, 0, (12 * dp).toInt()) }
             } else {
                 LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
@@ -260,13 +279,11 @@ abstract class BaseAuthActivity : AppCompatActivity() {
             setTextColor(ContextCompat.getColor(this@BaseAuthActivity, R.color.text_primary))
             setHintTextColor(ContextCompat.getColor(this@BaseAuthActivity, R.color.text_muted))
             background = ContextCompat.getDrawable(this@BaseAuthActivity, R.drawable.bg_input_field)
-            setPadding(
-                (14 * dp).toInt(), (12 * dp).toInt(),
-                (14 * dp).toInt(), (12 * dp).toInt()
-            )
-            if (isPassword) inputType =
-                android.text.InputType.TYPE_CLASS_TEXT or
+            setPadding((14 * dp).toInt(), (12 * dp).toInt(), (14 * dp).toInt(), (12 * dp).toInt())
+            if (isPassword) {
+                inputType = android.text.InputType.TYPE_CLASS_TEXT or
                         android.text.InputType.TYPE_TEXT_VARIATION_PASSWORD
+            }
             layoutParams = LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
@@ -276,9 +293,11 @@ abstract class BaseAuthActivity : AppCompatActivity() {
         // EditText ko reference variables me save karo
         when (key) {
             "firstName" -> etFirstName = field
-            "lastName"  -> etLastName = field
-            "email"     -> etEmail = field
-            "password"  -> etPassword = field
+            "lastName" -> etLastName = field
+            "email" -> etEmail = field
+            "password" -> etPassword = field
+            "department" -> etDepartment = field
+            "teacherId" -> etTeacherId = field
         }
 
         wrapper.addView(labelView)
@@ -303,6 +322,10 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                 .start()
         }
     }
+
+    // =================================================================
+    // ADMIN
+    // =================================================================
 
     protected fun validateAdmin(): Boolean {
 
@@ -338,9 +361,7 @@ abstract class BaseAuthActivity : AppCompatActivity() {
         return true
     }
 
-    protected fun registerAdmin(
-        onSuccess: () -> Unit
-    ) {
+    protected fun registerAdmin(onSuccess: () -> Unit) {
 
         if (!validateAdmin()) return
 
@@ -381,19 +402,11 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                         onSuccess()
                     }
                     .addOnFailureListener {
-                        Toast.makeText(
-                            this,
-                            it.message,
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
                     }
             }
             .addOnFailureListener {
-                Toast.makeText(
-                    this,
-                    it.message,
-                    Toast.LENGTH_LONG
-                ).show()
+                Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
             }
     }
 
@@ -421,9 +434,7 @@ abstract class BaseAuthActivity : AppCompatActivity() {
         return true
     }
 
-    protected fun signInAdmin(
-        onSuccess: () -> Unit
-    ) {
+    protected fun signInAdmin(onSuccess: () -> Unit) {
 
         if (!validateAdminSignIn()) return
 
@@ -470,20 +481,280 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                     }
                     .addOnFailureListener {
                         binding.btnMain.isEnabled = true
-                        Toast.makeText(
-                            this,
-                            it.message,
-                            Toast.LENGTH_LONG
-                        ).show()
+                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
                     }
             }
             .addOnFailureListener {
                 binding.btnMain.isEnabled = true
+                Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+            }
+    }
+
+    // =================================================================
+    // TEACHER
+    // Sign-up flow is different from ADMIN: Admin creates the Teacher
+    // record first (see Teacher.kt), so on sign-up we must first VERIFY
+    // the Teacher ID against Firestore before creating a Firebase Auth
+    // account, then link that account back onto the same "teachers" doc.
+    //
+    //   Teacher ID
+    //      -> teachers/TCH-XXXX
+    //      -> exists?
+    //      -> already linked (accountLinked == true)?
+    //      -> email on record matches entered email?
+    //      -> Firebase Auth create
+    //      -> save authUid + mark accountLinked = true
+    //
+    // Sign-in still uses the same @uol.edu.pk domain lock and looks the
+    // teacher doc up by authUid (uid), matching signInAdmin() above.
+    // =================================================================
+
+    protected fun validateTeacher(): Boolean {
+
+        if (etFirstName.text.toString().trim().isEmpty()) {
+            etFirstName.error = "Enter First Name"
+            return false
+        }
+
+        if (etLastName.text.toString().trim().isEmpty()) {
+            etLastName.error = "Enter Last Name"
+            return false
+        }
+
+        val email = etEmail.text.toString().trim()
+
+        if (email.isEmpty()) {
+            etEmail.error = "Enter Email"
+            return false
+        }
+
+        if (!email.lowercase().endsWith("@uol.edu.pk")) {
+            etEmail.error = "Only Official UOL Email Allowed"
+            return false
+        }
+
+        val teacherId = etTeacherId.text.toString().trim().uppercase()
+
+        if (teacherId.isEmpty()) {
+            etTeacherId.error = "Enter Teacher ID"
+            return false
+        }
+
+        if (!teacherId.startsWith("TCH-")) {
+            etTeacherId.error = "Invalid Teacher ID"
+            return false
+        }
+
+        if (etDepartment.text.toString().trim().isEmpty()) {
+            etDepartment.error = "Enter Department"
+            return false
+        }
+
+        val password = etPassword.text.toString()
+
+        if (password.length < 8) {
+            etPassword.error = "Password must be at least 8 characters"
+            return false
+        }
+
+        return true
+    }
+
+    protected fun registerTeacher(onSuccess: () -> Unit) {
+
+        if (!validateTeacher()) return
+
+        val first = etFirstName.text.toString().trim()
+        val last = etLastName.text.toString().trim()
+        val fullName = "$first $last".trim()
+        val email = etEmail.text.toString().trim()
+        val department = etDepartment.text.toString().trim()
+        val teacherId = etTeacherId.text.toString().trim().uppercase()
+        val password = etPassword.text.toString()
+
+        binding.btnMain.isEnabled = false
+
+        // Step 1: Teacher ID must already exist (Admin creates it first).
+        db.collection("teachers")
+            .document(teacherId)
+            .get()
+            .addOnSuccessListener { document ->
+
+                if (!document.exists()) {
+                    binding.btnMain.isEnabled = true
+                    etTeacherId.error = "Teacher ID Not Found"
+                    Toast.makeText(
+                        this,
+                        "No Teacher record found for this Teacher ID. Contact Admin.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@addOnSuccessListener
+                }
+
+                val accountLinked = document.getBoolean("accountLinked") ?: false
+
+                if (accountLinked) {
+                    binding.btnMain.isEnabled = true
+                    etTeacherId.error = "Already Linked"
+                    Toast.makeText(
+                        this,
+                        "This Teacher ID is already linked to an account.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@addOnSuccessListener
+                }
+
+                val recordEmail = document.getString("email")?.trim()?.lowercase() ?: ""
+
+                if (recordEmail.isNotEmpty() && recordEmail != email.lowercase()) {
+                    binding.btnMain.isEnabled = true
+                    etEmail.error = "Email Does Not Match Teacher Record"
+                    Toast.makeText(
+                        this,
+                        "This email does not match the email on record for this Teacher ID.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    return@addOnSuccessListener
+                }
+
+                // Step 2: Teacher ID verified — now create the Auth account.
+                auth.createUserWithEmailAndPassword(email, password)
+                    .addOnSuccessListener {
+
+                        val uid = auth.currentUser!!.uid
+
+                        val updates = hashMapOf<String, Any?>(
+                            "authUid" to uid,
+                            "fullName" to fullName,
+                            "email" to email,
+                            "departmentName" to department,
+                            "accountLinked" to true,
+                            "linkedAt" to FieldValue.serverTimestamp()
+                        )
+
+                        // Step 3: Link the new Auth account onto the same
+                        // teacher doc (keyed by teacherId, e.g. TCH-XXXX).
+                        db.collection("teachers")
+                            .document(teacherId)
+                            .update(updates)
+                            .addOnSuccessListener {
+
+                                binding.btnMain.isEnabled = true
+                                auth.currentUser?.sendEmailVerification()
+
+                                Toast.makeText(
+                                    this,
+                                    "Teacher Account Linked Successfully",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                onSuccess()
+                            }
+                            .addOnFailureListener { error ->
+                                binding.btnMain.isEnabled = true
+                                Toast.makeText(
+                                    this,
+                                    error.message ?: "Teacher account creation failed.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                    }
+                    .addOnFailureListener { error ->
+                        binding.btnMain.isEnabled = true
+                        Toast.makeText(
+                            this,
+                            error.message ?: "Teacher account creation failed.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+            }
+            .addOnFailureListener { error ->
+                binding.btnMain.isEnabled = true
                 Toast.makeText(
                     this,
-                    it.message,
+                    "Unable to verify Teacher ID: ${error.message}",
                     Toast.LENGTH_LONG
                 ).show()
+            }
+    }
+
+    protected fun validateTeacherSignIn(): Boolean {
+
+        val email = etEmail.text.toString().trim()
+
+        if (email.isEmpty()) {
+            etEmail.error = "Enter Email"
+            return false
+        }
+
+        if (!email.lowercase().endsWith("@uol.edu.pk")) {
+            etEmail.error = "Only Official UOL Email Allowed"
+            return false
+        }
+
+        val password = etPassword.text.toString()
+
+        if (password.isEmpty()) {
+            etPassword.error = "Enter Password"
+            return false
+        }
+
+        return true
+    }
+
+    protected fun signInTeacher(onSuccess: () -> Unit) {
+
+        if (!validateTeacherSignIn()) return
+
+        val email = etEmail.text.toString().trim()
+        val password = etPassword.text.toString()
+
+        binding.btnMain.isEnabled = false
+
+        auth.signInWithEmailAndPassword(email, password)
+            .addOnSuccessListener {
+
+                val uid = auth.currentUser!!.uid
+
+                db.collection("teachers")
+                    .document(uid)
+                    .get()
+                    .addOnSuccessListener { document ->
+
+                        binding.btnMain.isEnabled = true
+
+                        if (!document.exists()) {
+                            auth.signOut()
+                            Toast.makeText(
+                                this,
+                                "No Teacher Account Found With This Email",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            return@addOnSuccessListener
+                        }
+
+                        val isActive = document.getBoolean("isActive") ?: false
+
+                        if (!isActive) {
+                            auth.signOut()
+                            Toast.makeText(
+                                this,
+                                "This Teacher Account Has Been Deactivated",
+                                Toast.LENGTH_LONG
+                            ).show()
+                            return@addOnSuccessListener
+                        }
+
+                        onSuccess()
+                    }
+                    .addOnFailureListener {
+                        binding.btnMain.isEnabled = true
+                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+                    }
+            }
+            .addOnFailureListener {
+                binding.btnMain.isEnabled = true
+                Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
             }
     }
 }

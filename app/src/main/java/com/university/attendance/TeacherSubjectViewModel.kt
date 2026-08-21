@@ -7,14 +7,14 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
 
 /**
- * Manages the Teacher-Subject Assignment screen:
+ * Manages the Teacher-Subject Assignment screen (ADMIN ONLY):
  *   1. Show a list of all teachers.
  *   2. Admin taps a teacher -> show ALL subjects as a checklist, with
  *      subjects already assigned to THIS teacher pre-checked.
  *   3. Admin checks/unchecks subjects, taps Save -> assignment updates.
  */
 class TeacherSubjectViewModel(
-    private val repository: TeacherSubjectRepository = TeacherSubjectRepository()
+    private val repository: AdminTeacherAssignmentRepository = AdminTeacherAssignmentRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableLiveData<UiState>(UiState.Idle)
@@ -98,8 +98,8 @@ class TeacherSubjectViewModel(
                 allSubjects = subjects,
                 selectedSubjectIds = selected
             )) {
-                is TeacherSubjectRepository.OpResult.Success -> _uiState.value = UiState.SaveSuccess
-                is TeacherSubjectRepository.OpResult.Error -> _uiState.value = UiState.Error(result.message)
+                is AdminTeacherAssignmentRepository.OpResult.Success -> _uiState.value = UiState.SaveSuccess
+                is AdminTeacherAssignmentRepository.OpResult.Error -> _uiState.value = UiState.Error(result.message)
             }
         }
     }

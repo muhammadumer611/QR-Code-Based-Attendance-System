@@ -19,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.QRCodeAttendance">
         <activity
+            android:name=".ActivityTeacherClasses"
+            android:exported="false" />
+        <activity
             android:name=".ActivitySettings"
             android:exported="false" />
         <activity

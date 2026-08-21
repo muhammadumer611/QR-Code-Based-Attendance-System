@@ -16,6 +16,7 @@
         android:background="@color/backgroundColor">
 
         <androidx.core.widget.NestedScrollView
+            android:id="@+id/scrollContent"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:fillViewport="true"
@@ -100,7 +101,8 @@
                         android:id="@+id/txtTeacher"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Muhammad Umer"
+                        android:text=""
+                        tools:text="Muhammad Umer"
                         android:textStyle="bold"
                         android:textColor="@android:color/white"
                         android:textSize="26sp"
@@ -112,7 +114,8 @@
                         android:id="@+id/txtRole"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Senior Faculty • CS Department"
+                        android:text=""
+                        tools:text="Senior Faculty • CS Department"
                         android:textColor="@color/cyanAccent"
                         android:textSize="12sp"
                         android:textStyle="bold"
@@ -150,11 +153,14 @@
                                 app:tint="@color/cyanAccent"/>
 
                             <EditText
+                                android:id="@+id/etSearchStudents"
                                 android:layout_width="0dp"
                                 android:layout_height="wrap_content"
                                 android:layout_weight="1"
                                 android:background="@null"
                                 android:hint="Search Students..."
+                                android:inputType="text"
+                                android:imeOptions="actionSearch"
                                 android:textColor="@android:color/white"
                                 android:textColorHint="@color/textSecondary"
                                 android:textSize="14sp"
@@ -176,6 +182,7 @@
                     android:orientation="horizontal"
                     android:weightSum="2">
 
+                    <!-- Assigned Subjects (real count from Firestore "subjects" collection) -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="130dp"
@@ -202,15 +209,16 @@
                             <TextView
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="Today's Classes"
+                                android:text="Assigned Subjects"
                                 android:textColor="@color/textSecondary"
                                 android:textSize="12sp"
                                 android:layout_marginTop="10dp"/>
 
                             <TextView
+                                android:id="@+id/tvAssignedSubjects"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="06"
+                                android:text="0"
                                 android:textColor="@android:color/white"
                                 android:textSize="26sp"
                                 android:textStyle="bold"/>
@@ -219,6 +227,7 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Total Students (real count, derived from assigned subjects) -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="130dp"
@@ -251,9 +260,10 @@
                                 android:layout_marginTop="10dp"/>
 
                             <TextView
+                                android:id="@+id/tvTotalStudents"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="240"
+                                android:text="0"
                                 android:textColor="@android:color/white"
                                 android:textSize="26sp"
                                 android:textStyle="bold"/>
@@ -273,6 +283,7 @@
                     android:paddingHorizontal="12dp"
                     android:weightSum="2">
 
+                    <!-- Attendance % (real, computed in TeacherDashboardRepository) -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="130dp"
@@ -305,9 +316,10 @@
                                 android:layout_marginTop="10dp"/>
 
                             <TextView
+                                android:id="@+id/tvAttendancePercentage"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="91%"
+                                android:text="0%"
                                 android:textColor="@color/cyanAccent"
                                 android:textStyle="bold"
                                 android:textSize="26sp"/>
@@ -316,7 +328,9 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
+                    <!-- Assignments - placeholder "-" until an Assignments module/collection exists -->
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardAssignments"
                         android:layout_width="0dp"
                         android:layout_height="130dp"
                         android:layout_weight="1"
@@ -348,9 +362,10 @@
                                 android:layout_marginTop="10dp"/>
 
                             <TextView
+                                android:id="@+id/tvAssignmentsCount"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="18"
+                                android:text="--"
                                 android:textColor="@android:color/white"
                                 android:textStyle="bold"
                                 android:textSize="26sp"/>
@@ -361,133 +376,63 @@
 
                 </LinearLayout>
 
-                <!-- ================= TODAY'S CLASSES ================= -->
+                <!-- ================= MY SUBJECTS (real data, was fake "Today's Classes") ================= -->
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Today's Classes"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="20dp"
-                    android:layout_marginTop="22dp"/>
-
-                <HorizontalScrollView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:scrollbars="none"
-                    android:clipToPadding="false"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="4dp">
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="22dp">
 
-                    <LinearLayout
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="My Subjects"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/tvViewAllSubjects"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingVertical="10dp">
+                        android:text="View All"
+                        android:textColor="@color/cyanAccent"
+                        android:textStyle="bold"
+                        android:textSize="13sp"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:padding="6dp"/>
 
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="250dp"
-                            android:layout_height="165dp"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="24dp"
-                            app:cardElevation="8dp"
-                            app:cardBackgroundColor="@color/glassCard"
-                            app:strokeColor="@color/cyanAccent"
-                            app:strokeWidth="1dp">
+                </LinearLayout>
 
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:padding="18dp">
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerMySubjects"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:clipToPadding="false"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="4dp"
+                    android:paddingVertical="10dp"
+                    android:orientation="horizontal"
+                    tools:listitem="@layout/item_subject_card"/>
 
-                                <TextView
-                                    android:text="Artificial Intelligence"
-                                    android:textColor="@android:color/white"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                                <TextView
-                                    android:text="BSSE - 7th Semester"
-                                    android:textColor="@color/textSecondary"
-                                    android:textSize="13sp"
-                                    android:layout_marginTop="6dp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1"/>
-
-                                <TextView
-                                    android:text="09:00 AM - 10:30 AM"
-                                    android:textColor="@color/cyanAccent"
-                                    android:textStyle="bold"
-                                    android:textSize="13sp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                            </LinearLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                        <com.google.android.material.card.MaterialCardView
-                            android:layout_width="250dp"
-                            android:layout_height="165dp"
-                            android:layout_margin="8dp"
-                            app:cardCornerRadius="24dp"
-                            app:cardElevation="8dp"
-                            app:cardBackgroundColor="@color/glassCard"
-                            app:strokeColor="@color/cyanAccent"
-                            app:strokeWidth="1dp">
-
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="match_parent"
-                                android:orientation="vertical"
-                                android:padding="18dp">
-
-                                <TextView
-                                    android:text="Machine Learning"
-                                    android:textColor="@android:color/white"
-                                    android:textSize="17sp"
-                                    android:textStyle="bold"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                                <TextView
-                                    android:text="BSCS - 6th Semester"
-                                    android:textColor="@color/textSecondary"
-                                    android:textSize="13sp"
-                                    android:layout_marginTop="6dp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                                <View
-                                    android:layout_width="0dp"
-                                    android:layout_height="0dp"
-                                    android:layout_weight="1"/>
-
-                                <TextView
-                                    android:text="11:00 AM - 12:30 PM"
-                                    android:textColor="@color/cyanAccent"
-                                    android:textStyle="bold"
-                                    android:textSize="13sp"
-                                    android:layout_width="wrap_content"
-                                    android:layout_height="wrap_content"/>
-
-                            </LinearLayout>
-
-                        </com.google.android.material.card.MaterialCardView>
-
-                    </LinearLayout>
-
-                </HorizontalScrollView>
+                <TextView
+                    android:id="@+id/txtSubjectsEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No subjects assigned yet. Contact Admin to get subjects assigned."
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:visibility="gone"
+                    tools:visibility="visible"/>
 
                 <!-- ================= QUICK ACTIONS ================= -->
 
@@ -511,10 +456,13 @@
                     <!-- QR Attendance — Primary CTA, glowing -->
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardTakeAttendance"
                         android:layout_width="0dp"
                         android:layout_height="176dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="14dp"
                         app:cardBackgroundColor="@color/glassCard"
@@ -566,10 +514,13 @@
                     <!-- Manual Attendance -->
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardManualAttendance"
                         android:layout_width="0dp"
                         android:layout_height="176dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="8dp"
                         app:cardBackgroundColor="@color/glassCard"
@@ -612,10 +563,13 @@
                     <!-- Upload Notes -->
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardUploadNotes"
                         android:layout_width="0dp"
                         android:layout_height="176dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="8dp"
                         app:cardBackgroundColor="@color/glassCard"
@@ -651,10 +605,13 @@
                     <!-- Assignments -->
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardAssignmentsAction"
                         android:layout_width="0dp"
                         android:layout_height="176dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="8dp"
                         app:cardBackgroundColor="@color/glassCard"
@@ -689,10 +646,13 @@
                     <!-- Students -->
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardStudents"
                         android:layout_width="0dp"
                         android:layout_height="176dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="8dp"
                         app:cardBackgroundColor="@color/glassCard"
@@ -727,10 +687,13 @@
                     <!-- Results -->
 
                     <com.google.android.material.card.MaterialCardView
+                        android:id="@+id/cardResults"
                         android:layout_width="0dp"
                         android:layout_height="176dp"
                         android:layout_columnWeight="1"
                         android:layout_margin="8dp"
+                        android:clickable="true"
+                        android:focusable="true"
                         app:cardCornerRadius="24dp"
                         app:cardElevation="8dp"
                         app:cardBackgroundColor="@color/glassCard"
@@ -795,25 +758,27 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Today's Attendance"
+                            android:text="Overall Attendance"
                             android:textColor="@android:color/white"
                             android:textStyle="bold"
                             android:textSize="16sp"/>
 
                         <ProgressBar
+                            android:id="@+id/progressAttendance"
                             style="?android:attr/progressBarStyleHorizontal"
                             android:layout_width="match_parent"
                             android:layout_height="10dp"
                             android:max="100"
-                            android:progress="92"
+                            android:progress="0"
                             android:progressTint="@color/cyanAccent"
                             android:progressBackgroundTint="#262C33"
                             android:layout_marginTop="16dp"/>
 
                         <TextView
+                            android:id="@+id/tvAttendanceSummary"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="92% Students Present"
+                            android:text="0% Students Present"
                             android:textStyle="bold"
                             android:textColor="@color/cyanAccent"
                             android:textSize="13sp"
@@ -839,9 +804,20 @@
                     android:id="@+id/recyclerRecent"
                     android:layout_width="match_parent"
                     android:layout_height="220dp"
-                    android:layout_margin="16dp"/>
+                    android:layout_margin="16dp"
+                    android:visibility="gone"/>
 
-                <!-- ================= UPCOMING CLASSES ================= -->
+                <TextView
+                    android:id="@+id/txtRecentEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Activity feed will appear here once this module is connected."
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="20dp"/>
+
+                <!-- ================= UPCOMING CLASSES (placeholder — no timetable module yet) ================= -->
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -866,12 +842,13 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="18dp">
+                        android:padding="18dp"
+                        android:gravity="center">
 
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="10:00 AM - Artificial Intelligence"
+                            android:text="Timetable module coming soon"
                             android:textColor="@android:color/white"
                             android:textStyle="bold"
                             android:textSize="14sp"/>
@@ -879,32 +856,11 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Room B-204"
+                            android:text="This section will show your scheduled classes with time and room once the timetable feature is connected."
                             android:textColor="@color/textSecondary"
-                            android:textSize="13sp"
-                            android:layout_marginTop="2dp"/>
-
-                        <View
-                            android:layout_width="match_parent"
-                            android:layout_height="1dp"
-                            android:layout_marginVertical="14dp"
-                            android:background="#262C33"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="12:00 PM - Machine Learning"
-                            android:textColor="@android:color/white"
-                            android:textStyle="bold"
-                            android:textSize="14sp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Room A-106"
-                            android:textColor="@color/textSecondary"
-                            android:textSize="13sp"
-                            android:layout_marginTop="2dp"/>
+                            android:textSize="12sp"
+                            android:gravity="center"
+                            android:layout_marginTop="6dp"/>
 
                     </LinearLayout>
 
@@ -913,6 +869,67 @@
             </LinearLayout>
 
         </androidx.core.widget.NestedScrollView>
+
+        <!-- ================= LOADING OVERLAY ================= -->
+
+        <FrameLayout
+            android:id="@+id/loadingOverlay"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:background="@color/backgroundColor"
+            android:visibility="visible"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <ProgressBar
+                android:id="@+id/progressLoading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:indeterminateTint="@color/cyanAccent"/>
+
+        </FrameLayout>
+
+        <!-- ================= ERROR STATE ================= -->
+
+        <LinearLayout
+            android:id="@+id/errorState"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="24dp"
+            android:visibility="gone"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+
+            <TextView
+                android:id="@+id/txtErrorMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Something went wrong."
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/btnRetry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="14dp"
+                android:text="Tap to retry"
+                android:textColor="@color/cyanAccent"
+                android:textStyle="bold"
+                android:textSize="14sp"
+                android:clickable="true"
+                android:focusable="true"
+                android:padding="8dp"/>
+
+        </LinearLayout>
 
         <!-- ================= FLOATING ACTION BUTTON ================= -->
 
