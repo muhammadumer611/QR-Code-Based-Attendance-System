@@ -505,8 +505,8 @@ abstract class BaseAuthActivity : AppCompatActivity() {
     //      -> Firebase Auth create
     //      -> save authUid + mark accountLinked = true
     //
-    // Sign-in still uses the same @uol.edu.pk domain lock and looks the
-    // teacher doc up by authUid (uid), matching signInAdmin() above.
+    // Sign-in looks the teacher doc up by authUid (uid), since the doc
+    // ID is the Teacher ID (TCH-XXXX), not the Firebase Auth uid.
     // =================================================================
 
     protected fun validateTeacher(): Boolean {
@@ -711,50 +711,175 @@ abstract class BaseAuthActivity : AppCompatActivity() {
 
         binding.btnMain.isEnabled = false
 
-        auth.signInWithEmailAndPassword(email, password)
+        // ---------------------------------------------------------
+        // STEP 1
+        // Firebase Authentication
+        // ---------------------------------------------------------
+
+        auth.signInWithEmailAndPassword(
+            email,
+            password
+        )
             .addOnSuccessListener {
 
-                val uid = auth.currentUser!!.uid
+                val firebaseUser = auth.currentUser
+
+                if (firebaseUser == null) {
+
+                    binding.btnMain.isEnabled = true
+
+                    Toast.makeText(
+                        this,
+                        "Unable to load teacher account.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    return@addOnSuccessListener
+                }
+
+                val uid = firebaseUser.uid
+
+                // -------------------------------------------------
+                // STEP 2
+                // Find Teacher using Firebase Auth UID
+                // -------------------------------------------------
 
                 db.collection("teachers")
-                    .document(uid)
+                    .whereEqualTo("authUid", uid)
+                    .limit(1)
                     .get()
-                    .addOnSuccessListener { document ->
+                    .addOnSuccessListener { snapshot ->
+
+                        if (snapshot.isEmpty) {
+
+                            auth.signOut()
+
+                            binding.btnMain.isEnabled = true
+
+                            Toast.makeText(
+                                this,
+                                "Teacher profile is not linked with this account.",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            return@addOnSuccessListener
+                        }
+
+                        // -------------------------------------------------
+                        // STEP 3
+                        // Convert Firestore document into Teacher
+                        // -------------------------------------------------
+
+                        val document = snapshot.documents.first()
+
+                        val teacher =
+                            document.toObject(Teacher::class.java)
+
+                        if (teacher == null) {
+
+                            auth.signOut()
+
+                            binding.btnMain.isEnabled = true
+
+                            Toast.makeText(
+                                this,
+                                "Invalid teacher profile.",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            return@addOnSuccessListener
+                        }
+
+                        // Firestore document ID = our Teacher ID
+                        teacher.teacherId = document.id
+
+                        // -------------------------------------------------
+                        // STEP 4
+                        // Check account status
+                        // -------------------------------------------------
+
+                        if (!teacher.isActive) {
+
+                            auth.signOut()
+
+                            binding.btnMain.isEnabled = true
+
+                            Toast.makeText(
+                                this,
+                                "Your teacher account has been deactivated by Admin.",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            return@addOnSuccessListener
+                        }
+
+                        // -------------------------------------------------
+                        // STEP 5
+                        // Make sure account is linked
+                        // -------------------------------------------------
+
+                        if (!teacher.accountLinked) {
+
+                            auth.signOut()
+
+                            binding.btnMain.isEnabled = true
+
+                            Toast.makeText(
+                                this,
+                                "Your teacher account is not linked yet.",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            return@addOnSuccessListener
+                        }
+
+                        // -------------------------------------------------
+                        // STEP 6
+                        // Save Teacher Session
+                        // -------------------------------------------------
+
+                        TeacherSession.save(
+                            this,
+                            teacher
+                        )
 
                         binding.btnMain.isEnabled = true
 
-                        if (!document.exists()) {
-                            auth.signOut()
-                            Toast.makeText(
-                                this,
-                                "No Teacher Account Found With This Email",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            return@addOnSuccessListener
-                        }
+                        Toast.makeText(
+                            this,
+                            "Welcome ${teacher.fullName}",
+                            Toast.LENGTH_SHORT
+                        ).show()
 
-                        val isActive = document.getBoolean("isActive") ?: false
-
-                        if (!isActive) {
-                            auth.signOut()
-                            Toast.makeText(
-                                this,
-                                "This Teacher Account Has Been Deactivated",
-                                Toast.LENGTH_LONG
-                            ).show()
-                            return@addOnSuccessListener
-                        }
+                        // -------------------------------------------------
+                        // STEP 7
+                        // Open Teacher Dashboard
+                        // -------------------------------------------------
 
                         onSuccess()
                     }
-                    .addOnFailureListener {
+                    .addOnFailureListener { error ->
+
+                        auth.signOut()
+
                         binding.btnMain.isEnabled = true
-                        Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+
+                        Toast.makeText(
+                            this,
+                            "Unable to load teacher profile: ${error.message}",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
             }
-            .addOnFailureListener {
+            .addOnFailureListener { error ->
+
                 binding.btnMain.isEnabled = true
-                Toast.makeText(this, it.message, Toast.LENGTH_LONG).show()
+
+                Toast.makeText(
+                    this,
+                    error.message ?: "Login failed.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
     }
 }
