@@ -13,6 +13,9 @@ class ScheduleViewModel(
     private val _schedule = MutableLiveData<Schedule?>(null)
     val schedule: LiveData<Schedule?> = _schedule
 
+    private val _teachers = MutableLiveData<List<Teacher>>(emptyList())
+    val teachers: LiveData<List<Teacher>> = _teachers
+
     private val _uiState = MutableLiveData<UiState>(UiState.Idle)
     val uiState: LiveData<UiState> = _uiState
 
@@ -24,31 +27,130 @@ class ScheduleViewModel(
         data class Error(val message: String) : UiState()
     }
 
-    fun loadSchedule() {
-        _uiState.value = UiState.Loading
+    // ============================================================
+    // LOAD ALL TEACHERS
+    // ============================================================
+
+    fun loadTeachers() {
+
         viewModelScope.launch {
+
             try {
-                _schedule.value = repository.getCurrentSchedule()
-                _uiState.value = UiState.Loaded
+
+                val teacherRepository = TeacherRepository()
+
+                val teachers =
+                    teacherRepository.getAllTeachers()
+
+                _teachers.value = teachers
+
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Failed to load schedule.")
+
+                _uiState.value =
+                    UiState.Error(
+                        e.message ?: "Failed to load teachers."
+                    )
             }
         }
     }
 
-    fun saveSchedule(fileName: String, note: String) {
-        if (fileName.isBlank()) {
-            _uiState.value = UiState.Error("Please enter a file name.")
+    // ============================================================
+    // LOAD SELECTED TEACHER'S SCHEDULE
+    // ============================================================
+
+    fun loadScheduleForTeacher(
+        teacherAuthUid: String
+    ) {
+
+        if (teacherAuthUid.isBlank()) {
+            _schedule.value = null
             return
         }
+
         _uiState.value = UiState.Loading
+
         viewModelScope.launch {
-            when (val result = repository.saveSchedule(fileName, note)) {
+
+            try {
+
+                _schedule.value =
+                    repository.getScheduleForTeacher(
+                        teacherAuthUid
+                    )
+
+                _uiState.value = UiState.Loaded
+
+            } catch (e: Exception) {
+
+                _uiState.value =
+                    UiState.Error(
+                        e.message
+                            ?: "Failed to load schedule."
+                    )
+            }
+        }
+    }
+
+    // ============================================================
+    // SAVE SCHEDULE FOR SELECTED TEACHER
+    // ============================================================
+
+    fun saveSchedule(
+        teacher: Teacher,
+        fileName: String,
+        note: String
+    ) {
+
+        if (teacher.authUid.isBlank()) {
+
+            _uiState.value =
+                UiState.Error(
+                    "Selected teacher has no Firebase Auth ID."
+                )
+
+            return
+        }
+
+        if (fileName.isBlank()) {
+
+            _uiState.value =
+                UiState.Error(
+                    "Please enter a file name."
+                )
+
+            return
+        }
+
+        _uiState.value = UiState.Loading
+
+        viewModelScope.launch {
+
+            when (
+                val result = repository.saveSchedule(
+                    teacherAuthUid = teacher.authUid,
+                    teacherName = teacher.fullName,
+                    fileName = fileName,
+                    note = note
+                )
+            ) {
+
                 is ScheduleRepository.OpResult.Success -> {
-                    _uiState.value = UiState.SaveSuccess
-                    loadSchedule() // refresh with the newly saved record
+
+                    _uiState.value =
+                        UiState.SaveSuccess
+
+                    loadScheduleForTeacher(
+                        teacher.authUid
+                    )
                 }
-                is ScheduleRepository.OpResult.Error -> _uiState.value = UiState.Error(result.message)
+
+                is ScheduleRepository.OpResult.Error -> {
+
+                    _uiState.value =
+                        UiState.Error(
+                            result.message
+                        )
+                }
             }
         }
     }

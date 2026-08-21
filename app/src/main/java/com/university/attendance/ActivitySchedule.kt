@@ -4,6 +4,7 @@ import android.app.AlertDialog
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
@@ -12,99 +13,258 @@ import com.university.attendance.databinding.DialogScheduleUploadBinding
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-/**
- * Screen: Admin -> Schedule.
- *
- * Placeholder implementation per current requirements: stores only the
- * schedule file's NAME and an optional note/link in Firestore -- no real
- * PDF upload/storage yet (that needs Firebase Storage, deferred for now).
- * "View" opens the note as a link if one was provided; otherwise it
- * explains that no viewable file/link exists yet.
- */
 class ActivitySchedule : AppCompatActivity() {
 
     private lateinit var binding: ActivityScheduleBinding
     private lateinit var viewModel: ScheduleViewModel
 
-    private val displayFormat = SimpleDateFormat("dd MMM yyyy, hh:mm a", Locale.US)
+    private val displayFormat =
+        SimpleDateFormat(
+            "dd MMM yyyy, hh:mm a",
+            Locale.US
+        )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityScheduleBinding.inflate(layoutInflater)
+        binding =
+            ActivityScheduleBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[ScheduleViewModel::class.java]
+        viewModel =
+            ViewModelProvider(this)[ScheduleViewModel::class.java]
 
-        binding.btnBackHeader.setOnClickListener { finish() }
-        binding.btnUpload.setOnClickListener { showUploadDialog() }
-        binding.btnView.setOnClickListener { handleView() }
+        binding.btnBackHeader.setOnClickListener {
+            finish()
+        }
+
+        binding.btnUpload.setOnClickListener {
+            showUploadDialog()
+        }
+
+        binding.btnView.setOnClickListener {
+            handleView()
+        }
 
         observeViewModel()
-        viewModel.loadSchedule()
+
+        // Admin ke saare teachers load karo
+        viewModel.loadTeachers()
     }
 
-    private fun showUploadDialog() {
-        val dialogBinding = DialogScheduleUploadBinding.inflate(LayoutInflater.from(this))
+    // ============================================================
+    // TEACHER SELECTION + UPLOAD DIALOG
+    // ============================================================
 
-        // Pre-fill with existing values, if any, so re-uploading is easy to edit.
-        viewModel.schedule.value?.let { current ->
-            dialogBinding.etFileName.setText(current.fileName)
-            dialogBinding.etNote.setText(current.note)
+    private fun showUploadDialog() {
+
+        val teachers =
+            viewModel.teachers.value ?: emptyList()
+
+        if (teachers.isEmpty()) {
+
+            Toast.makeText(
+                this,
+                "No teachers found. Please add a teacher first.",
+                Toast.LENGTH_LONG
+            ).show()
+
+            return
         }
+
+        val dialogBinding =
+            DialogScheduleUploadBinding.inflate(
+                LayoutInflater.from(this)
+            )
+
+        // --------------------------------------------------------
+        // Teacher names
+        // --------------------------------------------------------
+
+        val teacherNames =
+            teachers.map { teacher ->
+
+                if (teacher.fullName.isNotBlank()) {
+                    teacher.fullName
+                } else {
+                    teacher.email
+                }
+            }
+
+        val teacherAdapter =
+            ArrayAdapter(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                teacherNames
+            )
+
+        dialogBinding.etTeacher.setAdapter(
+            teacherAdapter
+        )
+
+        dialogBinding.etTeacher.setOnClickListener {
+            dialogBinding.etTeacher.showDropDown()
+        }
+
+        // --------------------------------------------------------
+        // Teacher select hone par uska existing schedule load
+        // --------------------------------------------------------
+
+        dialogBinding.etTeacher.setOnItemClickListener {
+                _, _, position, _ ->
+
+            val selectedTeacher =
+                teachers[position]
+
+            viewModel.loadScheduleForTeacher(
+                selectedTeacher.authUid
+            )
+        }
+
+        // --------------------------------------------------------
+        // Save button
+        // --------------------------------------------------------
 
         AlertDialog.Builder(this)
             .setTitle("Upload Schedule")
             .setView(dialogBinding.root)
             .setPositiveButton("Save") { _, _ ->
-                val fileName = dialogBinding.etFileName.text.toString()
-                val note = dialogBinding.etNote.text.toString()
-                viewModel.saveSchedule(fileName, note)
+
+                val selectedPosition =
+                    teacherNames.indexOf(
+                        dialogBinding.etTeacher.text.toString()
+                    )
+
+                if (selectedPosition == -1) {
+
+                    Toast.makeText(
+                        this,
+                        "Please select a teacher.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    return@setPositiveButton
+                }
+
+                val selectedTeacher =
+                    teachers[selectedPosition]
+
+                val fileName =
+                    dialogBinding.etFileName
+                        .text
+                        .toString()
+
+                val note =
+                    dialogBinding.etNote
+                        .text
+                        .toString()
+
+                viewModel.saveSchedule(
+                    teacher = selectedTeacher,
+                    fileName = fileName,
+                    note = note
+                )
             }
-            .setNegativeButton("Cancel", null)
+            .setNegativeButton(
+                "Cancel",
+                null
+            )
             .show()
     }
 
+    // ============================================================
+    // VIEW
+    // ============================================================
+
     private fun handleView() {
-        val schedule = viewModel.schedule.value
-        if (schedule == null || schedule.fileName.isBlank()) {
-            Toast.makeText(this, "No schedule file uploaded yet.", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (schedule.note.isBlank()) {
+
+        val schedule =
+            viewModel.schedule.value
+
+        if (
+            schedule == null ||
+            schedule.fileName.isBlank()
+        ) {
+
             Toast.makeText(
                 this,
-                "No link available for this file yet -- PDF viewing isn't set up.",
-                Toast.LENGTH_LONG
+                "No schedule file uploaded yet.",
+                Toast.LENGTH_SHORT
             ).show()
-        } else {
-            Toast.makeText(this, "Link/Note: ${schedule.note}", Toast.LENGTH_LONG).show()
+
+            return
         }
+
+        Toast.makeText(
+            this,
+            "Teacher: ${schedule.teacherName}\n" +
+                    "File: ${schedule.fileName}\n" +
+                    "Note: ${schedule.note}",
+            Toast.LENGTH_LONG
+        ).show()
     }
 
+    // ============================================================
+    // OBSERVERS
+    // ============================================================
+
     private fun observeViewModel() {
+
         viewModel.uiState.observe(this) { state ->
+
             binding.progressBar.visibility =
-                if (state is ScheduleViewModel.UiState.Loading) View.VISIBLE else View.GONE
+                if (
+                    state is ScheduleViewModel.UiState.Loading
+                ) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
 
             when (state) {
-                is ScheduleViewModel.UiState.Error ->
-                    Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
-                is ScheduleViewModel.UiState.SaveSuccess ->
-                    Toast.makeText(this, "Schedule updated.", Toast.LENGTH_SHORT).show()
+
+                is ScheduleViewModel.UiState.Error -> {
+
+                    Toast.makeText(
+                        this,
+                        state.message,
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                is ScheduleViewModel.UiState.SaveSuccess -> {
+
+                    Toast.makeText(
+                        this,
+                        "Schedule assigned to teacher successfully.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
                 else -> Unit
             }
         }
 
         viewModel.schedule.observe(this) { schedule ->
-            if (schedule == null || schedule.fileName.isBlank()) {
-                binding.tvFileName.text = "No file uploaded yet"
+
+            if (
+                schedule == null ||
+                schedule.fileName.isBlank()
+            ) {
+
+                binding.tvFileName.text =
+                    "No schedule assigned"
+
                 binding.tvUploadedInfo.text = ""
+
             } else {
-                binding.tvFileName.text = schedule.fileName
-                binding.tvUploadedInfo.text = schedule.uploadedAt?.let {
-                    "Uploaded ${displayFormat.format(it)} by ${schedule.uploadedBy}"
-                } ?: ""
+
+                binding.tvFileName.text =
+                    schedule.fileName
+
+                binding.tvUploadedInfo.text =
+                    "Teacher: ${schedule.teacherName}"
             }
         }
     }
