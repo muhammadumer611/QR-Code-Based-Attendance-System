@@ -114,6 +114,10 @@
         <activity
             android:name=".ActivityStudentSignIn"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ActivityClassSchedule"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
