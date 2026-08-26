@@ -1,0 +1,255 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    activity_add_student.xml
+
+    Two-step Add Student form:
+      - stepOneContainer: University / Department / Program / Session / Section
+      - stepTwoContainer: Name / Contact / CNIC / Father CNIC / Guardian / RegNo
+
+    Styled to match the existing dark glassmorphism theme (black background,
+    cyan #00E5FF accents) already used in the Student Dashboard.
+    Adjust drawable names (bg_glass_card, bg_input_field, etc.) to match
+    whatever glass-card drawables already exist in your project; placeholder
+    names are used below where I can't see your exact drawable files.
+-->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- Header -->
+        <TextView
+            android:id="@+id/tvHeaderTitle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Add Student"
+            android:textColor="#FFFFFF"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:id="@+id/tvStepIndicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Step 1 of 2 — Class Information"
+            android:textColor="#00E5FF"
+            android:textSize="14sp"
+            android:layout_marginBottom="20dp" />
+
+        <!-- ============ STEP 1 CONTAINER ============ -->
+        <LinearLayout
+            android:id="@+id/stepOneContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#1A1A1A"
+            android:padding="16dp"
+            android:visibility="visible">
+
+            <AutoCompleteTextView
+                android:id="@+id/etUniversityName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="University Name"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <AutoCompleteTextView
+                android:id="@+id/etDepartmentName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Department Name (e.g. Computer Science)"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <AutoCompleteTextView
+                android:id="@+id/etProgramName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Program (e.g. BSSE, BSCS)"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <AutoCompleteTextView
+                android:id="@+id/etSession"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Session (e.g. 2022)"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <AutoCompleteTextView
+                android:id="@+id/etSection"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Class / Section (e.g. A)"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:id="@+id/btnNextStep"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:text="Next"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                android:backgroundTint="#00E5FF"
+                android:layout_marginTop="12dp" />
+
+        </LinearLayout>
+
+        <!-- ============ STEP 2 CONTAINER ============ -->
+        <LinearLayout
+            android:id="@+id/stepTwoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="#1A1A1A"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <EditText
+                android:id="@+id/etFullName"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Full Name"
+                android:inputType="textPersonName|textCapWords"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etRegNo"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Registration No. (e.g. FA22-BSSE-045)"
+                android:inputType="textCapCharacters"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etContactNumber"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Contact Number (03XXXXXXXXX)"
+                android:inputType="phone"
+                android:maxLength="11"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etCnicNumber"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="CNIC Number (XXXXX-XXXXXXX-X)"
+                android:inputType="number"
+                android:maxLength="15"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etFatherCnicNumber"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Father CNIC Number"
+                android:inputType="number"
+                android:maxLength="15"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <EditText
+                android:id="@+id/etGuardianNumber"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Guardian Number (03XXXXXXXXX)"
+                android:inputType="phone"
+                android:maxLength="11"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp">
+
+                <Button
+                    android:id="@+id/btnBackStep"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="Back"
+                    android:textColor="#00E5FF"
+                    android:backgroundTint="#2A2A2A"
+                    android:layout_marginEnd="8dp" />
+
+                <Button
+                    android:id="@+id/btnSaveStudent"
+                    android:layout_width="0dp"
+                    android:layout_height="52dp"
+                    android:layout_weight="1"
+                    android:text="Save Student"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    android:backgroundTint="#00E5FF"
+                    android:layout_marginStart="8dp" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <!-- Loading indicator, shown while saving to Firestore -->
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:indeterminateTint="#00E5FF"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+</ScrollView>

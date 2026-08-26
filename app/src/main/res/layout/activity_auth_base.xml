@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bg_dark">
+
+    <!-- Grid -->
+    <View
+        android:id="@+id/gridOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:alpha="0.4"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Orb Top -->
+    <View
+        android:id="@+id/orbTop"
+        android:layout_width="280dp"
+        android:layout_height="280dp"
+        android:layout_marginStart="-80dp"
+        android:layout_marginTop="-80dp"
+        android:alpha="0.3"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <!-- Orb Bottom -->
+    <View
+        android:id="@+id/orbBottom"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_marginEnd="-50dp"
+        android:layout_marginBottom="-50dp"
+        android:alpha="0.2"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"/>
+
+    <!-- Bottom accent line -->
+    <View
+        android:id="@+id/accentLine"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:scrollbars="none"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:paddingTop="48dp">
+
+            <!-- Back Button -->
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:src="@drawable/ic_arrow_back"
+                android:background="@drawable/bg_back_btn"
+                android:padding="10dp"
+                android:layout_marginBottom="20dp"/>
+
+            <!-- Role Icon -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/iconWrap"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                app:cardCornerRadius="14dp"
+                app:cardElevation="0dp"
+                android:layout_marginBottom="16dp">
+                <TextView
+                    android:id="@+id/tvRoleIcon"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:textSize="20sp"/>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Role Badge -->
+            <LinearLayout
+                android:id="@+id/roleBadge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:paddingStart="10dp"
+                android:paddingEnd="12dp"
+                android:paddingTop="4dp"
+                android:paddingBottom="4dp"
+                android:layout_marginBottom="16dp">
+                <View
+                    android:id="@+id/badgeDot"
+                    android:layout_width="6dp"
+                    android:layout_height="6dp"
+                    android:layout_marginEnd="6dp"/>
+                <TextView
+                    android:id="@+id/tvBadgeText"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="9sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.1"/>
+            </LinearLayout>
+
+            <!-- Heading -->
+            <TextView
+                android:id="@+id/tvHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="30sp"
+                android:textColor="@color/text_primary"
+                android:textStyle="bold"
+                android:lineSpacingMultiplier="1.1"
+                android:layout_marginBottom="6dp"/>
+
+            <!-- Subheading -->
+            <TextView
+                android:id="@+id/tvSubHeading"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="13sp"
+                android:textColor="@color/text_muted"
+                android:layout_marginBottom="28dp"/>
+
+            <!-- Fields Container -->
+            <LinearLayout
+                android:id="@+id/fieldsContainer"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"/>
+
+            <!-- Main Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnMain"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:textSize="14sp"
+                android:textColor="@color/white"
+                android:letterSpacing="0.04"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                style="@style/Widget.MaterialComponents.Button"
+                app:cornerRadius="14dp"/>
+
+            <!-- Divider -->
+            <LinearLayout
+                android:id="@+id/dividerLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:layout_marginBottom="14dp"
+                android:visibility="gone">
+                <View android:layout_width="0dp" android:layout_height="1dp"
+                    android:layout_weight="1" android:background="#1A2035"/>
+                <TextView android:layout_width="wrap_content" android:layout_height="wrap_content"
+                    android:text="or" android:textSize="11sp" android:textColor="@color/text_muted"
+                    android:paddingStart="12dp" android:paddingEnd="12dp"/>
+                <View android:layout_width="0dp" android:layout_height="1dp"
+                    android:layout_weight="1" android:background="#1A2035"/>
+            </LinearLayout>
+
+            <!-- Switch Text -->
+            <TextView
+                android:id="@+id/tvSwitch"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:textSize="12sp"
+                android:textColor="@color/text_muted"
+                android:padding="8dp"/>
+
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

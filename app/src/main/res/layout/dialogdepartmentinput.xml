@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    dialog_department_input.xml
+    Reused for BOTH "Add Department" and "Edit Department"  the title and
+    pre-filled text are set programmatically in the Activity depending on
+    which action triggered it.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Department Name"
+        android:textColor="@color/textSecondary"
+        android:textSize="12sp"
+        android:layout_marginBottom="8dp" />
+
+    <EditText
+        android:id="@+id/etDepartmentNameInput"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:hint="e.g. Computer Science"
+        android:inputType="textCapWords"
+        android:textColor="@color/textPrimary"
+        android:textColorHint="@color/textTertiary"
+        android:background="@drawable/bg_search_glass"
+        android:padding="12dp" />
+
+</LinearLayout>

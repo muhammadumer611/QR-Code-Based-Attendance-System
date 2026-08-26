@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
+    <application
+        android:name=".AttendanceApp"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/onboard1"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/onboard1"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.QRCodeAttendance">
+        <activity
+            android:name=".ActivityTeacherClasses"
+            android:exported="false" />
+        <activity
+            android:name=".ActivitySettings"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityAdminProfile"
+            android:exported="false" />
+        <activity
+            android:name=".ActivitySubjectManagement"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityAttendanceDepartmentList"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityAttendanceClassList"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityAttendanceStudentList"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityStudentAttendanceDetail"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityManualAttendanceFilter"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityNotifications"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityReports"
+            android:exported="false" />
+        <activity
+            android:name=".ActivitySchedule"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityDailyOverview"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityTeacherSubjectAssignment"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityManualAttendanceRegister"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityDepartmentManagement"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityAddTeacher"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityAddStudent"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityTeacherDashboard"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityAdminDashboard"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityStudentDashboard"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityRoleSelection"
+            android:exported="false" />
+        <activity
+            android:name=".ActivityOnBoardingScreen"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".MainActivity"
+            android:exported="true" />
+        <activity
+            android:name=".ActivityAdminSignUp"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ActivityAdminSignIn"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ActivityTeacherSignUp"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ActivityTeacherSignIn"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ActivityStudentSignUp"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ActivityStudentSignIn"
+            android:windowSoftInputMode="adjustResize" />
+    </application>
+
+</manifest>
