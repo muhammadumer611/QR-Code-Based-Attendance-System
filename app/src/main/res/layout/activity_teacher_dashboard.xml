@@ -98,11 +98,14 @@
                         app:layout_constraintStart_toStartOf="parent"
                         app:layout_constraintTop_toBottomOf="@id/menuIcon"/>
 
+                    <!-- Old ID compatibility (unused, kept for legacy Kotlin refs) -->
                     <TextView
                         android:id="@+id/txtWelcome"
                         android:layout_width="0dp"
                         android:layout_height="0dp"
-                        android:visibility="gone"/>
+                        android:visibility="gone"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
 
                     <TextView
                         android:id="@+id/txtTeacher"
@@ -117,11 +120,14 @@
                         app:layout_constraintStart_toStartOf="@id/txtHello"
                         app:layout_constraintTop_toBottomOf="@id/txtHello"/>
 
+                    <!-- Old ID compatibility (unused, kept for legacy Kotlin refs) -->
                     <TextView
                         android:id="@+id/txtTeacherName"
-                        android:layout_width="0dp"
-                        android:layout_height="0dp"
-                        android:visibility="gone"/>
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:visibility="gone"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
 
                     <TextView
                         android:id="@+id/txtRole"
@@ -403,6 +409,50 @@
                     </com.google.android.material.card.MaterialCardView>
 
                 </LinearLayout>
+
+                <!-- ================= TODAY'S CLASSES ================= -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="22dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Today's Classes"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerTodayClasses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:clipToPadding="false"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="4dp"
+                    android:paddingVertical="10dp"
+                    tools:listitem="@layout/item_today_class"/>
+
+                <TextView
+                    android:id="@+id/txtTodayClassesEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No classes assigned for today."
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:visibility="gone"/>
 
                 <!-- ================= MY SUBJECTS ================= -->
 
@@ -997,4 +1047,3 @@
         app:menu="@menu/teacher_drawer_menu"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
-

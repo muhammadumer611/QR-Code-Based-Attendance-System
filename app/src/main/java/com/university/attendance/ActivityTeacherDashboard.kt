@@ -1,10 +1,10 @@
-
 package com.university.attendance
 
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -16,6 +16,7 @@ class ActivityTeacherDashboard : AppCompatActivity() {
     private lateinit var binding: ActivityTeacherDashboardBinding
 
     private lateinit var viewModel: TeacherDashboardViewModel
+    private lateinit var todayClassAdapter: TeacherTodayClassAdapter
 
     private lateinit var subjectAdapter: SubjectCardAdapter
 
@@ -53,7 +54,11 @@ class ActivityTeacherDashboard : AppCompatActivity() {
 
         setupSubjectsList()
 
+        setupTodayClasses()
+
         observeViewModel()
+
+        setupBackPressHandler()
 
 
         // --------------------------------------------------------
@@ -368,6 +373,58 @@ class ActivityTeacherDashboard : AppCompatActivity() {
 
 
     // ============================================================
+    // TODAY CLASSES RECYCLER
+    // ============================================================
+
+    private fun setupTodayClasses() {
+
+        todayClassAdapter =
+            TeacherTodayClassAdapter { classSchedule ->
+
+                val intent =
+                    Intent(
+                        this,
+                        ActivityTeacherClasses::class.java
+                    )
+
+                intent.putExtra(
+                    "scheduleId",
+                    classSchedule.scheduleId
+                )
+
+                intent.putExtra(
+                    "className",
+                    classSchedule.className
+                )
+
+                intent.putExtra(
+                    "subjectName",
+                    classSchedule.subjectName
+                )
+
+                startActivity(
+                    intent
+                )
+            }
+
+        binding.recyclerTodayClasses.apply {
+
+            layoutManager =
+                LinearLayoutManager(
+                    this@ActivityTeacherDashboard
+                )
+
+            adapter =
+                todayClassAdapter
+
+            setHasFixedSize(
+                true
+            )
+        }
+    }
+
+
+    // ============================================================
     // OBSERVE VIEW MODEL
     // ============================================================
 
@@ -626,20 +683,26 @@ class ActivityTeacherDashboard : AppCompatActivity() {
         classes: List<ClassSchedule>
     ) {
 
-        /*
-         * Current XML does not yet contain a dedicated
-         * Today's Classes RecyclerView.
-         *
-         * Therefore we do not try to access a non-existing
-         * binding ID here.
-         *
-         * The data is already available through:
-         *
-         * viewModel.todayClasses
-         *
-         * and will be connected when the dedicated XML section
-         * is added.
-         */
+        todayClassAdapter.submitList(
+            classes
+        )
+
+        if (classes.isEmpty()) {
+
+            binding.recyclerTodayClasses.visibility =
+                View.GONE
+
+            binding.txtTodayClassesEmpty.visibility =
+                View.VISIBLE
+
+        } else {
+
+            binding.recyclerTodayClasses.visibility =
+                View.VISIBLE
+
+            binding.txtTodayClassesEmpty.visibility =
+                View.GONE
+        }
     }
 
 
@@ -669,28 +732,42 @@ class ActivityTeacherDashboard : AppCompatActivity() {
 
 
     // ============================================================
-    // BACK BUTTON
+    // BACK PRESS HANDLING
+    //
+    // onBackPressed() is deprecated on ComponentActivity /
+    // AppCompatActivity. We register an OnBackPressedCallback
+    // instead, which is the supported replacement and also works
+    // correctly with predictive back gestures on newer Android
+    // versions.
     // ============================================================
 
-    @Suppress("DEPRECATION")
-    override fun onBackPressed() {
+    private fun setupBackPressHandler() {
 
-        if (
-            binding.drawerLayout
-                .isDrawerOpen(
-                    binding.navigationView
-                )
-        ) {
+        onBackPressedDispatcher.addCallback(this) {
 
-            binding.drawerLayout
-                .closeDrawer(
-                    binding.navigationView
-                )
+            if (
+                binding.drawerLayout
+                    .isDrawerOpen(
+                        binding.navigationView
+                    )
+            ) {
 
-        } else {
+                binding.drawerLayout
+                    .closeDrawer(
+                        binding.navigationView
+                    )
 
-            super.onBackPressed()
+            } else {
+
+                // Disable this callback and re-trigger the
+                // dispatcher so the default (finish activity)
+                // behavior runs.
+
+                isEnabled = false
+
+                onBackPressedDispatcher
+                    .onBackPressed()
+            }
         }
     }
 }
-
