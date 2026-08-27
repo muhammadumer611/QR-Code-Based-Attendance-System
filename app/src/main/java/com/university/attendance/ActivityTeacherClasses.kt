@@ -1,106 +1,248 @@
 package com.university.attendance
 
+import android.content.Intent
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.university.attendance.databinding.ActivityTeacherClassesBinding
+import kotlinx.coroutines.launch
 
 class ActivityTeacherClasses : AppCompatActivity() {
 
     private lateinit var binding: ActivityTeacherClassesBinding
     private lateinit var viewModel: TeacherClassesViewModel
-    private lateinit var adapter: ClassListAdapter
+    private lateinit var adapter: TeacherClassesAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityTeacherClassesBinding.inflate(layoutInflater)
+        binding =
+            ActivityTeacherClassesBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
 
-        viewModel = ViewModelProvider(this)[TeacherClassesViewModel::class.java]
+        viewModel =
+            ViewModelProvider(this)[TeacherClassesViewModel::class.java]
 
-        setupUi()
-        setupList()
+        setupRecyclerView()
+        setupClicks()
         observeViewModel()
 
-        viewModel.loadClasses()
+        loadClasses()
     }
 
-    private fun setupUi() {
-        binding.btnBack.setOnClickListener { finish() }
+    // ============================================================
+    // LOAD CLASSES
+    // ============================================================
 
-        binding.btnRetry.setOnClickListener { viewModel.loadClasses() }
+    private fun loadClasses() {
 
-        binding.etSearch.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+        if (FirebaseAuth.getInstance().currentUser == null) {
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                viewModel.search(s?.toString().orEmpty())
-            }
-
-            override fun afterTextChanged(s: Editable?) {}
-        })
-    }
-
-    private fun setupList() {
-        adapter = ClassListAdapter { subject ->
-            // Class Detail screen isn't built yet -- it needs Subject.kt's
-            // full field set, Student.kt, and the attendance_records shape
-            // confirmed first, so we don't guess at those here (Step 2).
             Toast.makeText(
                 this,
-                "Class Detail for ${subject.courseCode} — coming in Step 2.",
-                Toast.LENGTH_SHORT
+                "Teacher session not found.",
+                Toast.LENGTH_LONG
             ).show()
+
+            finish()
+            return
         }
 
-        binding.recyclerClasses.apply {
-            layoutManager = LinearLayoutManager(this@ActivityTeacherClasses)
-            adapter = this@ActivityTeacherClasses.adapter
+        lifecycleScope.launch {
+
+            try {
+
+                val repository =
+                    TeacherSubjectsRepository()
+
+                val teacher =
+                    repository.getCurrentTeacher()
+
+                viewModel.loadClasses(
+                    teacher.teacherId
+                )
+
+            } catch (e: Exception) {
+
+                Toast.makeText(
+                    this@ActivityTeacherClasses,
+                    e.message
+                        ?: "Unable to load teacher profile.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
         }
     }
+
+    // ============================================================
+    // RECYCLER VIEW
+    // ============================================================
+
+    private fun setupRecyclerView() {
+
+        adapter =
+            TeacherClassesAdapter { subject ->
+
+                openClassDetail(subject)
+            }
+
+        binding.recyclerClasses.apply {
+
+            layoutManager =
+                LinearLayoutManager(
+                    this@ActivityTeacherClasses
+                )
+
+            adapter =
+                this@ActivityTeacherClasses.adapter
+
+            setHasFixedSize(false)
+        }
+    }
+
+    // ============================================================
+    // CLICKS
+    // ============================================================
+
+    private fun setupClicks() {
+
+        binding.btnBack.setOnClickListener {
+            finish()
+        }
+
+        binding.btnRetry.setOnClickListener {
+            loadClasses()
+        }
+    }
+
+    // ============================================================
+    // OBSERVERS
+    // ============================================================
 
     private fun observeViewModel() {
 
         viewModel.uiState.observe(this) { state ->
+
             when (state) {
 
+                is TeacherClassesViewModel.UiState.Idle -> {
+
+                    binding.loadingOverlay.visibility =
+                        View.GONE
+
+                    binding.errorState.visibility =
+                        View.GONE
+                }
+
                 is TeacherClassesViewModel.UiState.Loading -> {
-                    binding.progressLoading.visibility = View.VISIBLE
-                    binding.errorState.visibility = View.GONE
-                    binding.recyclerClasses.visibility = View.GONE
-                    binding.txtEmpty.visibility = View.GONE
+
+                    binding.loadingOverlay.visibility =
+                        View.VISIBLE
+
+                    binding.errorState.visibility =
+                        View.GONE
                 }
 
                 is TeacherClassesViewModel.UiState.Success -> {
-                    binding.progressLoading.visibility = View.GONE
-                    binding.errorState.visibility = View.GONE
+
+                    binding.loadingOverlay.visibility =
+                        View.GONE
+
+                    binding.errorState.visibility =
+                        View.GONE
                 }
 
                 is TeacherClassesViewModel.UiState.Error -> {
-                    binding.progressLoading.visibility = View.GONE
-                    binding.recyclerClasses.visibility = View.GONE
-                    binding.txtEmpty.visibility = View.GONE
-                    binding.errorState.visibility = View.VISIBLE
-                    binding.txtErrorMessage.text = state.message
+
+                    binding.loadingOverlay.visibility =
+                        View.GONE
+
+                    binding.errorState.visibility =
+                        View.VISIBLE
+
+                    binding.txtErrorMessage.text =
+                        state.message
                 }
             }
         }
 
-        viewModel.filteredSubjects.observe(this) { subjects ->
-            adapter.submitList(subjects)
+        viewModel.classes.observe(this) { classes ->
 
-            if (viewModel.uiState.value is TeacherClassesViewModel.UiState.Success) {
-                binding.recyclerClasses.visibility =
-                    if (subjects.isEmpty()) View.GONE else View.VISIBLE
-                binding.txtEmpty.visibility =
-                    if (subjects.isEmpty()) View.VISIBLE else View.GONE
-            }
+            binding.txtEmpty.visibility =
+                if (classes.isEmpty()) {
+                    View.VISIBLE
+                } else {
+                    View.GONE
+                }
+
+            binding.recyclerClasses.visibility =
+                if (classes.isEmpty()) {
+                    View.GONE
+                } else {
+                    View.VISIBLE
+                }
+
+            adapter.submitList(classes)
         }
     }
+
+    // ============================================================
+    // CLASS DETAIL
+    // ============================================================
+
+    private fun openClassDetail(
+        subject: Subject
+    ) {
+
+        val intent =
+            Intent(
+                this,
+                ActivityTeacherClassDetail::class.java
+            ).apply {
+
+                putExtra(
+                    "subjectId",
+                    subject.subjectId
+                )
+
+                putExtra(
+                    "courseCode",
+                    subject.courseCode
+                )
+
+                putExtra(
+                    "subjectName",
+                    subject.subjectName
+                )
+
+                putExtra(
+                    "programName",
+                    subject.programName
+                )
+
+                putExtra(
+                    "semester",
+                    subject.semester
+                )
+
+                putExtra(
+                    "departmentName",
+                    subject.departmentName
+                )
+
+                putExtra(
+                    "teacherId",
+                    subject.teacherId
+                )
+            }
+
+        startActivity(intent)
+    }
 }
+

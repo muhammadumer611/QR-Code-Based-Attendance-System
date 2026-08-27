@@ -65,6 +65,7 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <ImageView
+                            android:id="@+id/imgProfile"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:padding="8dp"
@@ -98,6 +99,12 @@
                         app:layout_constraintTop_toBottomOf="@id/menuIcon"/>
 
                     <TextView
+                        android:id="@+id/txtWelcome"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone"/>
+
+                    <TextView
                         android:id="@+id/txtTeacher"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
@@ -109,6 +116,12 @@
                         android:layout_marginTop="2dp"
                         app:layout_constraintStart_toStartOf="@id/txtHello"
                         app:layout_constraintTop_toBottomOf="@id/txtHello"/>
+
+                    <TextView
+                        android:id="@+id/txtTeacherName"
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:visibility="gone"/>
 
                     <TextView
                         android:id="@+id/txtRole"
@@ -182,7 +195,6 @@
                     android:orientation="horizontal"
                     android:weightSum="2">
 
-                    <!-- Assigned Subjects (real count from Firestore "subjects" collection) -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="130dp"
@@ -223,11 +235,17 @@
                                 android:textSize="26sp"
                                 android:textStyle="bold"/>
 
+                            <!-- Old ID compatibility -->
+                            <TextView
+                                android:id="@+id/txtTotalClasses"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:visibility="gone"/>
+
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Total Students (real count, derived from assigned subjects) -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="130dp"
@@ -268,6 +286,12 @@
                                 android:textSize="26sp"
                                 android:textStyle="bold"/>
 
+                            <TextView
+                                android:id="@+id/txtTotalStudents"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:visibility="gone"/>
+
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
@@ -283,7 +307,6 @@
                     android:paddingHorizontal="12dp"
                     android:weightSum="2">
 
-                    <!-- Attendance % (real, computed in TeacherDashboardRepository) -->
                     <com.google.android.material.card.MaterialCardView
                         android:layout_width="0dp"
                         android:layout_height="130dp"
@@ -324,11 +347,16 @@
                                 android:textStyle="bold"
                                 android:textSize="26sp"/>
 
+                            <TextView
+                                android:id="@+id/txtAttendancePercentage"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:visibility="gone"/>
+
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Assignments - placeholder "-" until an Assignments module/collection exists -->
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardAssignments"
                         android:layout_width="0dp"
@@ -376,7 +404,7 @@
 
                 </LinearLayout>
 
-                <!-- ================= MY SUBJECTS (real data, was fake "Today's Classes") ================= -->
+                <!-- ================= MY SUBJECTS ================= -->
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -431,8 +459,7 @@
                     android:textSize="13sp"
                     android:gravity="center"
                     android:padding="20dp"
-                    android:visibility="gone"
-                    tools:visibility="visible"/>
+                    android:visibility="gone"/>
 
                 <!-- ================= QUICK ACTIONS ================= -->
 
@@ -452,8 +479,6 @@
                     android:layout_marginTop="8dp"
                     android:padding="10dp"
                     android:columnCount="2">
-
-                    <!-- QR Attendance — Primary CTA, glowing -->
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardTakeAttendance"
@@ -511,8 +536,6 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Manual Attendance -->
-
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardManualAttendance"
                         android:layout_width="0dp"
@@ -560,8 +583,6 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Upload Notes -->
-
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardUploadNotes"
                         android:layout_width="0dp"
@@ -602,8 +623,6 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Assignments -->
-
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardAssignmentsAction"
                         android:layout_width="0dp"
@@ -643,8 +662,6 @@
 
                     </com.google.android.material.card.MaterialCardView>
 
-                    <!-- Students -->
-
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardStudents"
                         android:layout_width="0dp"
@@ -683,8 +700,6 @@
                         </LinearLayout>
 
                     </com.google.android.material.card.MaterialCardView>
-
-                    <!-- Results -->
 
                     <com.google.android.material.card.MaterialCardView
                         android:id="@+id/cardResults"
@@ -817,7 +832,7 @@
                     android:gravity="center"
                     android:padding="20dp"/>
 
-                <!-- ================= UPCOMING CLASSES (placeholder — no timetable module yet) ================= -->
+                <!-- ================= UPCOMING CLASSES ================= -->
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -839,6 +854,7 @@
                     app:strokeWidth="1dp">
 
                     <LinearLayout
+                        android:id="@+id/todayClassesContainer"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
@@ -846,9 +862,10 @@
                         android:gravity="center">
 
                         <TextView
+                            android:id="@+id/txtNoTodayClasses"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Timetable module coming soon"
+                            android:text="No classes assigned for today."
                             android:textColor="@android:color/white"
                             android:textStyle="bold"
                             android:textSize="14sp"/>
@@ -865,6 +882,26 @@
                     </LinearLayout>
 
                 </com.google.android.material.card.MaterialCardView>
+
+                <!-- Compatibility IDs for old Kotlin code -->
+
+                <TextView
+                    android:id="@+id/btnMyClasses"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"/>
+
+                <TextView
+                    android:id="@+id/btnAttendance"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"/>
+
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="0dp"
+                    android:layout_height="0dp"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -960,3 +997,4 @@
         app:menu="@menu/teacher_drawer_menu"/>
 
 </androidx.drawerlayout.widget.DrawerLayout>
+

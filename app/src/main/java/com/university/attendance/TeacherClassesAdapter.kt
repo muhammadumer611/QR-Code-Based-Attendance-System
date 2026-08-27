@@ -1,30 +1,26 @@
 package com.university.attendance
 
-import android.view.LayoutInflater
+import android.graphics.Typeface
+import android.view.Gravity
+import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.university.attendance.databinding.ItemTeacherClassBinding
 
 class TeacherClassesAdapter(
-    private val onClassClick: (Subject) -> Unit
+    private val onClick: (Subject) -> Unit
 ) : RecyclerView.Adapter<TeacherClassesAdapter.ClassViewHolder>() {
 
     private val items =
         mutableListOf<Subject>()
 
-    private var studentCounts =
-        emptyMap<String, Int>()
-
     fun submitList(
-        list: List<Subject>,
-        counts: Map<String, Int> = emptyMap()
+        newList: List<Subject>
     ) {
 
         items.clear()
-        items.addAll(list)
-
-        studentCounts =
-            counts
+        items.addAll(newList)
 
         notifyDataSetChanged()
     }
@@ -34,14 +30,140 @@ class TeacherClassesAdapter(
         viewType: Int
     ): ClassViewHolder {
 
-        val binding =
-            ItemTeacherClassBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
+        val context =
+            parent.context
 
-        return ClassViewHolder(binding)
+        val container =
+            LinearLayout(context).apply {
+
+                orientation =
+                    LinearLayout.VERTICAL
+
+                gravity =
+                    Gravity.CENTER_VERTICAL
+
+                setPadding(
+                    32,
+                    28,
+                    32,
+                    28
+                )
+
+                layoutParams =
+                    RecyclerView.LayoutParams(
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+
+                        setMargins(
+                            20,
+                            10,
+                            20,
+                            10
+                        )
+                    }
+
+                setBackgroundColor(
+                    android.graphics.Color.WHITE
+                )
+
+                isClickable = true
+                isFocusable = true
+            }
+
+        val subjectName =
+            TextView(context).apply {
+
+                textSize = 18f
+
+                setTypeface(
+                    null,
+                    Typeface.BOLD
+                )
+
+                setTextColor(
+                    android.graphics.Color.rgb(
+                        25,
+                        35,
+                        55
+                    )
+                )
+            }
+
+        val courseCode =
+            TextView(context).apply {
+
+                textSize = 14f
+
+                setTextColor(
+                    android.graphics.Color.DKGRAY
+                )
+
+                setPadding(
+                    0,
+                    8,
+                    0,
+                    0
+                )
+            }
+
+        val program =
+            TextView(context).apply {
+
+                textSize = 14f
+
+                setTextColor(
+                    android.graphics.Color.GRAY
+                )
+
+                setPadding(
+                    0,
+                    5,
+                    0,
+                    0
+                )
+            }
+
+        val semester =
+            TextView(context).apply {
+
+                textSize = 14f
+
+                setTextColor(
+                    android.graphics.Color.GRAY
+                )
+
+                setPadding(
+                    0,
+                    5,
+                    0,
+                    0
+                )
+            }
+
+        container.addView(
+            subjectName
+        )
+
+        container.addView(
+            courseCode
+        )
+
+        container.addView(
+            program
+        )
+
+        container.addView(
+            semester
+        )
+
+        return ClassViewHolder(
+            container,
+            subjectName,
+            courseCode,
+            program,
+            semester
+        )
     }
 
     override fun onBindViewHolder(
@@ -57,31 +179,35 @@ class TeacherClassesAdapter(
     override fun getItemCount(): Int =
         items.size
 
-    inner class ClassViewHolder(private val binding: ItemTeacherClassBinding) : RecyclerView.ViewHolder(binding.root
-    ) {
+    inner class ClassViewHolder(
+        itemView: View,
+        private val subjectName: TextView,
+        private val courseCode: TextView,
+        private val program: TextView,
+        private val semester: TextView
+    ) : RecyclerView.ViewHolder(itemView) {
 
-        fun bind(subject: Subject) {
+        fun bind(
+            subject: Subject
+        ) {
 
-            binding.txtCourseCode.text =subject.courseCode
+            subjectName.text =
+                subject.subjectName
 
-            binding.txtSubjectName.text =subject.subjectName
+            courseCode.text =
+                "Course Code: ${subject.courseCode}"
 
-            binding.txtProgram.text =subject.programName
+            program.text =
+                "Program: ${subject.programName}"
 
-            binding.txtSemester.text =subject.semester
+            semester.text =
+                "Semester: ${subject.semester}"
 
-            binding.txtDepartment.text =subject.departmentName
+            itemView.setOnClickListener {
 
-            val count =studentCounts[subject.subjectId] ?: 0
-
-            binding.txtStudentCount.text ="$count Students"
-
-            binding.root.setOnClickListener {
-
-                onClassClick(
-                    subject
-                )
+                onClick(subject)
             }
         }
     }
 }
+
