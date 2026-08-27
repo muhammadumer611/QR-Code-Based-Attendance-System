@@ -1,0 +1,238 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ===================================================== -->
+        <!-- TEACHER -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Teacher"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <AutoCompleteTextView
+            android:id="@+id/etTeacher"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="Select Teacher"
+            android:inputType="none"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- CLASS NAME -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Class Name"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etClassName"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="e.g. BSCS 5th A"
+            android:inputType="textCapWords"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- SUBJECT -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Subject"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etSubject"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="e.g. Database Systems"
+            android:inputType="textCapWords"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- DATE -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Date"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etDate"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="Select Date"
+            android:focusable="false"
+            android:clickable="true"
+            android:inputType="none"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- START TIME -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start Time"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etStartTime"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="Select Start Time"
+            android:focusable="false"
+            android:clickable="true"
+            android:inputType="none"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- END TIME -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="End Time"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etEndTime"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="Select End Time"
+            android:focusable="false"
+            android:clickable="true"
+            android:inputType="none"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- ROOM -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Room Number"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etRoom"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="e.g. Lab 01 / Room 205"
+            android:inputType="textCapWords"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- SEMESTER -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Semester"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etSemester"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="e.g. 5th Semester"
+            android:inputType="textCapWords"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- NOTE -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Note"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etNote"
+            android:layout_width="match_parent"
+            android:layout_height="90dp"
+            android:hint="Optional note"
+            android:gravity="top|start"
+            android:inputType="textCapSentences|textMultiLine"
+            android:padding="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="5dp" />
+
+    </LinearLayout>
+
+</ScrollView>

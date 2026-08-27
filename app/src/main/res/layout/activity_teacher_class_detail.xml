@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/backgroundColor">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <!-- ===================================================== -->
+        <!-- HEADER -->
+        <!-- ===================================================== -->
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/btnBack"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:padding="9dp"
+                android:src="@drawable/ic_arrow_back"
+                android:contentDescription="Back"
+                android:clickable="true"
+                android:focusable="true"
+                app:tint="@color/cyanAccent"
+                xmlns:app="http://schemas.android.com/apk/res-auto"/>
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:text="Class Details"
+                android:textColor="@android:color/white"
+                android:textSize="22sp"
+                android:textStyle="bold"/>
+
+        </LinearLayout>
+
+
+        <!-- ===================================================== -->
+        <!-- SUBJECT CARD -->
+        <!-- ===================================================== -->
+
+        <com.google.android.material.card.MaterialCardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="8dp"
+            app:cardBackgroundColor="@color/glassCard"
+            app:strokeColor="@color/cyanAccentDim"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="22dp">
+
+                <TextView
+                    android:id="@+id/tvSubjectName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Subject Name"
+                    android:textColor="@android:color/white"
+                    android:textSize="24sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvCourseCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Course Code"
+                    android:textColor="@color/cyanAccent"
+                    android:textSize="14sp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:id="@+id/tvProgram"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:text="Program"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/tvSemester"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Semester"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp"/>
+
+                <TextView
+                    android:id="@+id/tvDepartment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Department"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="14sp"/>
+
+            </LinearLayout>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <!-- ===================================================== -->
+        <!-- ACTIONS -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Class Management"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold"/>
+
+
+        <com.google.android.material.card.MaterialCardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginTop="12dp"
+            app:cardCornerRadius="18dp"
+            app:cardBackgroundColor="@color/glassCard"
+            app:strokeColor="@color/cyanAccentDim"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:text="View Students"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+
+        <com.google.android.material.card.MaterialCardView
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_width="match_parent"
+            android:layout_height="70dp"
+            android:layout_marginTop="10dp"
+            app:cardCornerRadius="18dp"
+            app:cardBackgroundColor="@color/glassCard"
+            app:strokeColor="@color/cyanAccentDim"
+            app:strokeWidth="1dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="20dp"
+                android:text="Attendance Records"
+                android:textColor="@android:color/white"
+                android:textSize="15sp"
+                android:textStyle="bold"/>
+
+        </com.google.android.material.card.MaterialCardView>
+
+    </LinearLayout>
+
+</ScrollView>

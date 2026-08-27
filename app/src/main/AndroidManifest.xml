@@ -118,6 +118,10 @@
             android:name=".ActivityClassSchedule"
             android:exported="false"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".ActivityTeacherClassDetail"
+            android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
     </application>
 
 </manifest>
