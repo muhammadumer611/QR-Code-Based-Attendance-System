@@ -49,6 +49,7 @@ class ActivityAdminDashboard : AppCompatActivity() {
             CardSearchTarget(listOf("total students"), binding.cardTotalStudents),
             CardSearchTarget(listOf("total teachers"), binding.cardTotalTeachers),
             CardSearchTarget(listOf("total departments"), binding.cardTotalDepartments),
+            CardSearchTarget( listOf( "class schedule", "class schedules","class timetable","create class", "manage class schedule"), binding.cardClassSchedule),
             CardSearchTarget(listOf("total subjects"), binding.cardTotalSubjects),
             CardSearchTarget(listOf("setting", "settings"), binding.cardSettings),
             CardSearchTarget(listOf("announcement", "notification", "notifications"), binding.cardAnnouncement),
@@ -132,6 +133,9 @@ class ActivityAdminDashboard : AppCompatActivity() {
 
         binding.cardSchedule.setOnClickListener {
             startActivity(Intent(this, ActivitySchedule::class.java))
+        }
+        binding.cardClassSchedule.setOnClickListener {
+            startActivity( Intent(this, ActivityClassSchedule::class.java))
         }
 
         binding.cardReports.setOnClickListener {
