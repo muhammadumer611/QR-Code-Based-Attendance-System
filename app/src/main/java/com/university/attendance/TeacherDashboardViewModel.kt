@@ -5,28 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
+import androidx.activity.OnBackPressedCallback
 
 class TeacherDashboardViewModel(
     private val repository: TeacherDashboardRepository =
         TeacherDashboardRepository()
 ) : ViewModel() {
-
-
-    // ============================================================
-    // UI STATE
-    // ============================================================
-
-    sealed class UiState {
-
-        object Loading : UiState()
-
-        object Success : UiState()
-
-        data class Error(
-            val message: String
-        ) : UiState()
-    }
-
 
     private val _uiState =
         MutableLiveData<UiState>()
@@ -35,20 +19,12 @@ class TeacherDashboardViewModel(
         _uiState
 
 
-    // ============================================================
-    // TEACHER
-    // ============================================================
-
     private val _teacher =
         MutableLiveData<Teacher>()
 
     val teacher: LiveData<Teacher> =
         _teacher
 
-
-    // ============================================================
-    // SUBJECTS
-    // ============================================================
 
     private val _subjects =
         MutableLiveData<List<Subject>>(
@@ -59,10 +35,6 @@ class TeacherDashboardViewModel(
         _subjects
 
 
-    // ============================================================
-    // TOTAL STUDENTS
-    // ============================================================
-
     private val _totalStudents =
         MutableLiveData(0)
 
@@ -70,20 +42,12 @@ class TeacherDashboardViewModel(
         _totalStudents
 
 
-    // ============================================================
-    // ATTENDANCE
-    // ============================================================
-
     private val _attendancePercentage =
         MutableLiveData(0)
 
     val attendancePercentage: LiveData<Int> =
         _attendancePercentage
 
-
-    // ============================================================
-    // TODAY'S CLASSES
-    // ============================================================
 
     private val _todayClasses =
         MutableLiveData<List<ClassSchedule>>(
@@ -94,22 +58,23 @@ class TeacherDashboardViewModel(
         _todayClasses
 
 
-    // ============================================================
-    // UPCOMING CLASSES
-    // ============================================================
-
-    private val _upcomingClasses =
+    private val _weekClasses =
         MutableLiveData<List<ClassSchedule>>(
             emptyList()
         )
 
-    val upcomingClasses: LiveData<List<ClassSchedule>> =
-        _upcomingClasses
+    val weekClasses: LiveData<List<ClassSchedule>> =
+        _weekClasses
 
 
-    // ============================================================
-    // LOAD DASHBOARD
-    // ============================================================
+    private val _semesterClasses =
+        MutableLiveData<List<ClassSchedule>>(
+            emptyList()
+        )
+
+    val semesterClasses: LiveData<List<ClassSchedule>> =
+        _semesterClasses
+
 
     fun loadDashboard() {
 
@@ -125,78 +90,58 @@ class TeacherDashboardViewModel(
                     repository.loadDashboard()
 
 
-                // ------------------------------------------------
-                // TEACHER
-                // ------------------------------------------------
-
                 _teacher.value =
                     data.teacher
 
-
-                // ------------------------------------------------
-                // SUBJECTS
-                // ------------------------------------------------
 
                 _subjects.value =
                     data.assignedSubjects
 
 
-                // ------------------------------------------------
-                // STUDENTS
-                // ------------------------------------------------
-
                 _totalStudents.value =
                     data.totalStudents
 
-
-                // ------------------------------------------------
-                // ATTENDANCE
-                // ------------------------------------------------
 
                 _attendancePercentage.value =
                     data.attendancePercentage
 
 
-                // ------------------------------------------------
-                // TODAY
-                // ------------------------------------------------
-
                 _todayClasses.value =
                     data.todayClasses
 
 
-                // ------------------------------------------------
-                // UPCOMING
-                // ------------------------------------------------
-
-                _upcomingClasses.value =
-                    data.upcomingClasses
+                _weekClasses.value =
+                    data.weekClasses
 
 
-                // ------------------------------------------------
-                // SUCCESS
-                // ------------------------------------------------
+                _semesterClasses.value =
+                    data.semesterClasses
+
 
                 _uiState.value =
                     UiState.Success
+
 
             } catch (e: Exception) {
 
                 _uiState.value =
                     UiState.Error(
                         e.message
-                            ?: "Failed to load teacher dashboard."
+                            ?: "Failed to load dashboard."
                     )
             }
         }
     }
 
 
-    // ============================================================
-    // REFRESH
-    // ============================================================
+    sealed class UiState {
 
-    fun refresh() {
-        loadDashboard()
+        object Loading : UiState()
+
+        object Success : UiState()
+
+        data class Error(
+            val message: String
+        ) : UiState()
     }
 }

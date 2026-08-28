@@ -454,6 +454,94 @@
                     android:padding="20dp"
                     android:visibility="gone"/>
 
+                <!-- ================= THIS WEEK ================= -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="22dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="This Week"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerWeeklyClasses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:clipToPadding="false"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingVertical="8dp"
+                    tools:listitem="@layout/item_teacher_today_class"/>
+
+                <TextView
+                    android:id="@+id/txtWeeklyClassesEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No classes scheduled for this week."
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:visibility="gone"/>
+
+                <!-- ================= SEMESTER CLASSES ================= -->
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:layout_marginStart="20dp"
+                    android:layout_marginEnd="20dp"
+                    android:layout_marginTop="22dp">
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Semester Classes"
+                        android:textColor="@android:color/white"
+                        android:textSize="20sp"
+                        android:textStyle="bold"/>
+
+                </LinearLayout>
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerSemesterClasses"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:clipToPadding="false"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp"
+                    android:paddingVertical="8dp"
+                    tools:listitem="@layout/item_teacher_today_class"/>
+
+                <TextView
+                    android:id="@+id/txtSemesterClassesEmpty"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No semester classes found."
+                    android:textColor="@color/textSecondary"
+                    android:textSize="13sp"
+                    android:gravity="center"
+                    android:padding="20dp"
+                    android:visibility="gone"/>
+
                 <!-- ================= MY SUBJECTS ================= -->
 
                 <LinearLayout
@@ -881,57 +969,6 @@
                     android:textSize="13sp"
                     android:gravity="center"
                     android:padding="20dp"/>
-
-                <!-- ================= UPCOMING CLASSES ================= -->
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Upcoming Classes"
-                    android:textColor="@android:color/white"
-                    android:textSize="20sp"
-                    android:textStyle="bold"
-                    android:layout_marginStart="20dp"/>
-
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_margin="16dp"
-                    app:cardCornerRadius="22dp"
-                    app:cardElevation="6dp"
-                    app:cardBackgroundColor="@color/glassCard"
-                    app:strokeColor="@color/cyanAccentDim"
-                    app:strokeWidth="1dp">
-
-                    <LinearLayout
-                        android:id="@+id/todayClassesContainer"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="18dp"
-                        android:gravity="center">
-
-                        <TextView
-                            android:id="@+id/txtNoTodayClasses"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="No classes assigned for today."
-                            android:textColor="@android:color/white"
-                            android:textStyle="bold"
-                            android:textSize="14sp"/>
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="This section will show your scheduled classes with time and room once the timetable feature is connected."
-                            android:textColor="@color/textSecondary"
-                            android:textSize="12sp"
-                            android:gravity="center"
-                            android:layout_marginTop="6dp"/>
-
-                    </LinearLayout>
-
-                </com.google.android.material.card.MaterialCardView>
 
                 <!-- Compatibility IDs for old Kotlin code -->
 

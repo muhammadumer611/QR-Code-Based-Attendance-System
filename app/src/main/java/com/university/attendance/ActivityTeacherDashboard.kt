@@ -4,7 +4,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
-import androidx.activity.addCallback
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -13,35 +13,36 @@ import com.university.attendance.databinding.ActivityTeacherDashboardBinding
 
 class ActivityTeacherDashboard : AppCompatActivity() {
 
-    private lateinit var binding: ActivityTeacherDashboardBinding
+    private lateinit var binding:
+            ActivityTeacherDashboardBinding
 
-    private lateinit var viewModel: TeacherDashboardViewModel
-    private lateinit var todayClassAdapter: TeacherTodayClassAdapter
+    private lateinit var viewModel:
+            TeacherDashboardViewModel
 
-    private lateinit var subjectAdapter: SubjectCardAdapter
+    private lateinit var subjectAdapter:
+            SubjectCardAdapter
 
+    private lateinit var todayAdapter:
+            TeacherTodayClassAdapter
 
-    // ============================================================
-    // ON CREATE
-    // ============================================================
+    private lateinit var weekAdapter:
+            TeacherTodayClassAdapter
+
+    private lateinit var semesterAdapter:
+            TeacherTodayClassAdapter
+
 
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
-
-        super.onCreate(
-            savedInstanceState
-        )
+        super.onCreate(savedInstanceState)
 
 
         binding =
             ActivityTeacherDashboardBinding
                 .inflate(layoutInflater)
 
-
-        setContentView(
-            binding.root
-        )
+        setContentView(binding.root)
 
 
         viewModel =
@@ -50,35 +51,58 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             ]
 
 
+        setupBackPressHandler()
+
         setupUi()
 
         setupSubjectsList()
 
-        setupTodayClasses()
+        setupClassLists()
 
         observeViewModel()
 
-        setupBackPressHandler()
-
-
-        // --------------------------------------------------------
-        // LOAD DASHBOARD
-        // --------------------------------------------------------
 
         viewModel.loadDashboard()
     }
 
 
     // ============================================================
-    // UI SETUP
+    // BACK PRESS
+    // ============================================================
+
+    private fun setupBackPressHandler() {
+
+        onBackPressedDispatcher.addCallback(
+            this,
+            object : OnBackPressedCallback(true) {
+
+                override fun handleOnBackPressed() {
+
+                    if (
+                        binding.drawerLayout.isDrawerOpen(
+                            binding.navigationView
+                        )
+                    ) {
+
+                        binding.drawerLayout.closeDrawers()
+
+                    } else {
+
+                        isEnabled = false
+
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            }
+        )
+    }
+
+
+    // ============================================================
+    // UI
     // ============================================================
 
     private fun setupUi() {
-
-
-        // --------------------------------------------------------
-        // MENU
-        // --------------------------------------------------------
 
         binding.menuIcon.setOnClickListener {
 
@@ -87,10 +111,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             )
         }
 
-
-        // --------------------------------------------------------
-        // PROFILE
-        // --------------------------------------------------------
 
         binding.profileImage.setOnClickListener {
 
@@ -102,10 +122,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
         }
 
 
-        // --------------------------------------------------------
-        // NOTIFICATIONS
-        // --------------------------------------------------------
-
         binding.notification.setOnClickListener {
 
             startActivity(
@@ -116,10 +132,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             )
         }
 
-
-        // --------------------------------------------------------
-        // TAKE ATTENDANCE
-        // --------------------------------------------------------
 
         val openAttendance =
             View.OnClickListener {
@@ -144,10 +156,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             )
 
 
-        // --------------------------------------------------------
-        // MANUAL ATTENDANCE
-        // --------------------------------------------------------
-
         binding.cardManualAttendance
             .setOnClickListener {
 
@@ -159,10 +167,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             }
 
 
-        // --------------------------------------------------------
-        // UPLOAD NOTES
-        // --------------------------------------------------------
-
         binding.cardUploadNotes
             .setOnClickListener {
 
@@ -173,10 +177,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
                 ).show()
             }
 
-
-        // --------------------------------------------------------
-        // ASSIGNMENTS
-        // --------------------------------------------------------
 
         binding.cardAssignmentsAction
             .setOnClickListener {
@@ -200,10 +200,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             }
 
 
-        // --------------------------------------------------------
-        // STUDENTS
-        // --------------------------------------------------------
-
         binding.cardStudents
             .setOnClickListener {
 
@@ -214,10 +210,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
                 ).show()
             }
 
-
-        // --------------------------------------------------------
-        // RESULTS
-        // --------------------------------------------------------
 
         binding.cardResults
             .setOnClickListener {
@@ -230,10 +222,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             }
 
 
-        // --------------------------------------------------------
-        // RETRY
-        // --------------------------------------------------------
-
         binding.btnRetry
             .setOnClickListener {
 
@@ -241,94 +229,18 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             }
 
 
-        // --------------------------------------------------------
-        // DRAWER
-        // --------------------------------------------------------
-
-        binding.navigationView
-            .setNavigationItemSelectedListener { item ->
-
-                when (item.itemId) {
-
-
-                    // --------------------------------------------
-                    // DASHBOARD
-                    // --------------------------------------------
-
-                    R.id.nav_dashboard -> {
-
-                        binding.drawerLayout
-                            .closeDrawers()
-
-                        true
-                    }
-
-
-                    // --------------------------------------------
-                    // LOGOUT
-                    // --------------------------------------------
-
-                    R.id.nav_logout -> {
-
-                        FirebaseAuth
-                            .getInstance()
-                            .signOut()
-
-
-                        val intent =
-                            Intent(
-                                this,
-                                ActivityTeacherSignIn::class.java
-                            )
-
-
-                        intent.flags =
-                            Intent.FLAG_ACTIVITY_NEW_TASK or
-                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
-
-
-                        startActivity(
-                            intent
-                        )
-
-
-                        true
-                    }
-
-
-                    // --------------------------------------------
-                    // OTHER MODULES
-                    // --------------------------------------------
-
-                    else -> {
-
-                        binding.drawerLayout
-                            .closeDrawers()
-
-
-                        Toast.makeText(
-                            this,
-                            "This module will be connected in the next phase.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-
-
-                        true
-                    }
-                }
-            }
+        setupDrawer()
     }
 
 
     // ============================================================
-    // SUBJECT RECYCLER
+    // SUBJECTS
     // ============================================================
 
     private fun setupSubjectsList() {
 
-
         subjectAdapter =
-            SubjectCardAdapter { subject ->
+            SubjectCardAdapter { _ ->
 
                 startActivity(
                     Intent(
@@ -360,52 +272,30 @@ class ActivityTeacherDashboard : AppCompatActivity() {
                     false
                 )
 
-
             adapter =
                 subjectAdapter
 
-
-            setHasFixedSize(
-                true
-            )
+            setHasFixedSize(true)
         }
     }
 
 
     // ============================================================
-    // TODAY CLASSES RECYCLER
+    // CLASS RECYCLERS
     // ============================================================
 
-    private fun setupTodayClasses() {
+    private fun setupClassLists() {
 
-        todayClassAdapter =
-            TeacherTodayClassAdapter { classSchedule ->
+        // --------------------------------------------------------
+        // TODAY
+        // --------------------------------------------------------
 
-                val intent =
-                    Intent(
-                        this,
-                        ActivityTeacherClasses::class.java
-                    )
+        todayAdapter =
+            TeacherTodayClassAdapter {
 
-                intent.putExtra(
-                    "scheduleId",
-                    classSchedule.scheduleId
-                )
-
-                intent.putExtra(
-                    "className",
-                    classSchedule.className
-                )
-
-                intent.putExtra(
-                    "subjectName",
-                    classSchedule.subjectName
-                )
-
-                startActivity(
-                    intent
-                )
+                openClass(it)
             }
+
 
         binding.recyclerTodayClasses.apply {
 
@@ -415,21 +305,86 @@ class ActivityTeacherDashboard : AppCompatActivity() {
                 )
 
             adapter =
-                todayClassAdapter
+                todayAdapter
+        }
 
-            setHasFixedSize(
-                true
-            )
+
+        // --------------------------------------------------------
+        // THIS WEEK
+        // --------------------------------------------------------
+
+        weekAdapter =
+            TeacherTodayClassAdapter {
+
+                openClass(it)
+            }
+
+
+        binding.recyclerWeeklyClasses.apply {
+
+            layoutManager =
+                LinearLayoutManager(
+                    this@ActivityTeacherDashboard
+                )
+
+            adapter =
+                weekAdapter
+        }
+
+
+        // --------------------------------------------------------
+        // SEMESTER
+        // --------------------------------------------------------
+
+        semesterAdapter =
+            TeacherTodayClassAdapter {
+
+                openClass(it)
+            }
+
+
+        binding.recyclerSemesterClasses.apply {
+
+            layoutManager =
+                LinearLayoutManager(
+                    this@ActivityTeacherDashboard
+                )
+
+            adapter =
+                semesterAdapter
         }
     }
 
 
     // ============================================================
-    // OBSERVE VIEW MODEL
+    // CLASS CLICK
+    // ============================================================
+
+    private fun openClass(
+        classSchedule: ClassSchedule
+    ) {
+
+        /*
+         * Abhi direct class detail activity tumhare
+         * existing project mein defined nahi hai.
+         *
+         * Isliye click par selected class ka basic
+         * information show kar rahe hain.
+         */
+
+        Toast.makeText(
+            this,
+            "${classSchedule.subjectName} • ${classSchedule.className}",
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+
+    // ============================================================
+    // OBSERVE
     // ============================================================
 
     private fun observeViewModel() {
-
 
         // --------------------------------------------------------
         // UI STATE
@@ -440,72 +395,45 @@ class ActivityTeacherDashboard : AppCompatActivity() {
 
                 when (state) {
 
-
-                    // --------------------------------------------
-                    // LOADING
-                    // --------------------------------------------
-
                     is TeacherDashboardViewModel.UiState.Loading -> {
 
                         binding.loadingOverlay.visibility =
                             View.VISIBLE
 
-
                         binding.errorState.visibility =
                             View.GONE
-
 
                         binding.scrollContent.visibility =
                             View.GONE
                     }
 
-
-                    // --------------------------------------------
-                    // SUCCESS
-                    // --------------------------------------------
 
                     is TeacherDashboardViewModel.UiState.Success -> {
 
                         binding.loadingOverlay.visibility =
                             View.GONE
 
-
                         binding.errorState.visibility =
                             View.GONE
-
 
                         binding.scrollContent.visibility =
                             View.VISIBLE
                     }
 
 
-                    // --------------------------------------------
-                    // ERROR
-                    // --------------------------------------------
-
                     is TeacherDashboardViewModel.UiState.Error -> {
 
                         binding.loadingOverlay.visibility =
                             View.GONE
 
-
                         binding.scrollContent.visibility =
                             View.GONE
-
 
                         binding.errorState.visibility =
                             View.VISIBLE
 
-
                         binding.txtErrorMessage.text =
                             state.message
-
-
-                        Toast.makeText(
-                            this,
-                            state.message,
-                            Toast.LENGTH_LONG
-                        ).show()
                     }
                 }
             }
@@ -519,18 +447,16 @@ class ActivityTeacherDashboard : AppCompatActivity() {
             .observe(this) { teacher ->
 
                 binding.txtTeacher.text =
-                    teacher.fullName
-                        .ifBlank {
-                            "Teacher"
-                        }
+                    teacher.fullName.ifBlank {
+                        "Teacher"
+                    }
 
 
                 binding.txtRole.text =
                     buildString {
 
                         if (
-                            teacher.designation
-                                .isNotBlank()
+                            teacher.designation.isNotBlank()
                         ) {
 
                             append(
@@ -540,21 +466,16 @@ class ActivityTeacherDashboard : AppCompatActivity() {
 
 
                         if (
-                            teacher.designation
-                                .isNotBlank() &&
-                            teacher.departmentName
-                                .isNotBlank()
+                            teacher.designation.isNotBlank() &&
+                            teacher.departmentName.isNotBlank()
                         ) {
 
-                            append(
-                                " • "
-                            )
+                            append(" • ")
                         }
 
 
                         if (
-                            teacher.departmentName
-                                .isNotBlank()
+                            teacher.departmentName.isNotBlank()
                         ) {
 
                             append(
@@ -594,7 +515,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
                     binding.recyclerMySubjects.visibility =
                         View.GONE
 
-
                     binding.txtSubjectsEmpty.visibility =
                         View.VISIBLE
 
@@ -603,7 +523,6 @@ class ActivityTeacherDashboard : AppCompatActivity() {
                     binding.recyclerMySubjects.visibility =
                         View.VISIBLE
 
-
                     binding.txtSubjectsEmpty.visibility =
                         View.GONE
                 }
@@ -611,7 +530,7 @@ class ActivityTeacherDashboard : AppCompatActivity() {
 
 
         // --------------------------------------------------------
-        // TOTAL STUDENTS
+        // STUDENTS
         // --------------------------------------------------------
 
         viewModel.totalStudents
@@ -643,131 +562,159 @@ class ActivityTeacherDashboard : AppCompatActivity() {
 
 
         // --------------------------------------------------------
-        // TODAY'S CLASSES
-        //
-        // Data is now loaded from:
-        // classSchedules
+        // TODAY
         // --------------------------------------------------------
 
         viewModel.todayClasses
             .observe(this) { classes ->
 
-                updateTodayClasses(
+                todayAdapter.submitList(
                     classes
                 )
+
+
+                if (classes.isEmpty()) {
+
+                    binding.recyclerTodayClasses.visibility =
+                        View.GONE
+
+                    binding.txtTodayClassesEmpty.visibility =
+                        View.VISIBLE
+
+                } else {
+
+                    binding.recyclerTodayClasses.visibility =
+                        View.VISIBLE
+
+                    binding.txtTodayClassesEmpty.visibility =
+                        View.GONE
+                }
             }
 
 
         // --------------------------------------------------------
-        // UPCOMING CLASSES
-        //
-        // Data is now loaded from:
-        // classSchedules
+        // THIS WEEK
         // --------------------------------------------------------
 
-        viewModel.upcomingClasses
+        viewModel.weekClasses
             .observe(this) { classes ->
 
-                updateUpcomingClasses(
+                weekAdapter.submitList(
                     classes
                 )
+
+
+                if (classes.isEmpty()) {
+
+                    binding.recyclerWeeklyClasses.visibility =
+                        View.GONE
+
+                    binding.txtWeeklyClassesEmpty.visibility =
+                        View.VISIBLE
+
+                } else {
+
+                    binding.recyclerWeeklyClasses.visibility =
+                        View.VISIBLE
+
+                    binding.txtWeeklyClassesEmpty.visibility =
+                        View.GONE
+                }
+            }
+
+
+        // --------------------------------------------------------
+        // SEMESTER
+        // --------------------------------------------------------
+
+        viewModel.semesterClasses
+            .observe(this) { classes ->
+
+                semesterAdapter.submitList(
+                    classes
+                )
+
+
+                if (classes.isEmpty()) {
+
+                    binding.recyclerSemesterClasses.visibility =
+                        View.GONE
+
+                    binding.txtSemesterClassesEmpty.visibility =
+                        View.VISIBLE
+
+                } else {
+
+                    binding.recyclerSemesterClasses.visibility =
+                        View.VISIBLE
+
+                    binding.txtSemesterClassesEmpty.visibility =
+                        View.GONE
+                }
             }
     }
 
 
     // ============================================================
-    // TODAY CLASSES
+    // DRAWER
     // ============================================================
 
-    private fun updateTodayClasses(
-        classes: List<ClassSchedule>
-    ) {
+    private fun setupDrawer() {
 
-        todayClassAdapter.submitList(
-            classes
-        )
+        binding.navigationView
+            .setNavigationItemSelectedListener { item ->
 
-        if (classes.isEmpty()) {
+                when (item.itemId) {
 
-            binding.recyclerTodayClasses.visibility =
-                View.GONE
+                    R.id.nav_dashboard -> {
 
-            binding.txtTodayClassesEmpty.visibility =
-                View.VISIBLE
+                        binding.drawerLayout
+                            .closeDrawers()
 
-        } else {
-
-            binding.recyclerTodayClasses.visibility =
-                View.VISIBLE
-
-            binding.txtTodayClassesEmpty.visibility =
-                View.GONE
-        }
-    }
+                        true
+                    }
 
 
-    // ============================================================
-    // UPCOMING CLASSES
-    // ============================================================
+                    R.id.nav_logout -> {
 
-    private fun updateUpcomingClasses(
-        classes: List<ClassSchedule>
-    ) {
-
-        /*
-         * Current XML contains a placeholder card for
-         * Upcoming Classes.
-         *
-         * We intentionally don't reference any IDs that are
-         * not present in the current XML.
-         *
-         * The real ClassSchedule data is now available through:
-         *
-         * viewModel.upcomingClasses
-         *
-         * and the XML card can be converted to a RecyclerView
-         * in the next step.
-         */
-    }
+                        FirebaseAuth
+                            .getInstance()
+                            .signOut()
 
 
-    // ============================================================
-    // BACK PRESS HANDLING
-    //
-    // onBackPressed() is deprecated on ComponentActivity /
-    // AppCompatActivity. We register an OnBackPressedCallback
-    // instead, which is the supported replacement and also works
-    // correctly with predictive back gestures on newer Android
-    // versions.
-    // ============================================================
+                        val intent =
+                            Intent(
+                                this,
+                                ActivityTeacherSignIn::class.java
+                            )
 
-    private fun setupBackPressHandler() {
 
-        onBackPressedDispatcher.addCallback(this) {
+                        intent.flags =
+                            Intent.FLAG_ACTIVITY_NEW_TASK or
+                                    Intent.FLAG_ACTIVITY_CLEAR_TASK
 
-            if (
-                binding.drawerLayout
-                    .isDrawerOpen(
-                        binding.navigationView
-                    )
-            ) {
 
-                binding.drawerLayout
-                    .closeDrawer(
-                        binding.navigationView
-                    )
+                        startActivity(intent)
 
-            } else {
+                        true
+                    }
 
-                // Disable this callback and re-trigger the
-                // dispatcher so the default (finish activity)
-                // behavior runs.
 
-                isEnabled = false
+                    else -> {
 
-                onBackPressedDispatcher
-                    .onBackPressed()
+                        binding.drawerLayout
+                            .closeDrawers()
+
+
+                        Toast.makeText(
+                            this,
+                            "This module will be connected in the next phase.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        true
+                    }
+                }
             }
-        }
     }
 }

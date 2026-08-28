@@ -9,19 +9,11 @@ class TeacherTodayClassAdapter(
     private val onClassClick: (ClassSchedule) -> Unit
 ) : RecyclerView.Adapter<TeacherTodayClassAdapter.ClassViewHolder>() {
 
-    private val classList =
-        mutableListOf<ClassSchedule>()
+    private val classList = mutableListOf<ClassSchedule>()
 
-    fun submitList(
-        newList: List<ClassSchedule>
-    ) {
-
+    fun submitList(newList: List<ClassSchedule>) {
         classList.clear()
-
-        classList.addAll(
-            newList
-        )
-
+        classList.addAll(newList)
         notifyDataSetChanged()
     }
 
@@ -30,40 +22,29 @@ class TeacherTodayClassAdapter(
         viewType: Int
     ): ClassViewHolder {
 
-        val binding =
-            ItemTeacherTodayClassBinding.inflate(
-                LayoutInflater.from(parent.context),
-                parent,
-                false
-            )
-
-        return ClassViewHolder(
-            binding
+        val binding = ItemTeacherTodayClassBinding.inflate(
+            LayoutInflater.from(parent.context),
+            parent,
+            false
         )
+
+        return ClassViewHolder(binding)
     }
 
     override fun onBindViewHolder(
         holder: ClassViewHolder,
         position: Int
     ) {
-
-        holder.bind(
-            classList[position]
-        )
+        holder.bind(classList[position])
     }
 
-    override fun getItemCount(): Int =
-        classList.size
+    override fun getItemCount(): Int = classList.size
 
     inner class ClassViewHolder(
         private val binding: ItemTeacherTodayClassBinding
-    ) : RecyclerView.ViewHolder(
-        binding.root
-    ) {
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(
-            classSchedule: ClassSchedule
-        ) {
+        fun bind(classSchedule: ClassSchedule) {
 
             binding.tvSubjectName.text =
                 classSchedule.subjectName.ifBlank {
@@ -80,11 +61,8 @@ class TeacherTodayClassAdapter(
                     classSchedule.startTime.isNotBlank() &&
                     classSchedule.endTime.isNotBlank()
                 ) {
-
                     "${classSchedule.startTime} - ${classSchedule.endTime}"
-
                 } else {
-
                     "Time not available"
                 }
 
@@ -94,10 +72,7 @@ class TeacherTodayClassAdapter(
                 }
 
             binding.root.setOnClickListener {
-
-                onClassClick(
-                    classSchedule
-                )
+                onClassClick(classSchedule)
             }
         }
     }
