@@ -40,11 +40,20 @@ class ClassScheduleRepository(
 
         return try {
 
+            if (classSchedule.teacherId.isBlank()) {
+
+                return OpResult.Error(
+                    "Teacher ID is missing."
+                )
+            }
+
             val document =
                 classScheduleRef.document()
 
             document
-                .set(classSchedule.toMap())
+                .set(
+                    classSchedule.toMap()
+                )
                 .await()
 
             OpResult.Success(
@@ -54,68 +63,72 @@ class ClassScheduleRepository(
         } catch (e: Exception) {
 
             OpResult.Error(
-                message =
-                    e.message
-                        ?: "Failed to save class schedule.",
-
-                exception = e
+                e.message
+                    ?: "Failed to save class schedule.",
+                e
             )
         }
     }
 
     // ============================================================
     // GET ALL CLASSES FOR TEACHER
+    // PRIMARY KEY = TEACHER ID
     // ============================================================
 
     suspend fun getClassesForTeacher(
-        teacherAuthUid: String
+        teacherId: String
     ): List<ClassSchedule> {
 
-        if (teacherAuthUid.isBlank()) {
+        if (teacherId.isBlank()) {
             return emptyList()
         }
 
         val snapshot =
             classScheduleRef
                 .whereEqualTo(
-                    "teacherAuthUid",
-                    teacherAuthUid
+                    "teacherId",
+                    teacherId
                 )
                 .get()
                 .await()
 
-        return snapshot.documents.mapNotNull { document ->
+        return snapshot.documents
+            .mapNotNull { document ->
 
-            document
-                .toObject(ClassSchedule::class.java)
-                ?.apply {
+                document
+                    .toObject(
+                        ClassSchedule::class.java
+                    )
+                    ?.apply {
 
-                    scheduleId =
-                        document.id
-                }
-        }.sortedWith(
-            compareBy<ClassSchedule> {
-
-                it.date
-
-            }.thenBy {
-
-                parseTimeForSorting(
-                    it.startTime
-                )
+                        scheduleId =
+                            document.id
+                    }
             }
-        )
+            .sortedWith(
+                compareBy<ClassSchedule> {
+
+                    it.date
+
+                }.thenBy {
+
+                    parseTimeForSorting(
+                        it.startTime
+                    )
+                }
+            )
     }
 
     // ============================================================
     // GET TODAY'S CLASSES
+    // NO COMPOSITE INDEX REQUIRED
     // ============================================================
 
     suspend fun getTodayClassesForTeacher(
-        teacherAuthUid: String
+        teacherId: String
     ): List<ClassSchedule> {
 
-        if (teacherAuthUid.isBlank()) {
+        if (teacherId.isBlank()) {
             return emptyList()
         }
 
@@ -127,35 +140,40 @@ class ClassScheduleRepository(
                 Calendar.getInstance().time
             )
 
+        // Only teacherId query.
+        // Date filtering is done locally.
         val snapshot =
             classScheduleRef
                 .whereEqualTo(
-                    "teacherAuthUid",
-                    teacherAuthUid
-                )
-                .whereEqualTo(
-                    "date",
-                    today
+                    "teacherId",
+                    teacherId
                 )
                 .get()
                 .await()
 
-        return snapshot.documents.mapNotNull { document ->
+        return snapshot.documents
+            .mapNotNull { document ->
 
-            document
-                .toObject(ClassSchedule::class.java)
-                ?.apply {
+                document
+                    .toObject(
+                        ClassSchedule::class.java
+                    )
+                    ?.apply {
 
-                    scheduleId =
-                        document.id
-                }
+                        scheduleId =
+                            document.id
+                    }
+            }
+            .filter {
 
-        }.sortedBy {
+                it.date == today
+            }
+            .sortedBy {
 
-            parseTimeForSorting(
-                it.startTime
-            )
-        }
+                parseTimeForSorting(
+                    it.startTime
+                )
+            }
     }
 
     // ============================================================
@@ -163,12 +181,12 @@ class ClassScheduleRepository(
     // ============================================================
 
     suspend fun getClassesForDate(
-        teacherAuthUid: String,
+        teacherId: String,
         date: String
     ): List<ClassSchedule> {
 
         if (
-            teacherAuthUid.isBlank() ||
+            teacherId.isBlank() ||
             date.isBlank()
         ) {
             return emptyList()
@@ -177,32 +195,35 @@ class ClassScheduleRepository(
         val snapshot =
             classScheduleRef
                 .whereEqualTo(
-                    "teacherAuthUid",
-                    teacherAuthUid
-                )
-                .whereEqualTo(
-                    "date",
-                    date
+                    "teacherId",
+                    teacherId
                 )
                 .get()
                 .await()
 
-        return snapshot.documents.mapNotNull { document ->
+        return snapshot.documents
+            .mapNotNull { document ->
 
-            document
-                .toObject(ClassSchedule::class.java)
-                ?.apply {
+                document
+                    .toObject(
+                        ClassSchedule::class.java
+                    )
+                    ?.apply {
 
-                    scheduleId =
-                        document.id
-                }
+                        scheduleId =
+                            document.id
+                    }
+            }
+            .filter {
 
-        }.sortedBy {
+                it.date == date
+            }
+            .sortedBy {
 
-            parseTimeForSorting(
-                it.startTime
-            )
-        }
+                parseTimeForSorting(
+                    it.startTime
+                )
+            }
     }
 
     // ============================================================
@@ -210,13 +231,13 @@ class ClassScheduleRepository(
     // ============================================================
 
     suspend fun getClassesBetweenDates(
-        teacherAuthUid: String,
+        teacherId: String,
         startDate: String,
         endDate: String
     ): List<ClassSchedule> {
 
         if (
-            teacherAuthUid.isBlank() ||
+            teacherId.isBlank() ||
             startDate.isBlank() ||
             endDate.isBlank()
         ) {
@@ -226,46 +247,47 @@ class ClassScheduleRepository(
         val snapshot =
             classScheduleRef
                 .whereEqualTo(
-                    "teacherAuthUid",
-                    teacherAuthUid
-                )
-                .whereGreaterThanOrEqualTo(
-                    "date",
-                    startDate
-                )
-                .whereLessThanOrEqualTo(
-                    "date",
-                    endDate
+                    "teacherId",
+                    teacherId
                 )
                 .get()
                 .await()
 
-        return snapshot.documents.mapNotNull { document ->
+        return snapshot.documents
+            .mapNotNull { document ->
 
-            document
-                .toObject(ClassSchedule::class.java)
-                ?.apply {
+                document
+                    .toObject(
+                        ClassSchedule::class.java
+                    )
+                    ?.apply {
 
-                    scheduleId =
-                        document.id
-                }
-
-        }.sortedWith(
-            compareBy<ClassSchedule> {
-
-                it.date
-
-            }.thenBy {
-
-                parseTimeForSorting(
-                    it.startTime
-                )
+                        scheduleId =
+                            document.id
+                    }
             }
-        )
+            .filter {
+
+                it.date >= startDate &&
+                        it.date <= endDate
+            }
+            .sortedWith(
+
+                compareBy<ClassSchedule> {
+
+                    it.date
+
+                }.thenBy {
+
+                    parseTimeForSorting(
+                        it.startTime
+                    )
+                }
+            )
     }
 
     // ============================================================
-    // DELETE CLASS
+    // DELETE
     // ============================================================
 
     suspend fun deleteClass(
@@ -293,17 +315,15 @@ class ClassScheduleRepository(
         } catch (e: Exception) {
 
             OpResult.Error(
-                message =
-                    e.message
-                        ?: "Failed to delete class.",
-
-                exception = e
+                e.message
+                    ?: "Failed to delete class.",
+                e
             )
         }
     }
 
     // ============================================================
-    // UPDATE CLASS
+    // UPDATE
     // ============================================================
 
     suspend fun updateClass(
@@ -322,7 +342,9 @@ class ClassScheduleRepository(
 
             classScheduleRef
                 .document(scheduleId)
-                .set(classSchedule.toMap())
+                .set(
+                    classSchedule.toMap()
+                )
                 .await()
 
             OpResult.Success(
@@ -332,11 +354,9 @@ class ClassScheduleRepository(
         } catch (e: Exception) {
 
             OpResult.Error(
-                message =
-                    e.message
-                        ?: "Failed to update class.",
-
-                exception = e
+                e.message
+                    ?: "Failed to update class.",
+                e
             )
         }
     }

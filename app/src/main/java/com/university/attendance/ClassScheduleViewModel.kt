@@ -61,7 +61,7 @@ class ClassScheduleViewModel(
     ) {
 
         if (
-            classSchedule.teacherAuthUid
+            classSchedule.teacherId
                 .isBlank()
         ) {
 
@@ -156,7 +156,7 @@ class ClassScheduleViewModel(
                         UiState.Success
 
                     loadAllClassesForTeacher(
-                        classSchedule.teacherAuthUid
+                        classSchedule.teacherId
                     )
                 }
 
@@ -176,12 +176,10 @@ class ClassScheduleViewModel(
     // ============================================================
 
     fun loadAllClassesForTeacher(
-        teacherAuthUid: String
+        teacherId: String
     ) {
 
-        if (
-            teacherAuthUid.isBlank()
-        ) {
+        if (teacherId.isBlank()) {
 
             _classes.value =
                 emptyList()
@@ -199,7 +197,7 @@ class ClassScheduleViewModel(
                 _classes.value =
                     repository
                         .getClassesForTeacher(
-                            teacherAuthUid
+                            teacherId
                         )
 
                 _uiState.value =
@@ -221,11 +219,11 @@ class ClassScheduleViewModel(
     // ============================================================
 
     fun loadTodayClasses(
-        teacherAuthUid: String
+        teacherId: String
     ) {
 
         if (
-            teacherAuthUid.isBlank()
+            teacherId.isBlank()
         ) {
 
             _classes.value =
@@ -244,7 +242,7 @@ class ClassScheduleViewModel(
                 _classes.value =
                     repository
                         .getTodayClassesForTeacher(
-                            teacherAuthUid
+                            teacherId
                         )
 
                 _uiState.value =
@@ -266,12 +264,12 @@ class ClassScheduleViewModel(
     // ============================================================
 
     fun loadClassesForDate(
-        teacherAuthUid: String,
+        teacherId: String,
         date: String
     ) {
 
         if (
-            teacherAuthUid.isBlank() ||
+            teacherId.isBlank() ||
             date.isBlank()
         ) {
 
@@ -291,7 +289,7 @@ class ClassScheduleViewModel(
                 _classes.value =
                     repository
                         .getClassesForDate(
-                            teacherAuthUid,
+                            teacherId,
                             date
                         )
 
@@ -315,7 +313,7 @@ class ClassScheduleViewModel(
 
     fun deleteClass(
         scheduleId: String,
-        teacherAuthUid: String
+        teacherId: String
     ) {
 
         if (
@@ -349,8 +347,9 @@ class ClassScheduleViewModel(
                         _uiState.value =
                             UiState.Success
 
+                        // Reload using Teacher ID
                         loadAllClassesForTeacher(
-                            teacherAuthUid
+                            teacherId
                         )
                     }
 
