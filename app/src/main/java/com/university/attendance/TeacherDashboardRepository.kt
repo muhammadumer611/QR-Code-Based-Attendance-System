@@ -42,7 +42,9 @@ class TeacherDashboardRepository(
 
         val weekClasses: List<ClassSchedule>,
 
-        val semesterClasses: List<ClassSchedule>
+        val semesterClasses: List<ClassSchedule>,
+
+        val schedule: Schedule?
     )
 
 
@@ -95,6 +97,23 @@ class TeacherDashboardRepository(
         val allClasses =
             getTeacherClasses(
                 teacher.teacherId
+            )
+
+
+        // --------------------------------------------------------
+        // TEACHER SCHEDULE (PDF)
+        // --------------------------------------------------------
+
+        val teacherSchedule =
+            ScheduleRepository(
+                firestore = firestore
+            ).getScheduleForTeacher(
+
+                teacherId =
+                    teacher.teacherId,
+
+                teacherAuthUid =
+                    teacher.authUid
             )
 
 
@@ -165,7 +184,9 @@ class TeacherDashboardRepository(
 
             weekClasses = weekClasses,
 
-            semesterClasses = semesterClasses
+            semesterClasses = semesterClasses,
+
+            schedule = teacherSchedule
         )
     }
 

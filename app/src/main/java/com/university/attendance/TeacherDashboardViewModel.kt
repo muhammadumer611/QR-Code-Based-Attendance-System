@@ -76,6 +76,13 @@ class TeacherDashboardViewModel(
         _semesterClasses
 
 
+    private val _schedule =
+        MutableLiveData<Schedule?>(null)
+
+    val schedule: LiveData<Schedule?> =
+        _schedule
+
+
     fun loadDashboard() {
 
         _uiState.value =
@@ -116,6 +123,10 @@ class TeacherDashboardViewModel(
 
                 _semesterClasses.value =
                     data.semesterClasses
+
+
+                _schedule.value =
+                    data.schedule
 
 
                 _uiState.value =
