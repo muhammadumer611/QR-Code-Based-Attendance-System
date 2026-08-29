@@ -39,35 +39,77 @@ class ScheduleRepository(
     // ============================================================
 
     suspend fun getScheduleForTeacher(
-        teacherAuthUid: String
+        teacherId: String,
+        teacherAuthUid: String = ""
     ): Schedule? {
 
-        if (teacherAuthUid.isBlank()) {
+        if (teacherId.isBlank() && teacherAuthUid.isBlank()) {
             return null
         }
 
-        val snapshot =
-            scheduleRef
-                .whereEqualTo(
-                    "teacherAuthUid",
-                    teacherAuthUid
-                )
-                .limit(1)
-                .get()
-                .await()
+        // --------------------------------------------------------
+        // PRIMARY: Teacher ID
+        // --------------------------------------------------------
 
-        if (snapshot.isEmpty) {
-            return null
-        }
+        if (teacherId.isNotBlank()) {
 
-        val document =
-            snapshot.documents.first()
+            val teacherIdSnapshot =
+                scheduleRef
+                    .whereEqualTo(
+                        "teacherId",
+                        teacherId
+                    )
+                    .limit(1)
+                    .get()
+                    .await()
 
-        return document
-            .toObject(Schedule::class.java)
-            ?.apply {
-                scheduleId = document.id
+            if (!teacherIdSnapshot.isEmpty) {
+
+                val document =
+                    teacherIdSnapshot.documents.first()
+
+                return document
+                    .toObject(Schedule::class.java)
+                    ?.apply {
+
+                        scheduleId =
+                            document.id
+                    }
             }
+        }
+
+        // --------------------------------------------------------
+        // FALLBACK: Old records using Auth UID
+        // --------------------------------------------------------
+
+        if (teacherAuthUid.isNotBlank()) {
+
+            val authSnapshot =
+                scheduleRef
+                    .whereEqualTo(
+                        "teacherAuthUid",
+                        teacherAuthUid
+                    )
+                    .limit(1)
+                    .get()
+                    .await()
+
+            if (!authSnapshot.isEmpty) {
+
+                val document =
+                    authSnapshot.documents.first()
+
+                return document
+                    .toObject(Schedule::class.java)
+                    ?.apply {
+
+                        scheduleId =
+                            document.id
+                    }
+            }
+        }
+
+        return null
     }
 
     // ============================================================
@@ -75,6 +117,7 @@ class ScheduleRepository(
     // ============================================================
 
     suspend fun saveSchedule(
+        teacherId: String,
         teacherAuthUid: String,
         teacherName: String,
         fileName: String,
@@ -90,9 +133,9 @@ class ScheduleRepository(
             // VALIDATION
             // ====================================================
 
-            if (teacherAuthUid.isBlank()) {
+            if (teacherId.isBlank()) {
                 return OpResult.Error(
-                    "Teacher Firebase Auth UID is missing."
+                    "Teacher ID is missing."
                 )
             }
 
@@ -106,26 +149,28 @@ class ScheduleRepository(
             // FIND EXISTING SCHEDULE
             // ====================================================
 
-            val existingSnapshot =
-                scheduleRef
-                    .whereEqualTo(
-                        "teacherAuthUid",
-                        teacherAuthUid
-                    )
-                    .limit(1)
-                    .get()
-                    .await()
+            val existingSchedule =
+                getScheduleForTeacher(
+                    teacherId = teacherId,
+                    teacherAuthUid = teacherAuthUid
+                )
 
             val existingDocument =
-                if (!existingSnapshot.isEmpty) {
-                    existingSnapshot.documents.first()
+                if (existingSchedule != null) {
+
+                    scheduleRef
+                        .document(
+                            existingSchedule.scheduleId
+                        )
+                        .get()
+                        .await()
+
                 } else {
                     null
                 }
 
             val oldSchedule =
-                existingDocument
-                    ?.toObject(Schedule::class.java)
+                existingSchedule
 
             // ====================================================
             // CLEAN FILE NAME
@@ -160,7 +205,7 @@ class ScheduleRepository(
             // ====================================================
 
             val storagePath =
-                "schedules/$teacherAuthUid/$uniqueFileName"
+                "schedules/$teacherId/$uniqueFileName"
 
             val storageRef =
                 storage.reference
@@ -205,6 +250,9 @@ class ScheduleRepository(
 
             val schedule =
                 Schedule(
+
+                    teacherId =
+                        teacherId,
 
                     teacherAuthUid =
                         teacherAuthUid,

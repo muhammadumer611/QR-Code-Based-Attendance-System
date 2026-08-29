@@ -178,7 +178,12 @@ class ActivitySchedule : AppCompatActivity() {
 
             // Load existing schedule
             viewModel.loadScheduleForTeacher(
-                selectedTeacher.authUid
+
+                teacherId =
+                    selectedTeacher.teacherId,
+
+                teacherAuthUid =
+                    selectedTeacher.authUid
             )
         }
 

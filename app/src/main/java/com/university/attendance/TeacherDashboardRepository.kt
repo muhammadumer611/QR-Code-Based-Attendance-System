@@ -94,12 +94,12 @@ class TeacherDashboardRepository(
 
         val allClasses =
             getTeacherClasses(
-                teacher.authUid
+                teacher.teacherId
             )
 
 
         // --------------------------------------------------------
-        // TODAY
+        // TODAY (must be Daily schedule)
         // --------------------------------------------------------
 
         val today =
@@ -109,7 +109,15 @@ class TeacherDashboardRepository(
         val todayClasses =
             allClasses
                 .filter {
-                    it.date == today
+
+                    it.periodType
+                        .trim()
+                        .equals(
+                            "Daily",
+                            ignoreCase = true
+                        ) &&
+
+                            it.date == today
                 }
                 .sortedWith(
                     compareBy<ClassSchedule> {
@@ -123,7 +131,7 @@ class TeacherDashboardRepository(
 
 
         // --------------------------------------------------------
-        // THIS WEEK
+        // THIS WEEK (must be Weekly schedule)
         // --------------------------------------------------------
 
         val weekClasses =
@@ -133,7 +141,7 @@ class TeacherDashboardRepository(
 
 
         // --------------------------------------------------------
-        // SEMESTER
+        // SEMESTER (must be Semester schedule)
         // --------------------------------------------------------
 
         val semesterClasses =
@@ -167,10 +175,10 @@ class TeacherDashboardRepository(
     // ============================================================
 
     private suspend fun getTeacherClasses(
-        teacherAuthUid: String
+        teacherId: String
     ): List<ClassSchedule> {
 
-        if (teacherAuthUid.isBlank()) {
+        if (teacherId.isBlank()) {
             return emptyList()
         }
 
@@ -178,8 +186,8 @@ class TeacherDashboardRepository(
         val snapshot =
             classScheduleRef
                 .whereEqualTo(
-                    "teacherAuthUid",
-                    teacherAuthUid
+                    "teacherId",
+                    teacherId
                 )
                 .get()
                 .await()
@@ -198,6 +206,23 @@ class TeacherDashboardRepository(
                             document.id
                     }
             }
+            .sortedWith(
+
+                compareBy<ClassSchedule> {
+
+                    it.date
+
+                }.thenBy {
+
+                    parseTimeForSorting(
+                        it.startTime
+                    )
+
+                }.thenBy {
+
+                    it.subjectName
+                }
+            )
     }
 
 
@@ -217,7 +242,7 @@ class TeacherDashboardRepository(
 
 
     // ============================================================
-    // THIS WEEK
+    // THIS WEEK (strict: periodType must be Weekly)
     // ============================================================
 
     private fun getCurrentWeekClasses(
@@ -293,6 +318,17 @@ class TeacherDashboardRepository(
         return classes
             .filter { classSchedule ->
 
+                if (
+                    !classSchedule.periodType
+                        .trim()
+                        .equals(
+                            "Weekly",
+                            ignoreCase = true
+                        )
+                ) {
+                    return@filter false
+                }
+
                 try {
 
                     val classDate =
@@ -308,9 +344,8 @@ class TeacherDashboardRepository(
                                 weekEnd
                             )
 
-                } catch (
-                    _: Exception
-                ) {
+                } catch (_: Exception) {
+
                     false
                 }
             }
@@ -335,7 +370,7 @@ class TeacherDashboardRepository(
 
 
     // ============================================================
-    // SEMESTER CLASSES
+    // SEMESTER CLASSES (strict: periodType must be Semester)
     // ============================================================
 
     private fun getSemesterClasses(
@@ -372,40 +407,37 @@ class TeacherDashboardRepository(
                 .toSet()
 
 
-        /*
-         * Agar assigned subject semester available hai,
-         * to sirf unhi semesters ki class schedules show
-         * hongi.
-         */
+        return classes
+            .filter { classSchedule ->
 
-        val filtered =
-            if (assignedSemesters.isNotEmpty()) {
+                // MUST be Semester schedule
+                if (
+                    !classSchedule.periodType
+                        .trim()
+                        .equals(
+                            "Semester",
+                            ignoreCase = true
+                        )
+                ) {
+                    return@filter false
+                }
 
-                classes.filter { classSchedule ->
+                // If teacher subjects have semester info,
+                // match schedule semester with them.
+                if (assignedSemesters.isNotEmpty()) {
 
                     assignedSemesters.contains(
                         classSchedule.semester
                             .trim()
                             .lowercase()
                     )
-                }
 
-            } else {
+                } else {
 
-                /*
-                 * Fallback:
-                 * agar subject mein semester missing ho
-                 * to teacher ki saari semester schedules
-                 * show kar do.
-                 */
-
-                classes.filter {
-                    it.semester.isNotBlank()
+                    classSchedule.semester
+                        .isNotBlank()
                 }
             }
-
-
-        return filtered
             .sortedWith(
 
                 compareBy<ClassSchedule> {

@@ -107,10 +107,14 @@ class ScheduleViewModel(
     // ============================================================
 
     fun loadScheduleForTeacher(
-        teacherAuthUid: String
+        teacherId: String,
+        teacherAuthUid: String = ""
     ) {
 
-        if (teacherAuthUid.isBlank()) {
+        if (
+            teacherId.isBlank() &&
+            teacherAuthUid.isBlank()
+        ) {
 
             _schedule.value =
                 null
@@ -127,7 +131,8 @@ class ScheduleViewModel(
 
                 val result =
                     repository.getScheduleForTeacher(
-                        teacherAuthUid
+                        teacherId = teacherId,
+                        teacherAuthUid = teacherAuthUid
                     )
 
                 _schedule.value =
@@ -163,14 +168,14 @@ class ScheduleViewModel(
     ) {
 
         // --------------------------------------------------------
-        // Teacher UID validation
+        // Teacher ID validation
         // --------------------------------------------------------
 
-        if (teacher.authUid.isBlank()) {
+        if (teacher.teacherId.isBlank()) {
 
             _uiState.value =
                 UiState.Error(
-                    "Selected teacher does not have a valid Firebase Auth UID."
+                    "Selected teacher does not have a valid Teacher ID."
                 )
 
             return
@@ -226,6 +231,9 @@ class ScheduleViewModel(
                 val result =
                     repository.saveSchedule(
 
+                        teacherId =
+                            teacher.teacherId,
+
                         teacherAuthUid =
                             teacher.authUid,
 
@@ -268,7 +276,11 @@ class ScheduleViewModel(
                         val updatedSchedule =
                             repository
                                 .getScheduleForTeacher(
-                                    teacher.authUid
+                                    teacherId =
+                                        teacher.teacherId,
+
+                                    teacherAuthUid =
+                                        teacher.authUid
                                 )
 
                         _schedule.value =

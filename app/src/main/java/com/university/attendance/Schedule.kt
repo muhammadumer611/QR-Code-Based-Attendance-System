@@ -11,6 +11,8 @@ data class Schedule(
     @set:Exclude
     var scheduleId: String = "",
 
+    var teacherId: String = "",
+
     var teacherAuthUid: String = "",
 
     var teacherName: String = "",
@@ -36,6 +38,8 @@ data class Schedule(
 
     @Exclude
     fun toMap(): Map<String, Any?> = mapOf(
+
+        "teacherId" to teacherId,
 
         "teacherAuthUid" to teacherAuthUid,
 
