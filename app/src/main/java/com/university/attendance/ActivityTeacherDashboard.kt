@@ -1,6 +1,7 @@
 package com.university.attendance
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -650,6 +651,79 @@ class ActivityTeacherDashboard : AppCompatActivity() {
 
                     binding.txtSemesterClassesEmpty.visibility =
                         View.GONE
+                }
+            }
+
+
+        // --------------------------------------------------------
+        // SCHEDULE PDF
+        // --------------------------------------------------------
+
+        viewModel.schedule
+            .observe(this) { schedule ->
+
+                if (
+                    schedule == null ||
+                    schedule.fileUrl.isBlank()
+                ) {
+
+                    binding.cardSchedulePdf.visibility =
+                        View.GONE
+
+                    binding.txtSchedulePdfEmpty.visibility =
+                        View.VISIBLE
+
+                    binding.btnViewSchedulePdf.isEnabled =
+                        false
+
+                } else {
+
+                    binding.cardSchedulePdf.visibility =
+                        View.VISIBLE
+
+                    binding.txtSchedulePdfEmpty.visibility =
+                        View.GONE
+
+                    binding.tvSchedulePdfName.text =
+                        schedule.fileName.ifBlank {
+                            "Class Schedule PDF"
+                        }
+
+                    binding.tvSchedulePdfNote.text =
+                        schedule.note.ifBlank {
+                            "Schedule uploaded by Admin."
+                        }
+
+                    binding.btnViewSchedulePdf.isEnabled =
+                        true
+
+                    binding.btnViewSchedulePdf.setOnClickListener {
+
+                        try {
+
+                            val intent =
+                                Intent(
+                                    Intent.ACTION_VIEW,
+                                    Uri.parse(
+                                        schedule.fileUrl
+                                    )
+                                )
+
+                            intent.addFlags(
+                                Intent.FLAG_ACTIVITY_NEW_TASK
+                            )
+
+                            startActivity(intent)
+
+                        } catch (_: Exception) {
+
+                            Toast.makeText(
+                                this,
+                                "No PDF viewer or browser is available.",
+                                Toast.LENGTH_LONG
+                            ).show()
+                        }
+                    }
                 }
             }
     }
