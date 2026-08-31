@@ -4,114 +4,262 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.university.attendance.Student
-import com.university.attendance.StudentRepository
-import com.university.attendance.ValidationUtils
 import kotlinx.coroutines.launch
 
-/**
- * Holds all form state across the 2-step "Add Student" flow, so navigating
- * between Step 1 (class info) and Step 2 (personal info) never loses data.
- */
 class AddStudentViewModel(
-    private val repository: StudentRepository = StudentRepository()
+    private val repository: StudentRepository =
+        StudentRepository()
 ) : ViewModel() {
 
-    // ---------- Step 1: Class / Program info ----------
-    var universityName: String = ""
-    var departmentName: String = ""
-    var programName: String = ""
-    var session: String = ""
-    var section: String = ""
+    // ============================================================
+    // STEP 1
+    // ============================================================
 
-    // ---------- Step 2: Personal info ----------
-    var fullName: String = ""
-    var contactNumber: String = ""
-    var cnicNumber: String = ""
-    var fatherCnicNumber: String = ""
-    var guardianNumber: String = ""
-    var regNo: String = ""
+    var universityName = ""
+    var departmentName = ""
+    var programName = ""
+    var semester = 1
+    var session = ""
+    var section = ""
 
-    private val _saveState = MutableLiveData<SaveUiState>()
-    val saveState: LiveData<SaveUiState> = _saveState
+    // ============================================================
+    // STEP 2
+    // ============================================================
+
+    var fullName = ""
+    var fatherName = ""
+    var personalEmail = ""
+    var contactNumber = ""
+    var cnicNumber = ""
+    var fatherCnicNumber = ""
+    var guardianNumber = ""
+    var regNo = ""
+
+    // ============================================================
+    // STATE
+    // ============================================================
+
+    private val _saveState =
+        MutableLiveData<SaveUiState>(
+            SaveUiState.Idle
+        )
+
+    val saveState:
+            LiveData<SaveUiState> =
+        _saveState
 
     sealed class SaveUiState {
-        object Idle : SaveUiState()
-        object Loading : SaveUiState()
-        data class Success(val classId: String) : SaveUiState()
-        data class Error(val message: String) : SaveUiState()
+
+        object Idle :
+            SaveUiState()
+
+        object Loading :
+            SaveUiState()
+
+        data class Success(
+            val studentId: String,
+            val generatedStudentId: String,
+            val classId: String
+        ) : SaveUiState()
+
+        data class Error(
+            val message: String
+        ) : SaveUiState()
     }
 
-    /**
-     * Validates Step 1 fields. Returns null if valid, or an error message
-     * for the first invalid field found.
-     */
+    // ============================================================
+    // VALIDATE STEP 1
+    // ============================================================
+
     fun validateStep1(): String? {
+
         return when {
-            !ValidationUtils.isNotBlank(universityName) -> "Please enter university name"
-            !ValidationUtils.isNotBlank(departmentName) -> "Please enter department name"
-            !ValidationUtils.isNotBlank(programName) -> "Please select/enter program (e.g. BSSE)"
-            !ValidationUtils.isNotBlank(session) -> "Please select/enter session (e.g. 2022)"
-            !ValidationUtils.isNotBlank(section) -> "Please select/enter class section (e.g. A)"
-            else -> null
+
+            universityName.isBlank() ->
+                "Please enter university name."
+
+            departmentName.isBlank() ->
+                "Please enter department name."
+
+            programName.isBlank() ->
+                "Please select program."
+
+            semester !in 1..8 ->
+                "Please select a valid semester."
+
+            session.isBlank() ->
+                "Please enter session."
+
+            section.isBlank() ->
+                "Please select class/section."
+
+            else ->
+                null
         }
     }
 
-    /**
-     * Validates Step 2 fields, including format checks for CNIC and phone
-     * numbers. Returns null if valid, or the first error message found.
-     */
+    // ============================================================
+    // VALIDATE STEP 2
+    // ============================================================
+
     fun validateStep2(): String? {
+
         return when {
-            !ValidationUtils.isNotBlank(fullName) -> "Please enter student's full name"
-            !ValidationUtils.isNotBlank(regNo) -> "Please enter registration number"
-            !ValidationUtils.isValidPhone(contactNumber) -> "Enter a valid contact number (e.g. 03001234567)"
-            !ValidationUtils.isValidCnic(cnicNumber) -> "Enter a valid CNIC (13 digits, e.g. 12345-1234567-1)"
-            !ValidationUtils.isValidCnic(fatherCnicNumber) -> "Enter a valid Father CNIC (13 digits)"
-            !ValidationUtils.isValidPhone(guardianNumber) -> "Enter a valid guardian number (e.g. 03001234567)"
-            else -> null
+
+            fullName.isBlank() ->
+                "Please enter student's full name."
+
+            fatherName.isBlank() ->
+                "Please enter father's/guardian name."
+
+            personalEmail.isBlank() ||
+                    !android.util.Patterns.EMAIL_ADDRESS
+                        .matcher(personalEmail.trim())
+                        .matches() ->
+                "Please enter a valid personal email."
+
+            !ValidationUtils.isValidPhone(
+                contactNumber
+            ) ->
+                "Enter a valid student phone number."
+
+            !ValidationUtils.isValidCnic(
+                cnicNumber
+            ) ->
+                "Enter a valid student CNIC."
+
+            !ValidationUtils.isValidCnic(
+                fatherCnicNumber
+            ) ->
+                "Enter a valid father CNIC."
+
+            !ValidationUtils.isValidPhone(
+                guardianNumber
+            ) ->
+                "Enter a valid guardian phone number."
+
+            else ->
+                null
         }
     }
 
-    /** Builds a Student object from all currently held form state. */
+    // ============================================================
+    // BUILD STUDENT
+    // ============================================================
+
     private fun buildStudent(): Student {
+
         return Student(
-            universityName = universityName.trim(),
-            departmentName = departmentName.trim(),
-            programName = programName.trim(),
-            session = session.trim(),
-            section = section.trim(),
-            fullName = fullName.trim(),
-            contactNumber = ValidationUtils.normalizePhone(contactNumber),
-            cnicNumber = ValidationUtils.normalizeCnic(cnicNumber),
-            fatherCnicNumber = ValidationUtils.normalizeCnic(fatherCnicNumber),
-            guardianNumber = ValidationUtils.normalizePhone(guardianNumber),
-            regNo = regNo.trim()
+
+            universityName =
+                universityName.trim(),
+
+            departmentName =
+                departmentName.trim(),
+
+            programName =
+                programName.trim().uppercase(),
+
+            semester =
+                semester,
+
+            session =
+                session.trim(),
+
+            section =
+                section.trim().uppercase(),
+
+            fullName =
+                fullName.trim(),
+
+            fatherName =
+                fatherName.trim(),
+
+            personalEmail =
+                personalEmail.trim().lowercase(),
+
+            contactNumber =
+                ValidationUtils.normalizePhone(
+                    contactNumber
+                ),
+
+            cnicNumber =
+                ValidationUtils.normalizeCnic(
+                    cnicNumber
+                ),
+
+            fatherCnicNumber =
+                ValidationUtils.normalizeCnic(
+                    fatherCnicNumber
+                ),
+
+            guardianNumber =
+                ValidationUtils.normalizePhone(
+                    guardianNumber
+                ),
+
+            regNo =
+                regNo.trim()
         )
     }
 
-    /** Saves the student to Firestore. Emits Loading -> Success/Error via saveState. */
-    fun saveStudent() {
-        val student = buildStudent()
+    // ============================================================
+    // SAVE
+    // ============================================================
 
-        _saveState.value = SaveUiState.Loading
+    fun saveStudent() {
+
+        val student =
+            buildStudent()
+
+        _saveState.value =
+            SaveUiState.Loading
+
         viewModelScope.launch {
-            when (val result = repository.addStudent(student)) {
+
+            when (
+                val result =
+                    repository.addStudent(
+                        student
+                    )
+            ) {
+
                 is StudentRepository.SaveResult.Success -> {
-                    _saveState.value = SaveUiState.Success(result.classId)
+
+                    _saveState.value =
+                        SaveUiState.Success(
+
+                            studentId =
+                                result.studentId,
+
+                            generatedStudentId =
+                                result.generatedStudentId,
+
+                            classId =
+                                result.classId
+                        )
                 }
+
                 is StudentRepository.SaveResult.Error -> {
-                    _saveState.value = SaveUiState.Error(result.message)
+
+                    _saveState.value =
+                        SaveUiState.Error(
+                            result.message
+                        )
                 }
             }
         }
     }
 
-    /** Clears all form fields, e.g. after a successful save if adding another student. */
+    // ============================================================
+    // RESET
+    // ============================================================
+
     fun resetPersonalInfoOnly() {
-        // Keep Step 1 (class info) intact since Admin likely adds multiple
-        // students to the SAME class in a row -- only clear Step 2 fields.
+
         fullName = ""
+        fatherName = ""
+        personalEmail = ""
         contactNumber = ""
         cnicNumber = ""
         fatherCnicNumber = ""

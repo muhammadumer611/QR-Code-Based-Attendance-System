@@ -1,17 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    activity_add_student.xml
 
-    Two-step Add Student form:
-      - stepOneContainer: University / Department / Program / Session / Section
-      - stepTwoContainer: Name / Contact / CNIC / Father CNIC / Guardian / RegNo
-
-    Styled to match the existing dark glassmorphism theme (black background,
-    cyan #00E5FF accents) already used in the Student Dashboard.
-    Adjust drawable names (bg_glass_card, bg_input_field, etc.) to match
-    whatever glass-card drawables already exist in your project; placeholder
-    names are used below where I can't see your exact drawable files.
--->
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -83,6 +71,18 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Program (e.g. BSSE, BSCS)"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- NEW: Semester -->
+            <AutoCompleteTextView
+                android:id="@+id/etSemester"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Semester"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#888888"
                 android:background="#2A2A2A"
@@ -196,6 +196,19 @@
                 android:padding="12dp"
                 android:layout_marginBottom="12dp" />
 
+            <!-- NEW: Father / Guardian Name (replaces the old bare "Guardian" concept) -->
+            <EditText
+                android:id="@+id/etFatherName"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Father / Guardian Name"
+                android:inputType="textPersonName|textCapWords"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
             <EditText
                 android:id="@+id/etGuardianNumber"
                 android:layout_width="match_parent"
@@ -203,6 +216,19 @@
                 android:hint="Guardian Number (03XXXXXXXXX)"
                 android:inputType="phone"
                 android:maxLength="11"
+                android:textColor="#FFFFFF"
+                android:textColorHint="#888888"
+                android:background="#2A2A2A"
+                android:padding="12dp"
+                android:layout_marginBottom="12dp" />
+
+            <!-- NEW: Personal Email -->
+            <EditText
+                android:id="@+id/etPersonalEmail"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Personal Email"
+                android:inputType="textEmailAddress"
                 android:textColor="#FFFFFF"
                 android:textColorHint="#888888"
                 android:background="#2A2A2A"
@@ -237,6 +263,20 @@
                     android:layout_marginStart="8dp" />
 
             </LinearLayout>
+
+            <!-- NEW: Generated Student ID display, shown after successful save -->
+            <TextView
+                android:id="@+id/tvGeneratedStudentId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="16dp"
+                android:gravity="center"
+                android:text="Student ID will appear here"
+                android:textColor="#00E5FF"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
         </LinearLayout>
 

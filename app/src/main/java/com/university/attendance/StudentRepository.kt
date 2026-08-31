@@ -1,256 +1,343 @@
-//package com.university.attendance
-//
-//import com.google.firebase.firestore.FieldValue
-//import com.google.firebase.firestore.FirebaseFirestore
-//import com.university.attendance.Student
-//import com.university.attendance.StudentClass
-//import com.university.attendance.ClassUtils
-//import kotlinx.coroutines.tasks.await
-//
-///**
-// * Handles all Firestore read/write operations related to Students and Classes.
-// *
-// * Collections used:
-// *  - "students" : one document per student
-// *  - "classes"  : one document per unique (university+department+program+session+section)
-// *
-// * The class-grouping logic (creating a new class OR incrementing studentCount
-// * on an existing one) is done inside a Firestore TRANSACTION. This is
-// * important: if two students are added at nearly the same time for the same
-// * new class, a transaction guarantees we don't accidentally create two
-// * separate class documents or lose a count increment (a "race condition").
-// */
-//class StudentRepository(
-//    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
-//) {
-//
-//    private val studentsRef = firestore.collection("students")
-//    private val classesRef = firestore.collection("classes")
-//
-//    /**
-//     * Result wrapper so the UI layer can distinguish success/failure without
-//     * needing to catch exceptions itself.
-//     */
-//    sealed class SaveResult {
-//        data class Success(val studentId: String, val classId: String) : SaveResult()
-//        data class Error(val message: String, val exception: Exception? = null) : SaveResult()
-//    }
-//
-//    /**
-//     * Adds a new student, and atomically creates or updates the matching
-//     * class document.
-//     *
-//     * Steps performed inside a single Firestore transaction:
-//     *  1. Build classId from the 5 grouping fields.
-//     *  2. Check if classes/{classId} exists.
-//     *     - If not, create it with studentCount = 1.
-//     *     - If yes, increment studentCount by 1.
-//     *  3. Create the new students/{auto-id} document with classId attached.
-//     *
-//     * All of this either fully succeeds or fully fails together -- so we
-//     * never end up with a student saved but the class count not updated,
-//     * or vice versa.
-//     */
-//    suspend fun addStudent(student: Student): SaveResult {
-//        return try {
-//            val classId = ClassUtils.buildClassId(
-//                universityName = student.universityName,
-//                departmentName = student.departmentName,
-//                programName = student.programName,
-//                session = student.session,
-//                section = student.section
-//            )
-//
-//            // Pre-check for duplicate RegNo before opening the transaction,
-//            // since Firestore transactions require all reads before writes
-//            // and we want a clear, specific error message for this case.
-//            val duplicateRegNo = studentsRef
-//                .whereEqualTo("regNo", student.regNo.trim())
-//                .limit(1)
-//                .get()
-//                .await()
-//
-//            if (!duplicateRegNo.isEmpty) {
-//                return SaveResult.Error("A student with Registration No. '${student.regNo}' already exists.")
-//            }
-//
-//            val newStudentRef = studentsRef.document() // auto-generated ID
-//            val classRef = classesRef.document(classId)
-//
-//            firestore.runTransaction { transaction ->
-//                val classSnapshot = transaction.get(classRef)
-//
-//                if (classSnapshot.exists()) {
-//                    // Class already exists -> just bump the count
-//                    transaction.update(classRef, "studentCount", FieldValue.increment(1))
-//                } else {
-//                    // Brand new class -> create it with count = 1
-//                    val newClass = StudentClass(
-//                        universityName = student.universityName.trim(),
-//                        departmentName = student.departmentName.trim(),
-//                        programName = student.programName.trim(),
-//                        session = student.session.trim(),
-//                        section = student.section.trim(),
-//                        studentCount = 1
-//                    )
-//                    transaction.set(classRef, newClass.toMap())
-//                }
-//
-//                // Attach the resolved classId to the student before saving
-//                val studentWithClassId = student.copy(classId = classId)
-//                transaction.set(newStudentRef, studentWithClassId.toMap())
-//
-//                null // transaction lambda must return a value; not used here
-//            }.await()
-//
-//            SaveResult.Success(studentId = newStudentRef.id, classId = classId)
-//        } catch (e: Exception) {
-//            SaveResult.Error(e.message ?: "Unknown error occurred while saving student.", e)
-//        }
-//    }
-//
-//    /** Fetches all students belonging to a specific class, ordered by name. */
-//    suspend fun getStudentsByClass(classId: String): List<Student> {
-//        val snapshot = studentsRef
-//            .whereEqualTo("classId", classId)
-//            .orderBy("fullName")
-//            .get()
-//            .await()
-//
-//        return snapshot.documents.mapNotNull { doc ->
-//            doc.toObject(Student::class.java)?.apply { studentId = doc.id }
-//        }
-//    }
-//
-//    /** Fetches all class documents, useful for an Admin "All Classes" overview screen. */
-//    suspend fun getAllClasses(): List<StudentClass> {
-//        val snapshot = classesRef.orderBy("universityName").get().await()
-//        return snapshot.documents.mapNotNull { doc ->
-//            doc.toObject(StudentClass::class.java)?.apply { classId = doc.id }
-//        }
-//    }
-//
-//    /** Fetches distinct list of existing universities, used to populate the dropdown. */
-//    suspend fun getDistinctUniversities(): List<String> {
-//        val snapshot = classesRef.get().await()
-//        return snapshot.documents
-//            .mapNotNull { it.getString("universityName") }
-//            .distinct()
-//            .sorted()
-//    }
-//}
 package com.university.attendance
 
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-/**
- * Handles all Firestore read/write operations related to Students and Classes.
- *
- * Collections used:
- *  - "students" : one document per student
- *  - "classes"  : one document per unique (university+department+program+session+section)
- *
- * UPDATED: after a successful addStudent(), logs an ActivityLog +
- * Notification via ActivityLogHelper so the Admin Dashboard's "Recent
- * Activities" and Notifications feeds update automatically.
- */
 class StudentRepository(
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val firestore: FirebaseFirestore =
+        FirebaseFirestore.getInstance()
 ) {
 
-    private val studentsRef = firestore.collection("students")
-    private val classesRef = firestore.collection("classes")
+    private val studentsRef =
+        firestore.collection("students")
+
+    private val classesRef =
+        firestore.collection("classes")
 
     sealed class SaveResult {
-        data class Success(val studentId: String, val classId: String) : SaveResult()
-        data class Error(val message: String, val exception: Exception? = null) : SaveResult()
+
+        data class Success(
+            val studentId: String,
+            val generatedStudentId: String,
+            val classId: String
+        ) : SaveResult()
+
+        data class Error(
+            val message: String,
+            val exception: Exception? = null
+        ) : SaveResult()
     }
 
-    suspend fun addStudent(student: Student): SaveResult {
+    // ============================================================
+    // ADD STUDENT
+    // ============================================================
+
+    suspend fun addStudent(
+        student: Student
+    ): SaveResult {
+
         return try {
-            val classId = ClassUtils.buildClassId(
-                universityName = student.universityName,
-                departmentName = student.departmentName,
-                programName = student.programName,
-                session = student.session,
-                section = student.section
-            )
 
-            val duplicateRegNo = studentsRef
-                .whereEqualTo("regNo", student.regNo.trim())
-                .limit(1)
-                .get()
-                .await()
+            val program =
+                student.programName
+                    .trim()
+                    .uppercase()
 
-            if (!duplicateRegNo.isEmpty) {
-                return SaveResult.Error("A student with Registration No. '${student.regNo}' already exists.")
+            val section =
+                student.section
+                    .trim()
+                    .uppercase()
+
+            val session =
+                student.session
+                    .trim()
+
+            val semester =
+                student.semester
+
+            // ----------------------------------------------------
+            // CLASS ID
+            // ----------------------------------------------------
+
+            val classId =
+                ClassUtils.buildClassId(
+                    universityName = student.universityName,
+                    departmentName = student.departmentName,
+                    programName = program,
+                    session = session,
+                    section = section
+                )
+
+            // ----------------------------------------------------
+            // DUPLICATE REGISTRATION
+            // ----------------------------------------------------
+
+            if (student.regNo.isNotBlank()) {
+
+                val duplicate =
+                    studentsRef
+                        .whereEqualTo(
+                            "regNo",
+                            student.regNo.trim()
+                        )
+                        .limit(1)
+                        .get()
+                        .await()
+
+                if (!duplicate.isEmpty) {
+
+                    return SaveResult.Error(
+                        "A student with Registration No. '${student.regNo}' already exists."
+                    )
+                }
             }
 
-            val newStudentRef = studentsRef.document()
-            val classRef = classesRef.document(classId)
+            // ----------------------------------------------------
+            // STUDENT NUMBER
+            //
+            // Example:
+            // BSSE-B2022-001
+            //
+            // ----------------------------------------------------
+
+            val studentPrefix =
+                "${program}-${section}${session}-"
+
+            val existingStudents =
+                studentsRef
+                    .whereEqualTo(
+                        "programName",
+                        program
+                    )
+                    .whereEqualTo(
+                        "section",
+                        section
+                    )
+                    .whereEqualTo(
+                        "session",
+                        session
+                    )
+                    .get()
+                    .await()
+
+            var maxNumber = 0
+
+            existingStudents.documents.forEach { doc ->
+
+                val oldId =
+                    doc.getString(
+                        "studentGeneratedId"
+                    )
+                        ?: return@forEach
+
+                if (
+                    oldId.startsWith(
+                        studentPrefix
+                    )
+                ) {
+
+                    val number =
+                        oldId
+                            .removePrefix(
+                                studentPrefix
+                            )
+                            .toIntOrNull()
+                            ?: 0
+
+                    if (number > maxNumber) {
+                        maxNumber = number
+                    }
+                }
+            }
+
+            val nextNumber =
+                maxNumber + 1
+
+            val generatedStudentId =
+                "$studentPrefix${nextNumber.toString().padStart(3, '0')}"
+
+            // ----------------------------------------------------
+            // NEW STUDENT DOC
+            // ----------------------------------------------------
+
+            val newStudentRef =
+                studentsRef.document()
+
+            val classRef =
+                classesRef.document(
+                    classId
+                )
+
+            // ----------------------------------------------------
+            // TRANSACTION
+            // ----------------------------------------------------
 
             firestore.runTransaction { transaction ->
-                val classSnapshot = transaction.get(classRef)
+
+                val classSnapshot =
+                    transaction.get(
+                        classRef
+                    )
 
                 if (classSnapshot.exists()) {
-                    transaction.update(classRef, "studentCount", FieldValue.increment(1))
-                } else {
-                    val newClass = StudentClass(
-                        universityName = student.universityName.trim(),
-                        departmentName = student.departmentName.trim(),
-                        programName = student.programName.trim(),
-                        session = student.session.trim(),
-                        section = student.section.trim(),
-                        studentCount = 1
+
+                    transaction.update(
+                        classRef,
+                        "studentCount",
+                        FieldValue.increment(1)
                     )
-                    transaction.set(classRef, newClass.toMap())
+
+                } else {
+
+                    val newClass =
+                        StudentClass(
+
+                            universityName =
+                                student.universityName.trim(),
+
+                            departmentName =
+                                student.departmentName.trim(),
+
+                            programName =
+                                program,
+
+                            session =
+                                session,
+
+                            section =
+                                section,
+
+                            studentCount =
+                                1
+                        )
+
+                    transaction.set(
+                        classRef,
+                        newClass.toMap()
+                    )
                 }
 
-                val studentWithClassId = student.copy(classId = classId)
-                transaction.set(newStudentRef, studentWithClassId.toMap())
+                val finalStudent =
+                    student.copy(
+
+                        programName =
+                            program,
+
+                        session =
+                            session,
+
+                        section =
+                            section,
+
+                        semester =
+                            semester,
+
+                        classId =
+                            classId,
+
+                        studentGeneratedId =
+                            generatedStudentId
+                    )
+
+                transaction.set(
+                    newStudentRef,
+                    finalStudent.toMap()
+                )
 
                 null
             }.await()
 
-            // Log this action for Recent Activities + Notifications.
-            ActivityLogHelper.log(
-                type = Type.STUDENT_ADDED,
-                title = "Student Added",
-                description = "${student.fullName} added to ${student.programName} - Section ${student.section}"
+            SaveResult.Success(
+                studentId =
+                    newStudentRef.id,
+
+                generatedStudentId =
+                    generatedStudentId,
+
+                classId =
+                    classId
             )
 
-            SaveResult.Success(studentId = newStudentRef.id, classId = classId)
         } catch (e: Exception) {
-            SaveResult.Error(e.message ?: "Unknown error occurred while saving student.", e)
+
+            SaveResult.Error(
+                message =
+                    e.message
+                        ?: "Failed to save student.",
+
+                exception =
+                    e
+            )
         }
     }
 
-    suspend fun getStudentsByClass(classId: String): List<Student> {
-        val snapshot = studentsRef
-            .whereEqualTo("classId", classId)
-            .orderBy("fullName")
-            .get()
-            .await()
+    // ============================================================
+    // STUDENTS BY CLASS
+    // ============================================================
 
-        return snapshot.documents.mapNotNull { doc ->
-            doc.toObject(Student::class.java)?.apply { studentId = doc.id }
+    suspend fun getStudentsByClass(
+        classId: String
+    ): List<Student> {
+
+        if (classId.isBlank()) {
+            return emptyList()
         }
-    }
 
-    suspend fun getAllClasses(): List<StudentClass> {
-        val snapshot = classesRef.orderBy("universityName").get().await()
-        return snapshot.documents.mapNotNull { doc ->
-            doc.toObject(StudentClass::class.java)?.apply { classId = doc.id }
-        }
-    }
+        val snapshot =
+            studentsRef
+                .whereEqualTo(
+                    "classId",
+                    classId
+                )
+                .get()
+                .await()
 
-    suspend fun getDistinctUniversities(): List<String> {
-        val snapshot = classesRef.get().await()
         return snapshot.documents
-            .mapNotNull { it.getString("universityName") }
-            .distinct()
-            .sorted()
+            .mapNotNull { doc ->
+
+                doc.toObject(
+                    Student::class.java
+                )?.apply {
+
+                    studentId =
+                        doc.id
+                }
+            }
+            .sortedBy {
+                it.fullName.lowercase()
+            }
+    }
+
+    // ============================================================
+    // ALL CLASSES
+    // ============================================================
+
+    suspend fun getAllClasses():
+            List<StudentClass> {
+
+        val snapshot =
+            classesRef
+                .get()
+                .await()
+
+        return snapshot.documents
+            .mapNotNull { doc ->
+
+                doc.toObject(
+                    StudentClass::class.java
+                )?.apply {
+
+                    classId =
+                        doc.id
+                }
+            }
+            .sortedWith(
+                compareBy(
+                    { it.programName },
+                    { it.session },
+                    { it.section }
+                )
+            )
     }
 }
