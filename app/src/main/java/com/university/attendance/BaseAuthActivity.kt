@@ -34,6 +34,10 @@ abstract class BaseAuthActivity : AppCompatActivity() {
     // "teachers/TCH-XXXX" doc created beforehand by Admin).
     protected lateinit var etTeacherId: EditText
 
+    // Student ID field for Student sign-up.
+    // Admin creates the Student record first.
+    protected lateinit var etStudentId: EditText
+
     abstract val role: String
     abstract val isSignUp: Boolean
     abstract val accentColor: Int
@@ -78,32 +82,106 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                 it.animate().scaleX(1f).scaleY(1f).setDuration(80).start()
 
                 when {
+
+                    // =========================================================
+                    // ADMIN
+                    // =========================================================
+
                     role == "ADMIN" && isSignUp -> {
+
                         registerAdmin {
-                            startActivity(Intent(this, getDashboardScreen()))
+
+                            startActivity(
+                                Intent(
+                                    this,
+                                    getDashboardScreen()
+                                )
+                            )
+
                             finish()
                         }
                     }
+
                     role == "ADMIN" && !isSignUp -> {
+
                         signInAdmin {
-                            startActivity(Intent(this, getDashboardScreen()))
+
+                            startActivity(
+                                Intent(
+                                    this,
+                                    getDashboardScreen()
+                                )
+                            )
+
                             finish()
                         }
                     }
+
+                    // =========================================================
+                    // TEACHER
+                    // =========================================================
+
                     role == "TEACHER" && isSignUp -> {
+
                         registerTeacher {
-                            startActivity(Intent(this, getDashboardScreen()))
+
+                            startActivity(
+                                Intent(
+                                    this,
+                                    getDashboardScreen()
+                                )
+                            )
+
                             finish()
                         }
                     }
+
                     role == "TEACHER" && !isSignUp -> {
+
                         signInTeacher {
-                            startActivity(Intent(this, getDashboardScreen()))
+
+                            startActivity(
+                                Intent(
+                                    this,
+                                    getDashboardScreen()
+                                )
+                            )
+
                             finish()
                         }
                     }
+
+                    // =========================================================
+                    // STUDENT
+                    // =========================================================
+
+                    role == "STUDENT" && isSignUp -> {
+
+                        registerStudent {
+
+                            startActivity(
+                                Intent(
+                                    this,
+                                    getDashboardScreen()
+                                )
+                            )
+
+                            finish()
+                        }
+                    }
+
+                    // Student sign-in abhi agar existing code mein nahi hai
+                    // to yahan baad mein add karenge.
+
                     else -> {
-                        startActivity(Intent(this, getDashboardScreen()))
+
+                        startActivity(
+                            Intent(
+                                this,
+                                getDashboardScreen()
+                            )
+                        )
+
                         finish()
                     }
                 }
@@ -188,12 +266,13 @@ abstract class BaseAuthActivity : AppCompatActivity() {
 
         val emailLabel = when (role) {
             "TEACHER" -> "Faculty Email"
-            "STUDENT" -> "Student Email"
+            "STUDENT" -> "Personal Email"
             else -> "Official UOL Email"
         }
         val emailHint = when (role) {
             "ADMIN" -> "admin@uol.edu.pk"
             "TEACHER" -> "teacher@uol.edu.pk"
+            "STUDENT" -> "student@gmail.com"
             else -> "${role.lowercase()}@university.edu"
         }
         container.addView(makeField(emailLabel, emailHint, "email"))
@@ -217,9 +296,15 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                         )
                     )
                 }
-                "STUDENT" -> container.addView(
-                    makeField("Roll Number", "BSCS-2021-001", "rollNumber")
-                )
+                "STUDENT" -> {
+                    container.addView(
+                        makeField(
+                            "Student ID",
+                            "e.g. BSSE-B2026-001",
+                            "studentId"
+                        )
+                    )
+                }
             }
         }
 
@@ -298,6 +383,7 @@ abstract class BaseAuthActivity : AppCompatActivity() {
             "password" -> etPassword = field
             "department" -> etDepartment = field
             "teacherId" -> etTeacherId = field
+            "studentId" -> etStudentId = field
         }
 
         wrapper.addView(labelView)
@@ -509,6 +595,60 @@ abstract class BaseAuthActivity : AppCompatActivity() {
     // ID is the Teacher ID (TCH-XXXX), not the Firebase Auth uid.
     // =================================================================
 
+    // =================================================================
+    // STUDENT
+    // Admin creates the Student record first.
+    // Student signs up using the Student ID generated by Admin.
+    // =================================================================
+
+    protected fun validateStudent(): Boolean {
+
+        if (etFirstName.text.toString().trim().isEmpty()) {
+            etFirstName.error = "Enter First Name"
+            return false
+        }
+
+        if (etLastName.text.toString().trim().isEmpty()) {
+            etLastName.error = "Enter Last Name"
+            return false
+        }
+
+        val email = etEmail.text.toString().trim()
+
+        if (email.isEmpty()) {
+            etEmail.error = "Enter Personal Email"
+            return false
+        }
+
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            etEmail.error = "Enter a valid email"
+            return false
+        }
+
+        val studentId = etStudentId.text.toString()
+            .trim()
+            .uppercase()
+
+        if (studentId.isEmpty()) {
+            etStudentId.error = "Enter Student ID"
+            return false
+        }
+
+        if (!studentId.startsWith("BS")) {
+            etStudentId.error = "Invalid Student ID"
+            return false
+        }
+
+        val password = etPassword.text.toString()
+
+        if (password.length < 8) {
+            etPassword.error = "Password must be at least 8 characters"
+            return false
+        }
+
+        return true
+    }
+
     protected fun validateTeacher(): Boolean {
 
         if (etFirstName.text.toString().trim().isEmpty()) {
@@ -673,6 +813,198 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                 Toast.makeText(
                     this,
                     "Unable to verify Teacher ID: ${error.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+    }
+
+    protected fun registerStudent(onSuccess: () -> Unit) {
+
+        if (!validateStudent()) return
+
+        val first = etFirstName.text.toString().trim()
+        val last = etLastName.text.toString().trim()
+
+        val fullName = "$first $last".trim()
+
+        val email = etEmail.text.toString().trim()
+
+        val studentId = etStudentId.text.toString()
+            .trim()
+            .uppercase()
+
+        val password = etPassword.text.toString()
+
+        binding.btnMain.isEnabled = false
+
+        // ---------------------------------------------------------
+        // STEP 1
+        // Verify Student ID created by Admin
+        // ---------------------------------------------------------
+
+        db.collection("students")
+            .document(studentId)
+            .get()
+            .addOnSuccessListener { document ->
+
+                if (!document.exists()) {
+
+                    binding.btnMain.isEnabled = true
+
+                    etStudentId.error = "Student ID Not Found"
+
+                    Toast.makeText(
+                        this,
+                        "No Student record found for this Student ID. Contact Admin.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    return@addOnSuccessListener
+                }
+
+                // -------------------------------------------------
+                // STEP 2
+                // Check whether account is already linked
+                // -------------------------------------------------
+
+                val accountLinked =
+                    document.getBoolean("accountLinked") ?: false
+
+                if (accountLinked) {
+
+                    binding.btnMain.isEnabled = true
+
+                    etStudentId.error = "Already Linked"
+
+                    Toast.makeText(
+                        this,
+                        "This Student ID is already linked to an account.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    return@addOnSuccessListener
+                }
+
+                // -------------------------------------------------
+                // STEP 3
+                // Verify personal email if Admin already saved it
+                // -------------------------------------------------
+
+                val recordEmail =
+                    document.getString("email")
+                        ?.trim()
+                        ?.lowercase()
+                        ?: ""
+
+                if (
+                    recordEmail.isNotEmpty() &&
+                    recordEmail != email.lowercase()
+                ) {
+
+                    binding.btnMain.isEnabled = true
+
+                    etEmail.error =
+                        "Email Does Not Match Student Record"
+
+                    Toast.makeText(
+                        this,
+                        "This email does not match the email saved by Admin.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    return@addOnSuccessListener
+                }
+
+                // -------------------------------------------------
+                // STEP 4
+                // Create Firebase Authentication account
+                // -------------------------------------------------
+
+                auth.createUserWithEmailAndPassword(
+                    email,
+                    password
+                )
+                    .addOnSuccessListener {
+
+                        val uid =
+                            auth.currentUser?.uid
+
+                        if (uid == null) {
+
+                            binding.btnMain.isEnabled = true
+
+                            Toast.makeText(
+                                this,
+                                "Unable to create Student account.",
+                                Toast.LENGTH_LONG
+                            ).show()
+
+                            return@addOnSuccessListener
+                        }
+
+                        // -------------------------------------------------
+                        // STEP 5
+                        // Link Firebase Auth account with Student document
+                        // -------------------------------------------------
+
+                        val updates =
+                            hashMapOf<String, Any?>(
+                                "authUid" to uid,
+                                "fullName" to fullName,
+                                "email" to email,
+                                "accountLinked" to true,
+                                "linkedAt" to FieldValue.serverTimestamp()
+                            )
+
+                        db.collection("students")
+                            .document(studentId)
+                            .update(updates)
+                            .addOnSuccessListener {
+
+                                binding.btnMain.isEnabled = true
+
+                                auth.currentUser
+                                    ?.sendEmailVerification()
+
+                                Toast.makeText(
+                                    this,
+                                    "Student Account Linked Successfully",
+                                    Toast.LENGTH_LONG
+                                ).show()
+
+                                onSuccess()
+                            }
+                            .addOnFailureListener { error ->
+
+                                binding.btnMain.isEnabled = true
+
+                                Toast.makeText(
+                                    this,
+                                    error.message
+                                        ?: "Unable to link Student account.",
+                                    Toast.LENGTH_LONG
+                                ).show()
+                            }
+                    }
+                    .addOnFailureListener { error ->
+
+                        binding.btnMain.isEnabled = true
+
+                        Toast.makeText(
+                            this,
+                            error.message
+                                ?: "Student account creation failed.",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+            }
+            .addOnFailureListener { error ->
+
+                binding.btnMain.isEnabled = true
+
+                Toast.makeText(
+                    this,
+                    "Unable to verify Student ID: ${error.message}",
                     Toast.LENGTH_LONG
                 ).show()
             }

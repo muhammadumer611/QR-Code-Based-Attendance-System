@@ -82,6 +82,7 @@ class AdminTeacherAssignmentRepository(
             }
             .filter {
                 it.semester == semester
+                    .toString()
             }
             .sortedBy {
                 it.courseCode
@@ -195,8 +196,7 @@ class AdminTeacherAssignmentRepository(
 
             oldSnapshot.documents
                 .filter {
-                    it.getString("subjectId")
-                    !in selectedSubjectIds
+                    it.getString("subjectId") !in selectedSubjectIds
                 }
                 .forEach { doc ->
 

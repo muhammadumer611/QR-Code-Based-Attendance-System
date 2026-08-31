@@ -659,73 +659,76 @@ class ActivityTeacherDashboard : AppCompatActivity() {
         // SCHEDULE PDF
         // --------------------------------------------------------
 
-        viewModel.schedule
-            .observe(this) { schedule ->
+        viewModel.schedule.observe(
+            this
+        ) { schedule ->
 
-                if (
-                    schedule == null ||
-                    schedule.fileUrl.isBlank()
-                ) {
+            if (
+                schedule == null ||
+                schedule.fileUrl.isBlank()
+            ) {
 
-                    binding.cardSchedulePdf.visibility =
-                        View.GONE
+                binding.cardSchedulePdf.visibility =
+                    View.GONE
 
-                    binding.txtSchedulePdfEmpty.visibility =
-                        View.VISIBLE
+                binding.txtSchedulePdfEmpty.visibility =
+                    View.VISIBLE
 
-                    binding.btnViewSchedulePdf.isEnabled =
-                        false
+                binding.btnViewSchedulePdf.isEnabled =
+                    false
 
-                } else {
+            } else {
 
-                    binding.cardSchedulePdf.visibility =
-                        View.VISIBLE
+                binding.cardSchedulePdf.visibility =
+                    View.VISIBLE
 
-                    binding.txtSchedulePdfEmpty.visibility =
-                        View.GONE
+                binding.txtSchedulePdfEmpty.visibility =
+                    View.GONE
 
-                    binding.tvSchedulePdfName.text =
-                        schedule.fileName.ifBlank {
-                            "Class Schedule PDF"
-                        }
+                binding.tvSchedulePdfName.text =
+                    schedule.fileName.ifBlank {
+                        "Class Schedule PDF"
+                    }
 
-                    binding.tvSchedulePdfNote.text =
-                        schedule.note.ifBlank {
-                            "Schedule uploaded by Admin."
-                        }
+                binding.tvSchedulePdfNote.text =
+                    schedule.note.ifBlank {
+                        "Schedule uploaded by Admin."
+                    }
 
-                    binding.btnViewSchedulePdf.isEnabled =
-                        true
+                binding.btnViewSchedulePdf.isEnabled =
+                    true
 
-                    binding.btnViewSchedulePdf.setOnClickListener {
+                binding.btnViewSchedulePdf.setOnClickListener {
 
-                        try {
+                    try {
 
-                            val intent =
-                                Intent(
-                                    Intent.ACTION_VIEW,
-                                    Uri.parse(
-                                        schedule.fileUrl
-                                    )
+                        val intent =
+                            Intent(
+                                Intent.ACTION_VIEW,
+                                Uri.parse(
+                                    schedule.fileUrl
                                 )
-
-                            intent.addFlags(
-                                Intent.FLAG_ACTIVITY_NEW_TASK
                             )
 
-                            startActivity(intent)
+                        intent.addFlags(
+                            Intent.FLAG_ACTIVITY_NEW_TASK
+                        )
 
-                        } catch (_: Exception) {
+                        startActivity(
+                            intent
+                        )
 
-                            Toast.makeText(
-                                this,
-                                "No PDF viewer or browser is available.",
-                                Toast.LENGTH_LONG
-                            ).show()
-                        }
+                    } catch (e: Exception) {
+
+                        Toast.makeText(
+                            this,
+                            "No PDF viewer or browser is available.",
+                            Toast.LENGTH_LONG
+                        ).show()
                     }
                 }
             }
+        }
     }
 
 
