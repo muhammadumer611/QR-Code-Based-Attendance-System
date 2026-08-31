@@ -107,7 +107,8 @@ class ClassScheduleRepository(
                             ).orEmpty(),
 
                         semester =
-                            semester,
+                            semester.toString(),
+
 
                         teacherId =
                             teacherId,

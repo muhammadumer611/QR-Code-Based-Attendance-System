@@ -210,7 +210,7 @@ class ActivitySubjectManagement : AppCompatActivity() {
             .setPositiveButton("Save") { _, _ ->
                 val courseCode = dialogBinding.etCourseCode.text.toString()
                 val subjectName = dialogBinding.etSubjectName.text.toString()
-                val creditHours = dialogBinding.etCreditHours.text.toString().toIntOrNull() ?: subject.creditHours
+                val creditHours = dialogBinding.etCreditHours.text.toString().toIntOrNull() ?: subject.creditHours.toIntOrNull() ?:0
                 viewModel.updateSubject(subject.subjectId, courseCode, subjectName, creditHours)
             }
             .setNegativeButton("Cancel", null)
