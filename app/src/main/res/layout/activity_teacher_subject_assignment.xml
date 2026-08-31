@@ -97,6 +97,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- NEW: Semester / Session row -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="12dp">
+
+            <AutoCompleteTextView
+                android:id="@+id/etAssignmentSemester"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:hint="Semester"
+                android:inputType="none"
+                android:paddingHorizontal="12dp"
+                android:background="@android:drawable/editbox_background" />
+
+            <AutoCompleteTextView
+                android:id="@+id/etAssignmentSession"
+                android:layout_width="0dp"
+                android:layout_height="52dp"
+                android:layout_weight="1"
+                android:layout_marginStart="10dp"
+                android:hint="Session"
+                android:paddingHorizontal="12dp"
+                android:background="@android:drawable/editbox_background" />
+
+        </LinearLayout>
+
         <TextView
             android:id="@+id/tvSelectedCount"
             android:layout_width="wrap_content"

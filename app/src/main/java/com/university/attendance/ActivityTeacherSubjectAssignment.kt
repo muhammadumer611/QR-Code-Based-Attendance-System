@@ -2,117 +2,367 @@ package com.university.attendance
 
 import android.os.Bundle
 import android.view.View
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.university.attendance.databinding.ActivityTeacherSubjectAssignmentBinding
 
-/**
- * Screen: Admin -> Teacher-Subject Assignment.
- *
- * Two-step flow inside ONE Activity (toggled containers, same pattern as
- * Add Student/Add Teacher):
- *   Step 1: pick a teacher from the list.
- *   Step 2: check/uncheck which subjects that teacher is assigned to,
- *           then Save.
- *
- * Fixes the earlier placeholder behavior where "Taught by" on Attendance
- * Summary / Daily Overview screens guessed the first teacher in a
- * department -- once assignments are saved here, those screens show the
- * real assigned teacher per subject.
- */
-class ActivityTeacherSubjectAssignment : AppCompatActivity() {
+class ActivityTeacherSubjectAssignment :
+    AppCompatActivity() {
 
-    private lateinit var binding: ActivityTeacherSubjectAssignmentBinding
-    private lateinit var viewModel: TeacherSubjectViewModel
-    private lateinit var subjectAdapter: SubjectChecklistAdapter
+    private lateinit var binding:
+            ActivityTeacherSubjectAssignmentBinding
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
+    private lateinit var viewModel:
+            TeacherSubjectViewModel
 
-        binding = ActivityTeacherSubjectAssignmentBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    private lateinit var subjectAdapter:
+            SubjectChecklistAdapter
 
-        viewModel = ViewModelProvider(this)[TeacherSubjectViewModel::class.java]
+    private var selectedTeacher:
+            Teacher? = null
+
+    private val semesters =
+        (1..8).map {
+            "Semester $it"
+        }
+
+    override fun onCreate(
+        savedInstanceState: Bundle?
+    ) {
+        super.onCreate(
+            savedInstanceState
+        )
+
+        binding =
+            ActivityTeacherSubjectAssignmentBinding
+                .inflate(
+                    layoutInflater
+                )
+
+        setContentView(
+            binding.root
+        )
+
+        viewModel =
+            ViewModelProvider(this)[
+                TeacherSubjectViewModel::class.java
+            ]
+
+        setupSemester()
+        setupSubjects()
+        setupObservers()
 
         binding.btnBackHeader.setOnClickListener {
-            if (binding.stepTwoContainer.visibility == View.VISIBLE) {
-                goToStep1()
+
+            if (
+                binding.stepTwoContainer.visibility ==
+                View.VISIBLE
+            ) {
+
+                binding.stepOneContainer.visibility =
+                    View.VISIBLE
+
+                binding.stepTwoContainer.visibility =
+                    View.GONE
+
             } else {
+
                 finish()
             }
         }
 
-        binding.recyclerTeachers.layoutManager = LinearLayoutManager(this)
-
-        setupSubjectChecklist()
-        observeViewModel()
-
         viewModel.loadTeachers()
     }
 
-    private fun setupSubjectChecklist() {
-        subjectAdapter = SubjectChecklistAdapter(
-            subjects = emptyList(),
-            selectedIds = emptySet(),
-            currentTeacherId = "",
-            onToggle = { subjectId -> viewModel.toggleSubject(subjectId) }
+    // ============================================================
+    // SEMESTER
+    // ============================================================
+
+    private fun setupSemester() {
+
+        binding.etAssignmentSemester.setAdapter(
+            ArrayAdapter(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                semesters
+            )
         )
-        binding.recyclerSubjects.layoutManager = LinearLayoutManager(this)
-        binding.recyclerSubjects.adapter = subjectAdapter
 
-        binding.btnSaveAssignment.setOnClickListener { viewModel.saveAssignment() }
+        binding.etAssignmentSemester.setOnClickListener {
+            binding.etAssignmentSemester.showDropDown()
+        }
+
+        binding.etAssignmentSemester.setOnItemClickListener { _, _, _, _ ->
+            loadSubjects()
+        }
+
+        binding.etAssignmentSession.setOnFocusChangeListener { _, hasFocus ->
+            if (!hasFocus) {
+                loadSubjects()
+            }
+        }
     }
 
-    private fun goToStep1() {
-        binding.stepOneContainer.visibility = View.VISIBLE
-        binding.stepTwoContainer.visibility = View.GONE
-        binding.tvHeaderTitle.text = "Assign Subjects"
-        binding.tvHeaderSubtitle.text = "Select a teacher"
+    // ============================================================
+    // SUBJECTS
+    // ============================================================
+
+    private fun setupSubjects() {
+
+        subjectAdapter =
+            SubjectChecklistAdapter(
+                subjects = emptyList(),
+                selectedIds = emptySet(),
+                currentTeacherId = "",
+                onToggle = {
+                    viewModel.toggleSubject(
+                        it
+                    )
+                }
+            )
+
+        binding.recyclerSubjects.layoutManager =
+            LinearLayoutManager(this)
+
+        binding.recyclerSubjects.adapter =
+            subjectAdapter
+
+        binding.btnSaveAssignment.setOnClickListener {
+
+            val teacher =
+                selectedTeacher
+
+            if (teacher == null) {
+
+                Toast.makeText(
+                    this,
+                    "Teacher not selected.",
+                    Toast.LENGTH_SHORT
+                ).show()
+
+                return@setOnClickListener
+            }
+
+            viewModel.saveAssignment(
+                teacher
+            )
+        }
     }
 
-    private fun goToStep2(teacher: Teacher) {
-        binding.stepOneContainer.visibility = View.GONE
-        binding.stepTwoContainer.visibility = View.VISIBLE
-        binding.tvHeaderTitle.text = teacher.fullName
-        binding.tvHeaderSubtitle.text = "${teacher.designation} • ${teacher.departmentName}"
+    // ============================================================
+    // SELECT TEACHER
+    // ============================================================
 
-        viewModel.loadSubjectsForTeacher(teacher.teacherId, teacher.fullName)
+    private fun openTeacher(
+        teacher: Teacher
+    ) {
+
+        selectedTeacher =
+            teacher
+
+        viewModel.selectTeacher(
+            teacher
+        )
+
+        binding.stepOneContainer.visibility =
+            View.GONE
+
+        binding.stepTwoContainer.visibility =
+            View.VISIBLE
+
+        binding.tvHeaderTitle.text =
+            teacher.fullName
+
+        binding.tvHeaderSubtitle.text =
+            "${teacher.designation} • ${teacher.departmentName}"
+
+        binding.etAssignmentSemester.setText(
+            ""
+        )
+
+        binding.etAssignmentSession.setText(
+            ""
+        )
+
+        binding.recyclerSubjects.visibility =
+            View.GONE
+
+        binding.tvSelectedCount.text =
+            "Select Semester + Session"
     }
 
-    private fun observeViewModel() {
-        viewModel.uiState.observe(this) { state ->
+    // ============================================================
+    // LOAD SUBJECTS
+    // ============================================================
+
+    private fun loadSubjects() {
+
+        val semesterText =
+            binding.etAssignmentSemester
+                .text
+                .toString()
+
+        val semester =
+            Regex("\\d+")
+                .find(
+                    semesterText
+                )
+                ?.value
+                ?.toIntOrNull()
+
+        val session =
+            binding.etAssignmentSession
+                .text
+                .toString()
+                .trim()
+
+        if (semester == null) {
+
+            Toast.makeText(
+                this,
+                "Please select semester.",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+        }
+
+        if (session.isBlank()) {
+
+            Toast.makeText(
+                this,
+                "Please enter/select session.",
+                Toast.LENGTH_SHORT
+            ).show()
+
+            return
+        }
+
+        viewModel.loadSubjects(
+            semester,
+            session
+        )
+    }
+
+    // ============================================================
+    // OBSERVERS
+    // ============================================================
+
+    private fun setupObservers() {
+
+        viewModel.teachers.observe(
+            this
+        ) { teachers ->
+
+            binding.tvEmptyState.visibility =
+                if (teachers.isEmpty())
+                    View.VISIBLE
+                else
+                    View.GONE
+
+            binding.recyclerTeachers.visibility =
+                if (teachers.isEmpty())
+                    View.GONE
+                else
+                    View.VISIBLE
+
+            binding.recyclerTeachers.adapter =
+                TeacherAssignmentAdapter(
+                    teachers
+                ) { teacher ->
+
+                    openTeacher(
+                        teacher
+                    )
+                }
+        }
+
+        viewModel.subjects.observe(
+            this
+        ) { subjects ->
+
+            binding.recyclerSubjects.visibility =
+                if (subjects.isEmpty())
+                    View.GONE
+                else
+                    View.VISIBLE
+
+            subjectAdapter.updateData(
+
+                subjects,
+
+                viewModel
+                    .selectedSubjectIds
+                    .value
+                    .orEmpty(),
+
+                viewModel.selectedTeacherId
+            )
+        }
+
+        viewModel.selectedSubjectIds.observe(
+            this
+        ) { selected ->
+
+            binding.tvSelectedCount.text =
+                "${selected.size} subject(s) selected"
+
+            subjectAdapter.updateData(
+
+                viewModel
+                    .subjects
+                    .value
+                    .orEmpty(),
+
+                selected,
+
+                viewModel.selectedTeacherId
+            )
+        }
+
+        viewModel.uiState.observe(
+            this
+        ) { state ->
+
             binding.progressBar.visibility =
-                if (state is TeacherSubjectViewModel.UiState.Loading) View.VISIBLE else View.GONE
+                if (
+                    state is TeacherSubjectViewModel.UiState.Loading
+                )
+                    View.VISIBLE
+                else
+                    View.GONE
 
             when (state) {
-                is TeacherSubjectViewModel.UiState.Error ->
-                    Toast.makeText(this, state.message, Toast.LENGTH_LONG).show()
-                is TeacherSubjectViewModel.UiState.SaveSuccess -> {
-                    Toast.makeText(this, "Assignment saved.", Toast.LENGTH_SHORT).show()
-                    goToStep1()
+
+                is TeacherSubjectViewModel.UiState.Error -> {
+
+                    Toast.makeText(
+                        this,
+                        state.message,
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
+
+                is TeacherSubjectViewModel.UiState.SaveSuccess -> {
+
+                    Toast.makeText(
+                        this,
+                        "Subjects assigned successfully.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
+                    binding.stepOneContainer.visibility =
+                        View.VISIBLE
+
+                    binding.stepTwoContainer.visibility =
+                        View.GONE
+                }
+
                 else -> Unit
             }
-        }
-
-        viewModel.teachers.observe(this) { teachers ->
-            binding.tvEmptyState.visibility = if (teachers.isEmpty()) View.VISIBLE else View.GONE
-            binding.recyclerTeachers.visibility = if (teachers.isEmpty()) View.GONE else View.VISIBLE
-
-            binding.recyclerTeachers.adapter = TeacherAssignmentAdapter(teachers) { teacher ->
-                goToStep2(teacher)
-            }
-        }
-
-        viewModel.subjects.observe(this) { subjects ->
-            subjectAdapter.updateData(subjects, viewModel.selectedSubjectIds.value.orEmpty(), viewModel.selectedTeacherId)
-        }
-
-        viewModel.selectedSubjectIds.observe(this) { selectedIds ->
-            subjectAdapter.updateData(viewModel.subjects.value.orEmpty(), selectedIds, viewModel.selectedTeacherId)
-            binding.tvSelectedCount.text = "${selectedIds.size} subject(s) selected"
         }
     }
 }

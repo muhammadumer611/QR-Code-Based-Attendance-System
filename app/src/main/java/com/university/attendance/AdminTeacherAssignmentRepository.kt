@@ -1,127 +1,302 @@
 package com.university.attendance
 
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
-/**
- * ADMIN-ONLY repository for the Teacher-Subject Assignment screen.
- *
- * This is intentionally a separate class from TeacherSubjectsRepository
- * (the read-only, teacher-scoped repository used by the Teacher Dashboard /
- * My Classes screens). Keeping them separate means a teacher-side ViewModel
- * can never accidentally get access to getAllTeachers(), getAllSubjects(),
- * or saveAssignment() -- those are Admin operations only.
- */
 class AdminTeacherAssignmentRepository(
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val firestore: FirebaseFirestore =
+        FirebaseFirestore.getInstance()
 ) {
 
-    private val teachersRef = firestore.collection("teachers")
-    private val subjectsRef = firestore.collection("subjects")
+    private val teachersRef =
+        firestore.collection("teachers")
+
+    private val subjectsRef =
+        firestore.collection("subjects")
+
+    private val assignmentsRef =
+        firestore.collection("teacherSubjectAssignments")
 
     sealed class OpResult {
-        object Success : OpResult()
-        data class Error(val message: String) : OpResult()
+
+        object Success :
+            OpResult()
+
+        data class Error(
+            val message: String
+        ) : OpResult()
     }
 
-    /**
-     * All teachers, for the "pick a teacher" list.
-     * Sorted by name so the list is stable and easy to scan.
-     */
-    suspend fun getAllTeachers(): List<Teacher> {
-        val snapshot = teachersRef.get().await()
+    // ============================================================
+    // TEACHERS
+    // ============================================================
+
+    suspend fun getAllTeachers():
+            List<Teacher> {
+
+        val snapshot =
+            teachersRef
+                .get()
+                .await()
 
         return snapshot.documents
             .mapNotNull { doc ->
-                doc.toObject(Teacher::class.java)?.apply {
-                    teacherId = doc.id
+
+                doc.toObject(
+                    Teacher::class.java
+                )?.apply {
+
+                    teacherId =
+                        doc.id
                 }
             }
-            .sortedBy { it.fullName }
+            .sortedBy {
+                it.fullName
+            }
     }
 
-    /**
-     * Every subject in the system (not filtered by teacher), for the
-     * assignment checklist. Same sort order as TeacherSubjectsRepository
-     * so the two screens feel consistent.
-     */
-    suspend fun getAllSubjects(): List<Subject> {
-        val snapshot = subjectsRef.get().await()
+    // ============================================================
+    // SUBJECTS BY SEMESTER
+    // ============================================================
+
+    suspend fun getSubjectsBySemester(
+        semester: Int
+    ): List<Subject> {
+
+        val snapshot =
+            subjectsRef
+                .get()
+                .await()
 
         return snapshot.documents
             .mapNotNull { doc ->
-                doc.toObject(Subject::class.java)?.apply {
-                    subjectId = doc.id
+
+                doc.toObject(
+                    Subject::class.java
+                )?.apply {
+
+                    subjectId =
+                        doc.id
                 }
             }
-            .sortedWith(
-                compareBy(
-                    { it.programName },
-                    { it.semester },
-                    { it.courseCode }
-                )
-            )
+            .filter {
+                it.semester == semester
+            }
+            .sortedBy {
+                it.courseCode
+            }
     }
 
-    /**
-     * Applies the admin's checklist selection as a single atomic batch write:
-     *
-     *  - Subjects that are checked AND not already assigned to this teacher
-     *    -> get teacherId/teacherName set to this teacher.
-     *  - Subjects that are unchecked AND currently assigned to this teacher
-     *    -> get teacherId/teacherName cleared (unassigned).
-     *  - Everything else is left untouched.
-     *
-     * Only the "teacherId" and "teacherName" fields are written, so this
-     * never overwrites any other field on Subject, known or unknown.
-     *
-     * Note: checking a subject that's currently assigned to a DIFFERENT
-     * teacher will reassign it to this teacher -- a subject can only belong
-     * to one teacher at a time in the current data model.
-     */
-    suspend fun saveAssignment(
+    // ============================================================
+    // SELECTED ASSIGNMENTS
+    // ============================================================
+
+    suspend fun getAssignedSubjectIds(
         teacherId: String,
-        teacherName: String,
-        allSubjects: List<Subject>,
+        semester: Int,
+        session: String
+    ): Set<String> {
+
+        if (
+            teacherId.isBlank() ||
+            session.isBlank()
+        ) {
+            return emptySet()
+        }
+
+        val snapshot =
+            assignmentsRef
+                .whereEqualTo(
+                    "teacherId",
+                    teacherId
+                )
+                .whereEqualTo(
+                    "semester",
+                    semester
+                )
+                .whereEqualTo(
+                    "session",
+                    session.trim()
+                )
+                .get()
+                .await()
+
+        return snapshot.documents
+            .mapNotNull {
+                it.getString(
+                    "subjectId"
+                )
+            }
+            .toSet()
+    }
+
+    // ============================================================
+    // SAVE ASSIGNMENT
+    // ============================================================
+
+    suspend fun saveAssignment(
+        teacher: Teacher,
+        semester: Int,
+        session: String,
+        subjects: List<Subject>,
         selectedSubjectIds: Set<String>
     ): OpResult {
 
         return try {
-            val batch = firestore.batch()
-            var hasChanges = false
 
-            allSubjects.forEach { subject ->
-                val isSelected = subject.subjectId in selectedSubjectIds
-                val isCurrentlyAssignedToThisTeacher = subject.teacherId == teacherId
+            if (teacher.teacherId.isBlank()) {
+                return OpResult.Error(
+                    "Teacher ID is missing."
+                )
+            }
 
-                if (isSelected && !isCurrentlyAssignedToThisTeacher) {
-                    batch.update(
-                        subjectsRef.document(subject.subjectId),
-                        mapOf(
-                            "teacherId" to teacherId,
-                            "teacherName" to teacherName
-                        )
+            if (session.isBlank()) {
+                return OpResult.Error(
+                    "Session is required."
+                )
+            }
+
+            val cleanSession =
+                session.trim()
+
+            val oldSnapshot =
+                assignmentsRef
+                    .whereEqualTo(
+                        "teacherId",
+                        teacher.teacherId
                     )
-                    hasChanges = true
-                } else if (!isSelected && isCurrentlyAssignedToThisTeacher) {
-                    batch.update(
-                        subjectsRef.document(subject.subjectId),
-                        mapOf(
-                            "teacherId" to "",
-                            "teacherName" to ""
-                        )
+                    .whereEqualTo(
+                        "semester",
+                        semester
                     )
-                    hasChanges = true
+                    .whereEqualTo(
+                        "session",
+                        cleanSession
+                    )
+                    .get()
+                    .await()
+
+            val oldIds =
+                oldSnapshot.documents
+                    .mapNotNull {
+                        it.getString(
+                            "subjectId"
+                        )
+                    }
+                    .toSet()
+
+            val batch =
+                firestore.batch()
+
+            // ----------------------------------------------------
+            // DELETE OLD
+            // ----------------------------------------------------
+
+            oldSnapshot.documents
+                .filter {
+                    it.getString("subjectId")
+                    !in selectedSubjectIds
                 }
-            }
+                .forEach { doc ->
 
-            if (hasChanges) {
-                batch.commit().await()
-            }
+                    batch.delete(
+                        doc.reference
+                    )
+                }
+
+            // ----------------------------------------------------
+            // ADD NEW
+            // ----------------------------------------------------
+
+            subjects
+                .filter {
+                    it.subjectId in
+                            selectedSubjectIds
+                }
+                .forEach { subject ->
+
+                    val assignmentId =
+                        "${teacher.teacherId}_${cleanSession}_${semester}_${subject.subjectId}"
+                            .replace(
+                                "/",
+                                "_"
+                            )
+
+                    val assignmentRef =
+                        assignmentsRef
+                            .document(
+                                assignmentId
+                            )
+
+                    val data =
+                        mapOf(
+
+                            "teacherId" to
+                                    teacher.teacherId,
+
+                            "teacherName" to
+                                    teacher.fullName,
+
+                            "subjectId" to
+                                    subject.subjectId,
+
+                            "subjectName" to
+                                    subject.subjectName,
+
+                            "courseCode" to
+                                    subject.courseCode,
+
+                            "programName" to
+                                    subject.programName,
+
+                            "departmentName" to
+                                    subject.departmentName,
+
+                            "semester" to
+                                    semester,
+
+                            "session" to
+                                    cleanSession,
+
+                            "updatedAt" to
+                                    FieldValue.serverTimestamp()
+                        )
+
+                    batch.set(
+                        assignmentRef,
+                        data
+                    )
+
+                    // ------------------------------------------------
+                    // Keep old subject.teacherId compatible
+                    // ------------------------------------------------
+
+                    batch.update(
+                        subjectsRef.document(
+                            subject.subjectId
+                        ),
+                        mapOf(
+                            "teacherId" to
+                                    teacher.teacherId,
+
+                            "teacherName" to
+                                    teacher.fullName
+                        )
+                    )
+                }
+
+            batch.commit()
+                .await()
 
             OpResult.Success
+
         } catch (e: Exception) {
-            OpResult.Error(e.message ?: "Failed to save subject assignment.")
+
+            OpResult.Error(
+                e.message
+                    ?: "Failed to save teacher subject assignment."
+            )
         }
     }
 }
