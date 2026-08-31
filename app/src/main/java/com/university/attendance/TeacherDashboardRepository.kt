@@ -118,55 +118,22 @@ class TeacherDashboardRepository(
 
 
         // --------------------------------------------------------
-        // TODAY (must be Daily schedule)
+        // TODAY / WEEK / SEMESTER (clean filtering)
         // --------------------------------------------------------
-
-        val today =
-            todayDate()
-
 
         val todayClasses =
-            allClasses
-                .filter {
-
-                    it.periodType
-                        .trim()
-                        .equals(
-                            "Daily",
-                            ignoreCase = true
-                        ) &&
-
-                            it.date == today
-                }
-                .sortedWith(
-                    compareBy<ClassSchedule> {
-                        parseTimeForSorting(
-                            it.startTime
-                        )
-                    }.thenBy {
-                        it.subjectName
-                    }
-                )
-
-
-        // --------------------------------------------------------
-        // THIS WEEK (must be Weekly schedule)
-        // --------------------------------------------------------
-
-        val weekClasses =
-            getCurrentWeekClasses(
+            getTodayClasses(
                 allClasses
             )
 
-
-        // --------------------------------------------------------
-        // SEMESTER (must be Semester schedule)
-        // --------------------------------------------------------
+        val weekClasses =
+            getWeeklyClasses(
+                allClasses
+            )
 
         val semesterClasses =
             getSemesterClasses(
-                allClasses,
-                subjects
+                allClasses
             )
 
 
@@ -203,7 +170,6 @@ class TeacherDashboardRepository(
             return emptyList()
         }
 
-
         val snapshot =
             classScheduleRef
                 .whereEqualTo(
@@ -212,7 +178,6 @@ class TeacherDashboardRepository(
                 )
                 .get()
                 .await()
-
 
         return snapshot.documents
             .mapNotNull { document ->
@@ -238,17 +203,126 @@ class TeacherDashboardRepository(
                     parseTimeForSorting(
                         it.startTime
                     )
-
-                }.thenBy {
-
-                    it.subjectName
                 }
             )
     }
 
 
     // ============================================================
-    // TODAY DATE
+    // TODAY
+    // ============================================================
+
+    private fun getTodayClasses(
+        allClasses: List<ClassSchedule>
+    ): List<ClassSchedule> {
+
+        val today =
+            todayDate()
+
+        val todayDay =
+            todayDayName()
+
+        return allClasses
+            .filter { schedule ->
+
+                val isDaily =
+                    schedule.periodType
+                        .equals(
+                            "Daily",
+                            ignoreCase = true
+                        ) &&
+
+                            schedule.date == today
+
+                val isWeekly =
+                    schedule.periodType
+                        .equals(
+                            "Weekly",
+                            ignoreCase = true
+                        ) &&
+
+                            schedule.dayName
+                                .equals(
+                                    todayDay,
+                                    ignoreCase = true
+                                )
+
+                isDaily || isWeekly
+            }
+            .sortedWith(
+                compareBy(
+                    { parseTimeForSorting(it.startTime) },
+                    { it.subjectName }
+                )
+            )
+    }
+
+
+    // ============================================================
+    // CURRENT WEEK
+    // ============================================================
+
+    private fun getWeeklyClasses(
+        allClasses: List<ClassSchedule>
+    ): List<ClassSchedule> {
+
+        return allClasses
+            .filter {
+
+                it.periodType
+                    .equals(
+                        "Weekly",
+                        ignoreCase = true
+                    )
+            }
+            .sortedWith(
+
+                compareBy<ClassSchedule> {
+
+                    dayOrder(
+                        it.dayName
+                    )
+
+                }.thenBy {
+
+                    parseTimeForSorting(
+                        it.startTime
+                    )
+                }
+            )
+    }
+
+
+    // ============================================================
+    // SEMESTER
+    // ============================================================
+
+    private fun getSemesterClasses(
+        allClasses: List<ClassSchedule>
+    ): List<ClassSchedule> {
+
+        return allClasses
+            .filter {
+
+                it.periodType
+                    .equals(
+                        "Semester",
+                        ignoreCase = true
+                    )
+            }
+            .sortedWith(
+
+                compareBy(
+                    { it.semester },
+                    { it.date },
+                    { parseTimeForSorting(it.startTime) }
+                )
+            )
+    }
+
+
+    // ============================================================
+    // DATE / DAY HELPERS
     // ============================================================
 
     private fun todayDate(): String {
@@ -262,220 +336,35 @@ class TeacherDashboardRepository(
     }
 
 
-    // ============================================================
-    // THIS WEEK (strict: periodType must be Weekly)
-    // ============================================================
+    private fun todayDayName(): String {
 
-    private fun getCurrentWeekClasses(
-        classes: List<ClassSchedule>
-    ): List<ClassSchedule> {
-
-        val calendar =
-            Calendar.getInstance()
-
-
-        // Monday
-        calendar.set(
-            Calendar.DAY_OF_WEEK,
-            Calendar.MONDAY
+        return SimpleDateFormat(
+            "EEEE",
+            Locale.US
+        ).format(
+            Calendar.getInstance().time
         )
-
-        calendar.set(
-            Calendar.HOUR_OF_DAY,
-            0
-        )
-
-        calendar.set(
-            Calendar.MINUTE,
-            0
-        )
-
-        calendar.set(
-            Calendar.SECOND,
-            0
-        )
-
-        calendar.set(
-            Calendar.MILLISECOND,
-            0
-        )
-
-        val weekStart =
-            calendar.time
-
-
-        // Sunday
-        calendar.add(
-            Calendar.DAY_OF_YEAR,
-            6
-        )
-
-        calendar.set(
-            Calendar.HOUR_OF_DAY,
-            23
-        )
-
-        calendar.set(
-            Calendar.MINUTE,
-            59
-        )
-
-        calendar.set(
-            Calendar.SECOND,
-            59
-        )
-
-        val weekEnd =
-            calendar.time
-
-
-        val dateFormat =
-            SimpleDateFormat(
-                "yyyy-MM-dd",
-                Locale.US
-            )
-
-
-        return classes
-            .filter { classSchedule ->
-
-                if (
-                    !classSchedule.periodType
-                        .trim()
-                        .equals(
-                            "Weekly",
-                            ignoreCase = true
-                        )
-                ) {
-                    return@filter false
-                }
-
-                try {
-
-                    val classDate =
-                        dateFormat.parse(
-                            classSchedule.date
-                        )
-
-                    classDate != null &&
-                            !classDate.before(
-                                weekStart
-                            ) &&
-                            !classDate.after(
-                                weekEnd
-                            )
-
-                } catch (_: Exception) {
-
-                    false
-                }
-            }
-            .sortedWith(
-
-                compareBy<ClassSchedule> {
-
-                    it.date
-
-                }.thenBy {
-
-                    parseTimeForSorting(
-                        it.startTime
-                    )
-
-                }.thenBy {
-
-                    it.subjectName
-                }
-            )
     }
 
 
-    // ============================================================
-    // SEMESTER CLASSES (strict: periodType must be Semester)
-    // ============================================================
+    private fun dayOrder(
+        day: String
+    ): Int {
 
-    private fun getSemesterClasses(
-        classes: List<ClassSchedule>,
-        subjects: List<Subject>
-    ): List<ClassSchedule> {
+        return when (
+            day.lowercase()
+        ) {
 
-        if (classes.isEmpty()) {
-            return emptyList()
+            "monday" -> 1
+            "tuesday" -> 2
+            "wednesday" -> 3
+            "thursday" -> 4
+            "friday" -> 5
+            "saturday" -> 6
+            "sunday" -> 7
+
+            else -> 99
         }
-
-
-        /*
-         * Admin schedule mein semester directly save hota hai.
-         *
-         * Teacher ke assigned subjects ke semesters bhi
-         * subjects collection mein available hain.
-         *
-         * Isliye pehle assigned subjects ke semester collect
-         * karte hain.
-         */
-
-        val assignedSemesters =
-            subjects
-                .map {
-                    it.semester
-                        .toString()
-                        .trim()
-                        .lowercase()
-                }
-                .filter {
-                    it.isNotBlank()
-                }
-                .toSet()
-
-
-        return classes
-            .filter { classSchedule ->
-
-                // MUST be Semester schedule
-                if (
-                    !classSchedule.periodType
-                        .trim()
-                        .equals(
-                            "Semester",
-                            ignoreCase = true
-                        )
-                ) {
-                    return@filter false
-                }
-
-                // If teacher subjects have semester info,
-                // match schedule semester with them.
-                if (assignedSemesters.isNotEmpty()) {
-
-                    assignedSemesters.contains(
-                        classSchedule.semester
-                            .trim()
-                            .lowercase()
-                    )
-
-                } else {
-
-                    classSchedule.semester
-                        .isNotBlank()
-                }
-            }
-            .sortedWith(
-
-                compareBy<ClassSchedule> {
-
-                    it.semester
-
-                }.thenBy {
-
-                    it.date
-
-                }.thenBy {
-
-                    parseTimeForSorting(
-                        it.startTime
-                    )
-                }
-            )
     }
 
 

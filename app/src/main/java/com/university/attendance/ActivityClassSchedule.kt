@@ -38,6 +38,16 @@ class ActivityClassSchedule : AppCompatActivity() {
 
     private var teachers: List<Teacher> = emptyList()
 
+    private var selectedSubject: Subject? = null
+
+    private var availableSubjects =
+        emptyList<Subject>()
+
+    private val semesterList =
+        (1..8).map {
+            "Semester $it"
+        }
+
     private val dateFormat =
         SimpleDateFormat(
             "yyyy-MM-dd",
@@ -220,6 +230,8 @@ class ActivityClassSchedule : AppCompatActivity() {
         selectedStartTime = ""
         selectedEndTime = ""
         selectedTeacher = null
+        selectedSubject = null
+        availableSubjects = emptyList()
 
         val dialogBinding =
             DialogAddClassScheduleBinding.inflate(
@@ -276,6 +288,74 @@ class ActivityClassSchedule : AppCompatActivity() {
 
             selectedTeacher =
                 teachers[position]
+
+            selectedSubject =
+                null
+
+            availableSubjects =
+                emptyList()
+
+            dialogBinding.etSubject.setText(
+                ""
+            )
+
+            dialogBinding.etSubject.isEnabled =
+                false
+        }
+
+        // ========================================================
+        // SEMESTER
+        // ========================================================
+
+        dialogBinding.etSemester.setAdapter(
+            ArrayAdapter(
+                this,
+                android.R.layout.simple_dropdown_item_1line,
+                semesterList
+            )
+        )
+
+        dialogBinding.etSemester.setOnClickListener {
+            dialogBinding.etSemester.showDropDown()
+        }
+
+        dialogBinding.etSemester.setOnItemClickListener {
+                _, _, _, _ ->
+
+            loadSubjectsForScheduleDialog(
+                dialogBinding
+            )
+        }
+
+        // ========================================================
+        // SESSION
+        // ========================================================
+
+        dialogBinding.etSession.setOnFocusChangeListener {
+                _, hasFocus ->
+
+            if (!hasFocus) {
+
+                loadSubjectsForScheduleDialog(
+                    dialogBinding
+                )
+            }
+        }
+
+        // ========================================================
+        // SUBJECT
+        // ========================================================
+
+        dialogBinding.etSubject.isEnabled =
+            false
+
+        dialogBinding.etSubject.setOnItemClickListener {
+                _, _, position, _ ->
+
+            selectedSubject =
+                availableSubjects.getOrNull(
+                    position
+                )
         }
 
         // ========================================================
@@ -351,6 +431,118 @@ class ActivityClassSchedule : AppCompatActivity() {
     }
 
     // ============================================================
+    // LOAD ASSIGNED SUBJECTS FOR TEACHER + SEMESTER + SESSION
+    // ============================================================
+
+    private fun loadSubjectsForScheduleDialog(
+        dialogBinding:
+        DialogAddClassScheduleBinding
+    ) {
+
+        val teacher =
+            selectedTeacher
+                ?: return
+
+        val semesterText =
+            dialogBinding.etSemester
+                .text
+                .toString()
+
+        val semester =
+            Regex("\\d+")
+                .find(
+                    semesterText
+                )
+                ?.value
+                ?.toIntOrNull()
+
+        val session =
+            dialogBinding.etSession
+                .text
+                .toString()
+                .trim()
+
+        if (semester == null) {
+            return
+        }
+
+        if (session.isBlank()) {
+            return
+        }
+
+        lifecycleScope.launch {
+
+            try {
+
+                dialogBinding.etSubject.isEnabled =
+                    false
+
+                val subjects =
+                    ClassScheduleRepository()
+                        .getAssignedSubjects(
+                            teacherId =
+                                teacher.teacherId,
+                            semester =
+                                semester,
+                            session =
+                                session
+                        )
+
+                availableSubjects =
+                    subjects
+
+                val subjectLabels =
+                    subjects.map {
+
+                        if (
+                            it.courseCode.isNotBlank()
+                        ) {
+
+                            "${it.courseCode} • ${it.subjectName}"
+
+                        } else {
+
+                            it.subjectName
+                        }
+                    }
+
+                dialogBinding.etSubject.setAdapter(
+                    ArrayAdapter(
+                        this@ActivityClassSchedule,
+                        android.R.layout.simple_dropdown_item_1line,
+                        subjectLabels
+                    )
+                )
+
+                dialogBinding.etSubject.isEnabled =
+                    subjects.isNotEmpty()
+
+                if (subjects.isEmpty()) {
+
+                    dialogBinding.etSubject.setText(
+                        ""
+                    )
+
+                    Toast.makeText(
+                        this@ActivityClassSchedule,
+                        "No subject assigned to this teacher for this semester/session.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+            } catch (e: Exception) {
+
+                Toast.makeText(
+                    this@ActivityClassSchedule,
+                    e.message
+                        ?: "Failed to load assigned subjects.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    // ============================================================
     // SAVE CLASS
     // ============================================================
 
@@ -401,16 +593,13 @@ class ActivityClassSchedule : AppCompatActivity() {
         // Subject
         // --------------------------------------------------------
 
-        val subjectName =
-            dialogBinding.etSubject
-                .text
-                .toString()
-                .trim()
+        val subject =
+            selectedSubject
 
-        if (subjectName.isBlank()) {
+        if (subject == null) {
 
             showError(
-                "Please enter subject name."
+                "Please select an assigned subject."
             )
 
             return
@@ -470,17 +659,49 @@ class ActivityClassSchedule : AppCompatActivity() {
         }
 
         // --------------------------------------------------------
+        // Semester + Session
+        // --------------------------------------------------------
+
+        val semester =
+            Regex("\\d+")
+                .find(
+                    dialogBinding.etSemester
+                        .text
+                        .toString()
+                )
+                ?.value
+                ?.toIntOrNull()
+
+        if (semester == null) {
+
+            showError(
+                "Please select a valid semester."
+            )
+
+            return
+        }
+
+        val session =
+            dialogBinding.etSession
+                .text
+                .toString()
+                .trim()
+
+        if (session.isBlank()) {
+
+            showError(
+                "Please enter session."
+            )
+
+            return
+        }
+
+        // --------------------------------------------------------
         // Optional fields
         // --------------------------------------------------------
 
         val roomNumber =
             dialogBinding.etRoom
-                .text
-                .toString()
-                .trim()
-
-        val semester =
-            dialogBinding.etSemester
                 .text
                 .toString()
                 .trim()
@@ -554,8 +775,17 @@ class ActivityClassSchedule : AppCompatActivity() {
                 className =
                     className,
 
+                subjectId =
+                    subject.subjectId,
+
                 subjectName =
-                    subjectName,
+                    subject.subjectName,
+
+                courseCode =
+                    subject.courseCode,
+
+                programName =
+                    subject.programName,
 
                 roomNumber =
                     roomNumber,
@@ -581,11 +811,21 @@ class ActivityClassSchedule : AppCompatActivity() {
                     selectedEndTime,
 
                 // ========================================================
-                // SEMESTER
+                // SEMESTER / SESSION / SECTION
                 // ========================================================
 
                 semester =
                     semester,
+
+                session =
+                    session,
+
+                section =
+                    className
+                        .substringAfterLast(
+                            " "
+                        )
+                        .trim(),
 
                 periodType =
                     selectedPeriod,

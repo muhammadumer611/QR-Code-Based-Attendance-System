@@ -12,11 +12,14 @@ class ClassScheduleRepository(
 ) {
 
     private val classScheduleRef =
-        firestore.collection("classSchedules")
+        firestore.collection(
+            "classSchedules"
+        )
 
-    // ============================================================
-    // RESULT
-    // ============================================================
+    private val assignmentRef =
+        firestore.collection(
+            "teacherSubjectAssignments"
+        )
 
     sealed class OpResult {
 
@@ -31,7 +34,101 @@ class ClassScheduleRepository(
     }
 
     // ============================================================
-    // SAVE CLASS
+    // SUBJECTS ASSIGNED TO TEACHER
+    // ============================================================
+
+    suspend fun getAssignedSubjects(
+        teacherId: String,
+        semester: Int,
+        session: String
+    ): List<Subject> {
+
+        if (
+            teacherId.isBlank() ||
+            session.isBlank()
+        ) {
+            return emptyList()
+        }
+
+        val snapshot =
+            assignmentRef
+                .whereEqualTo(
+                    "teacherId",
+                    teacherId
+                )
+                .whereEqualTo(
+                    "semester",
+                    semester
+                )
+                .whereEqualTo(
+                    "session",
+                    session.trim()
+                )
+                .get()
+                .await()
+
+        return snapshot.documents
+            .mapNotNull { doc ->
+
+                val subjectId =
+                    doc.getString(
+                        "subjectId"
+                    )
+
+                if (
+                    subjectId.isNullOrBlank()
+                ) {
+                    null
+                } else {
+
+                    Subject(
+
+                        subjectId =
+                            subjectId,
+
+                        subjectName =
+                            doc.getString(
+                                "subjectName"
+                            ).orEmpty(),
+
+                        courseCode =
+                            doc.getString(
+                                "courseCode"
+                            ).orEmpty(),
+
+                        programName =
+                            doc.getString(
+                                "programName"
+                            ).orEmpty(),
+
+                        departmentName =
+                            doc.getString(
+                                "departmentName"
+                            ).orEmpty(),
+
+                        semester =
+                            semester,
+
+                        teacherId =
+                            teacherId,
+
+                        teacherName =
+                            doc.getString(
+                                "teacherName"
+                            ).orEmpty()
+                    )
+                }
+            }
+            .distinctBy {
+                it.subjectId
+            }
+            .sortedBy {
+                it.courseCode
+            }
+    }
+
+    // ============================================================
+    // SAVE
     // ============================================================
 
     suspend fun saveClass(
@@ -40,10 +137,27 @@ class ClassScheduleRepository(
 
         return try {
 
-            if (classSchedule.teacherId.isBlank()) {
-
+            if (
+                classSchedule.teacherId.isBlank()
+            ) {
                 return OpResult.Error(
                     "Teacher ID is missing."
+                )
+            }
+
+            if (
+                classSchedule.subjectId.isBlank()
+            ) {
+                return OpResult.Error(
+                    "Please select a subject."
+                )
+            }
+
+            if (
+                classSchedule.session.isBlank()
+            ) {
+                return OpResult.Error(
+                    "Session is required."
                 )
             }
 
@@ -57,7 +171,7 @@ class ClassScheduleRepository(
                 .await()
 
             OpResult.Success(
-                scheduleId = document.id
+                document.id
             )
 
         } catch (e: Exception) {
@@ -71,8 +185,7 @@ class ClassScheduleRepository(
     }
 
     // ============================================================
-    // GET ALL CLASSES FOR TEACHER
-    // PRIMARY KEY = TEACHER ID
+    // TEACHER CLASSES
     // ============================================================
 
     suspend fun getClassesForTeacher(
@@ -93,91 +206,77 @@ class ClassScheduleRepository(
                 .await()
 
         return snapshot.documents
-            .mapNotNull { document ->
+            .mapNotNull { doc ->
 
-                document
-                    .toObject(
-                        ClassSchedule::class.java
-                    )
-                    ?.apply {
+                doc.toObject(
+                    ClassSchedule::class.java
+                )?.apply {
 
-                        scheduleId =
-                            document.id
-                    }
+                    scheduleId =
+                        doc.id
+                }
             }
             .sortedWith(
-                compareBy<ClassSchedule> {
-
-                    it.date
-
-                }.thenBy {
-
-                    parseTimeForSorting(
-                        it.startTime
-                    )
-                }
+                compareBy(
+                    { it.date },
+                    { parseTime(it.startTime) }
+                )
             )
     }
 
     // ============================================================
-    // GET TODAY'S CLASSES
-    // NO COMPOSITE INDEX REQUIRED
+    // TODAY
     // ============================================================
 
     suspend fun getTodayClassesForTeacher(
         teacherId: String
     ): List<ClassSchedule> {
 
-        if (teacherId.isBlank()) {
-            return emptyList()
-        }
-
-        val today =
-            SimpleDateFormat(
-                "yyyy-MM-dd",
-                Locale.US
-            ).format(
-                Calendar.getInstance().time
+        val all =
+            getClassesForTeacher(
+                teacherId
             )
 
-        // Only teacherId query.
-        // Date filtering is done locally.
-        val snapshot =
-            classScheduleRef
-                .whereEqualTo(
-                    "teacherId",
-                    teacherId
-                )
-                .get()
-                .await()
+        val today =
+            todayDate()
 
-        return snapshot.documents
-            .mapNotNull { document ->
+        val day =
+            todayDayName()
 
-                document
-                    .toObject(
-                        ClassSchedule::class.java
-                    )
-                    ?.apply {
-
-                        scheduleId =
-                            document.id
-                    }
-            }
+        return all
             .filter {
 
-                it.date == today
+                val daily =
+                    it.periodType
+                        .equals(
+                            "Daily",
+                            ignoreCase = true
+                        ) &&
+                            it.date == today
+
+                val weekly =
+                    it.periodType
+                        .equals(
+                            "Weekly",
+                            ignoreCase = true
+                        ) &&
+                            it.dayName
+                                .equals(
+                                    day,
+                                    ignoreCase = true
+                                )
+
+                daily || weekly
             }
             .sortedBy {
-
-                parseTimeForSorting(
+                parseTime(
                     it.startTime
                 )
             }
     }
 
     // ============================================================
-    // GET CLASSES FOR SPECIFIC DATE
+    // DATE
     // ============================================================
 
     suspend fun getClassesForDate(
@@ -185,105 +284,12 @@ class ClassScheduleRepository(
         date: String
     ): List<ClassSchedule> {
 
-        if (
-            teacherId.isBlank() ||
-            date.isBlank()
-        ) {
-            return emptyList()
-        }
-
-        val snapshot =
-            classScheduleRef
-                .whereEqualTo(
-                    "teacherId",
-                    teacherId
-                )
-                .get()
-                .await()
-
-        return snapshot.documents
-            .mapNotNull { document ->
-
-                document
-                    .toObject(
-                        ClassSchedule::class.java
-                    )
-                    ?.apply {
-
-                        scheduleId =
-                            document.id
-                    }
-            }
+        return getClassesForTeacher(
+            teacherId
+        )
             .filter {
-
                 it.date == date
             }
-            .sortedBy {
-
-                parseTimeForSorting(
-                    it.startTime
-                )
-            }
-    }
-
-    // ============================================================
-    // GET CLASSES BETWEEN TWO DATES
-    // ============================================================
-
-    suspend fun getClassesBetweenDates(
-        teacherId: String,
-        startDate: String,
-        endDate: String
-    ): List<ClassSchedule> {
-
-        if (
-            teacherId.isBlank() ||
-            startDate.isBlank() ||
-            endDate.isBlank()
-        ) {
-            return emptyList()
-        }
-
-        val snapshot =
-            classScheduleRef
-                .whereEqualTo(
-                    "teacherId",
-                    teacherId
-                )
-                .get()
-                .await()
-
-        return snapshot.documents
-            .mapNotNull { document ->
-
-                document
-                    .toObject(
-                        ClassSchedule::class.java
-                    )
-                    ?.apply {
-
-                        scheduleId =
-                            document.id
-                    }
-            }
-            .filter {
-
-                it.date >= startDate &&
-                        it.date <= endDate
-            }
-            .sortedWith(
-
-                compareBy<ClassSchedule> {
-
-                    it.date
-
-                }.thenBy {
-
-                    parseTimeForSorting(
-                        it.startTime
-                    )
-                }
-            )
     }
 
     // ============================================================
@@ -294,17 +300,12 @@ class ClassScheduleRepository(
         scheduleId: String
     ): OpResult {
 
-        if (scheduleId.isBlank()) {
-
-            return OpResult.Error(
-                "Invalid class schedule ID."
-            )
-        }
-
         return try {
 
             classScheduleRef
-                .document(scheduleId)
+                .document(
+                    scheduleId
+                )
                 .delete()
                 .await()
 
@@ -331,17 +332,12 @@ class ClassScheduleRepository(
         classSchedule: ClassSchedule
     ): OpResult {
 
-        if (scheduleId.isBlank()) {
-
-            return OpResult.Error(
-                "Invalid class schedule ID."
-            )
-        }
-
         return try {
 
             classScheduleRef
-                .document(scheduleId)
+                .document(
+                    scheduleId
+                )
                 .set(
                     classSchedule.toMap()
                 )
@@ -362,10 +358,30 @@ class ClassScheduleRepository(
     }
 
     // ============================================================
-    // TIME SORTING
+    // HELPERS
     // ============================================================
 
-    private fun parseTimeForSorting(
+    private fun todayDate(): String {
+
+        return SimpleDateFormat(
+            "yyyy-MM-dd",
+            Locale.US
+        ).format(
+            Calendar.getInstance().time
+        )
+    }
+
+    private fun todayDayName(): String {
+
+        return SimpleDateFormat(
+            "EEEE",
+            Locale.US
+        ).format(
+            Calendar.getInstance().time
+        )
+    }
+
+    private fun parseTime(
         time: String
     ): Long {
 

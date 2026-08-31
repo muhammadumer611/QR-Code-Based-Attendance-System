@@ -14,6 +14,9 @@ class TeacherSubjectsRepository(
     private val subjectsRef =
         firestore.collection("subjects")
 
+    private val teacherSubjectAssignmentsRef =
+        firestore.collection("teacherSubjectAssignments")
+
     suspend fun getAllTeachers(): List<Teacher> {
 
         val snapshot =
@@ -29,6 +32,77 @@ class TeacherSubjectsRepository(
                     teacherId = doc.id
                 }
         }
+    }
+
+    /**
+     * Teacher Dashboard ke liye assigned subjects ab
+     * "teacherSubjectAssignments" collection se read hote hain,
+     * "subjects" collection ke teacherId field se nahi.
+     */
+    suspend fun getAssignedSubjects(
+        teacherId: String
+    ): List<Subject> {
+
+        if (teacherId.isBlank()) {
+            return emptyList()
+        }
+
+        val snapshot =
+            teacherSubjectAssignmentsRef
+                .whereEqualTo(
+                    "teacherId",
+                    teacherId
+                )
+                .get()
+                .await()
+
+        return snapshot.documents
+            .mapNotNull { doc ->
+
+                val subjectId =
+                    doc.getString("subjectId")
+
+                if (subjectId.isNullOrBlank()) {
+                    null
+                } else {
+
+                    Subject(
+                        subjectId = subjectId,
+                        subjectName =
+                            doc.getString("subjectName")
+                                .orEmpty(),
+                        courseCode =
+                            doc.getString("courseCode")
+                                .orEmpty(),
+                        programName =
+                            doc.getString("programName")
+                                .orEmpty(),
+                        departmentName =
+                            doc.getString("departmentName")
+                                .orEmpty(),
+                        semester =
+                            doc.getLong("semester")
+
+                                ?.toInt()
+
+                                ?: 1,
+                        teacherId = teacherId,
+                        teacherName =
+                            doc.getString("teacherName")
+                                .orEmpty()
+                    )
+                }
+            }
+            .distinctBy {
+                it.subjectId
+            }
+            .sortedWith(
+                compareBy(
+                    { it.programName },
+                    { it.semester },
+                    { it.courseCode }
+                )
+            )
     }
 
     suspend fun getSubjectsForTeacher(

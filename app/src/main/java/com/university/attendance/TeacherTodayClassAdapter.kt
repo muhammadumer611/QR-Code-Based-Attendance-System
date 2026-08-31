@@ -6,14 +6,24 @@ import androidx.recyclerview.widget.RecyclerView
 import com.university.attendance.databinding.ItemTeacherTodayClassBinding
 
 class TeacherTodayClassAdapter(
-    private val onClassClick: (ClassSchedule) -> Unit
-) : RecyclerView.Adapter<TeacherTodayClassAdapter.ClassViewHolder>() {
+    private val onClassClick:
+        (ClassSchedule) -> Unit
+) : RecyclerView.Adapter<
+        TeacherTodayClassAdapter.ClassViewHolder>() {
 
-    private val classList = mutableListOf<ClassSchedule>()
+    private val classList =
+        mutableListOf<ClassSchedule>()
 
-    fun submitList(newList: List<ClassSchedule>) {
+    fun submitList(
+        newList: List<ClassSchedule>
+    ) {
+
         classList.clear()
-        classList.addAll(newList)
+
+        classList.addAll(
+            newList
+        )
+
         notifyDataSetChanged()
     }
 
@@ -22,57 +32,87 @@ class TeacherTodayClassAdapter(
         viewType: Int
     ): ClassViewHolder {
 
-        val binding = ItemTeacherTodayClassBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
-        )
+        val binding =
+            ItemTeacherTodayClassBinding.inflate(
+                LayoutInflater.from(
+                    parent.context
+                ),
+                parent,
+                false
+            )
 
-        return ClassViewHolder(binding)
+        return ClassViewHolder(
+            binding
+        )
     }
 
     override fun onBindViewHolder(
         holder: ClassViewHolder,
         position: Int
     ) {
-        holder.bind(classList[position])
+
+        holder.bind(
+            classList[position]
+        )
     }
 
-    override fun getItemCount(): Int = classList.size
+    override fun getItemCount(): Int =
+        classList.size
 
     inner class ClassViewHolder(
-        private val binding: ItemTeacherTodayClassBinding
-    ) : RecyclerView.ViewHolder(binding.root) {
+        private val binding:
+        ItemTeacherTodayClassBinding
+    ) :
+        RecyclerView.ViewHolder(
+            binding.root
+        ) {
 
-        fun bind(classSchedule: ClassSchedule) {
+        fun bind(
+            item: ClassSchedule
+        ) {
 
             binding.tvSubjectName.text =
-                classSchedule.subjectName.ifBlank {
-                    "Subject"
+                if (
+                    item.courseCode.isNotBlank()
+                ) {
+
+                    "${item.courseCode} • ${item.subjectName}"
+
+                } else {
+
+                    item.subjectName.ifBlank {
+                        "Subject"
+                    }
                 }
 
             binding.tvClassName.text =
-                classSchedule.className.ifBlank {
+                item.className.ifBlank {
                     "Class"
                 }
 
             binding.tvTime.text =
                 if (
-                    classSchedule.startTime.isNotBlank() &&
-                    classSchedule.endTime.isNotBlank()
+                    item.startTime.isNotBlank() &&
+                    item.endTime.isNotBlank()
                 ) {
-                    "${classSchedule.startTime} - ${classSchedule.endTime}"
+
+                    "${item.startTime} - ${item.endTime}"
+
                 } else {
+
                     "Time not available"
                 }
 
             binding.tvRoom.text =
-                classSchedule.roomNumber.ifBlank {
+                item.roomNumber.ifBlank {
                     "Room not assigned"
                 }
 
             binding.root.setOnClickListener {
-                onClassClick(classSchedule)
+
+                onClassClick(
+                    item
+                )
             }
         }
     }

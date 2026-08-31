@@ -61,7 +61,7 @@
 
 
         <!-- ===================================================== -->
-        <!-- SUBJECT -->
+        <!-- SUBJECT (now a dropdown of the teacher's assigned subjects) -->
         <!-- ===================================================== -->
 
         <TextView
@@ -72,12 +72,14 @@
             android:textSize="14sp"
             android:layout_marginBottom="6dp" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/etSubject"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:hint="e.g. Database Systems"
-            android:inputType="textCapWords"
+            android:hint="Select Assigned Subject"
+            android:inputType="none"
+            android:focusable="false"
+            android:clickable="true"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
             android:background="@android:drawable/editbox_background"
@@ -187,7 +189,7 @@
 
 
         <!-- ===================================================== -->
-        <!-- SEMESTER -->
+        <!-- SEMESTER (now a dropdown) -->
         <!-- ===================================================== -->
 
         <TextView
@@ -198,12 +200,38 @@
             android:textSize="14sp"
             android:layout_marginBottom="6dp" />
 
-        <EditText
+        <AutoCompleteTextView
             android:id="@+id/etSemester"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:hint="e.g. 5th Semester"
-            android:inputType="textCapWords"
+            android:hint="Select Semester"
+            android:inputType="none"
+            android:focusable="false"
+            android:clickable="true"
+            android:paddingStart="14dp"
+            android:paddingEnd="14dp"
+            android:background="@android:drawable/editbox_background"
+            android:layout_marginBottom="14dp" />
+
+
+        <!-- ===================================================== -->
+        <!-- SESSION -->
+        <!-- ===================================================== -->
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Session"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <EditText
+            android:id="@+id/etSession"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:hint="e.g. 2022"
+            android:inputType="text"
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
             android:background="@android:drawable/editbox_background"
