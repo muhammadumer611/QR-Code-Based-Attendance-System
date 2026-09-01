@@ -1,5 +1,6 @@
 package com.university.attendance
 
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
@@ -16,6 +17,41 @@ class TeacherSubjectsRepository(
 
     private val teacherSubjectAssignmentsRef =
         firestore.collection("teacherSubjectAssignments")
+
+    // ============================================================
+    // CURRENT LOGGED-IN TEACHER
+    // ============================================================
+
+    suspend fun getCurrentTeacher(): Teacher {
+
+        val currentUid =
+            FirebaseAuth.getInstance()
+                .currentUser
+                ?.uid
+
+        if (currentUid.isNullOrBlank()) {
+            throw Exception("No logged-in teacher found.")
+        }
+
+        val snapshot =
+            teachersRef
+                .whereEqualTo(
+                    "authUid",
+                    currentUid
+                )
+                .get()
+                .await()
+
+        val doc =
+            snapshot.documents.firstOrNull()
+                ?: throw Exception("Teacher profile not found.")
+
+        return doc.toObject(Teacher::class.java)
+            ?.apply {
+                teacherId = doc.id
+            }
+            ?: throw Exception("Failed to load teacher profile.")
+    }
 
     suspend fun getAllTeachers(): List<Teacher> {
 
@@ -84,8 +120,9 @@ class TeacherSubjectsRepository(
                             doc.getLong("semester")
 
                                 ?.toInt()
+                                ?.toString()
 
-                                ?: 1,
+                                ?: "1",
                         teacherId = teacherId,
                         teacherName =
                             doc.getString("teacherName")

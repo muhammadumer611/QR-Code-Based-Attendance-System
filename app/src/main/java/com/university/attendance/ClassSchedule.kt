@@ -29,7 +29,7 @@ data class ClassSchedule(
     var subjectName: String = "",
     var courseCode: String = "",
 
-    var roomNumber: String = "",
+    var roomNumber: Int = 1,
 
     // ============================================================
     // CLASS FILTER
@@ -59,6 +59,7 @@ data class ClassSchedule(
     // ============================================================
 
     var periodType: String = "Weekly",
+
 
     // ============================================================
     // NOTE

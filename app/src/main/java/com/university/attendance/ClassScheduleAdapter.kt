@@ -87,7 +87,7 @@ class ClassScheduleAdapter(
             // ROOM
             // ----------------------------------------------------
 
-            if (classSchedule.roomNumber.isNotBlank()) {
+            if (classSchedule.roomNumber !=0) {
 
                 binding.tvRoom.visibility =
                     View.VISIBLE
@@ -105,13 +105,13 @@ class ClassScheduleAdapter(
             // SEMESTER
             // ----------------------------------------------------
 
-            if (classSchedule.semester.isNotBlank()) {
+            if (classSchedule.semester !=0) {
 
                 binding.tvSemester.visibility =
                     View.VISIBLE
 
                 binding.tvSemester.text =
-                    classSchedule.semester
+                    "Semester ${classSchedule.semester}"
 
             } else {
 

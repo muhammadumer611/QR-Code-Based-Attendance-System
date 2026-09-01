@@ -108,10 +108,10 @@ class SubjectViewModel(
             departmentId = selectedDepartmentId,
             departmentName = selectedDepartmentName,
             programName = selectedProgram,
-            semester = selectedSemester,
+            semester = selectedSemester.toString(),
             courseCode = courseCode.trim(),
             subjectName = subjectName.trim(),
-            creditHours = creditHours
+            creditHours = creditHours.toString()
         )
 
         _actionState.value = ActionState.Loading

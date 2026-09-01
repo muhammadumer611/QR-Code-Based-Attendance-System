@@ -58,15 +58,22 @@ class ActivityTeacherClasses : AppCompatActivity() {
 
             try {
 
-                val repository =
-                    TeacherSubjectsRepository()
+                val teacherId =
+                    TeacherSession.getTeacherId(this@ActivityTeacherClasses)
 
-                val teacher =
-                    repository.getCurrentTeacher()
+                if (teacherId.isNullOrBlank()) {
 
-                viewModel.loadClasses(
-                    teacher.teacherId
-                )
+                    Toast.makeText(
+                        this@ActivityTeacherClasses,
+                        "Teacher session not found.",
+                        Toast.LENGTH_LONG
+                    ).show()
+
+                    finish()
+                    return@launch
+                }
+
+                viewModel.loadClasses(teacherId)
 
             } catch (e: Exception) {
 

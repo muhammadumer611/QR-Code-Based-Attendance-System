@@ -705,6 +705,8 @@ class ActivityClassSchedule : AppCompatActivity() {
                 .text
                 .toString()
                 .trim()
+                .toIntOrNull()
+                ?: 0
 
         val note =
             dialogBinding.etNote

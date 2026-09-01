@@ -843,11 +843,12 @@ abstract class BaseAuthActivity : AppCompatActivity() {
         // ---------------------------------------------------------
 
         db.collection("students")
-            .document(studentId)
+            .whereEqualTo("studentGeneratedId", studentId)
+            .limit(1)
             .get()
-            .addOnSuccessListener { document ->
+            .addOnSuccessListener { snapshot ->
 
-                if (!document.exists()) {
+                if (snapshot.isEmpty) {
 
                     binding.btnMain.isEnabled = true
 
@@ -861,6 +862,9 @@ abstract class BaseAuthActivity : AppCompatActivity() {
 
                     return@addOnSuccessListener
                 }
+
+                val document = snapshot.documents.first()
+                val studentDocRef = document.reference
 
                 // -------------------------------------------------
                 // STEP 2
@@ -956,8 +960,7 @@ abstract class BaseAuthActivity : AppCompatActivity() {
                                 "linkedAt" to FieldValue.serverTimestamp()
                             )
 
-                        db.collection("students")
-                            .document(studentId)
+                        studentDocRef
                             .update(updates)
                             .addOnSuccessListener {
 

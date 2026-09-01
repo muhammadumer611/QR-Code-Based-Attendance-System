@@ -103,10 +103,7 @@ class TeacherTodayClassAdapter(
                     "Time not available"
                 }
 
-            binding.tvRoom.text =
-                item.roomNumber.ifBlank {
-                    "Room not assigned"
-                }
+            // BSSE-A2025-001
 
             binding.root.setOnClickListener {
 
