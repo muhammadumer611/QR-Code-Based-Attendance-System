@@ -180,17 +180,11 @@ class TeacherDashboardRepository(
                 .await()
 
         return snapshot.documents
-            .mapNotNull { document ->
+            .map { document ->
 
-                document
-                    .toObject(
-                        ClassSchedule::class.java
-                    )
-                    ?.apply {
-
-                        scheduleId =
-                            document.id
-                    }
+                ClassSchedule.fromDocument(
+                    document
+                )
             }
             .sortedWith(
 

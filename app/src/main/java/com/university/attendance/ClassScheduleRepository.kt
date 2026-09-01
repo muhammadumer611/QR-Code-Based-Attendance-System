@@ -207,15 +207,11 @@ class ClassScheduleRepository(
                 .await()
 
         return snapshot.documents
-            .mapNotNull { doc ->
+            .map { doc ->
 
-                doc.toObject(
-                    ClassSchedule::class.java
-                )?.apply {
-
-                    scheduleId =
-                        doc.id
-                }
+                ClassSchedule.fromDocument(
+                    doc
+                )
             }
             .sortedWith(
                 compareBy(

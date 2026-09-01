@@ -1,5 +1,6 @@
 package com.university.attendance
 
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Exclude
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ServerTimestamp
@@ -29,7 +30,7 @@ data class ClassSchedule(
     var subjectName: String = "",
     var courseCode: String = "",
 
-    var roomNumber: Int = 1,
+    var roomNumber: Int = 0,
 
     // ============================================================
     // CLASS FILTER
@@ -60,7 +61,6 @@ data class ClassSchedule(
 
     var periodType: String = "Weekly",
 
-
     // ============================================================
     // NOTE
     // ============================================================
@@ -74,32 +74,180 @@ data class ClassSchedule(
 
 ) {
 
+    // ============================================================
+    // FIRESTORE -> CLASS SCHEDULE
+    //
+    // Important:
+    // roomNumber / semester may exist in Firestore as either
+    // Number or String because of old records.
+    //
+    // This mapper safely handles both.
+    // ============================================================
+
+    companion object {
+
+        fun fromDocument(
+            document: DocumentSnapshot
+        ): ClassSchedule {
+
+            val roomNumber =
+                when (
+                    val value =
+                        document.get("roomNumber")
+                ) {
+
+                    is Number ->
+                        value.toInt()
+
+                    is String ->
+                        value.trim().toIntOrNull()
+                            ?: 0
+
+                    else ->
+                        0
+                }
+
+            val semester =
+                when (
+                    val value =
+                        document.get("semester")
+                ) {
+
+                    is Number ->
+                        value.toInt()
+
+                    is String ->
+                        value.trim().toIntOrNull()
+                            ?: 1
+
+                    else ->
+                        1
+                }
+
+            return ClassSchedule(
+
+                scheduleId =
+                    document.id,
+
+                teacherId =
+                    document.getString("teacherId")
+                        .orEmpty(),
+
+                teacherName =
+                    document.getString("teacherName")
+                        .orEmpty(),
+
+                teacherAuthUid =
+                    document.getString("teacherAuthUid")
+                        .orEmpty(),
+
+                className =
+                    document.getString("className")
+                        .orEmpty(),
+
+                subjectId =
+                    document.getString("subjectId")
+                        .orEmpty(),
+
+                subjectName =
+                    document.getString("subjectName")
+                        .orEmpty(),
+
+                courseCode =
+                    document.getString("courseCode")
+                        .orEmpty(),
+
+                roomNumber =
+                    roomNumber,
+
+                programName =
+                    document.getString("programName")
+                        .orEmpty(),
+
+                semester =
+                    semester,
+
+                session =
+                    document.getString("session")
+                        .orEmpty(),
+
+                section =
+                    document.getString("section")
+                        .orEmpty(),
+
+                date =
+                    document.getString("date")
+                        .orEmpty(),
+
+                dayName =
+                    document.getString("dayName")
+                        .orEmpty(),
+
+                startTime =
+                    document.getString("startTime")
+                        .orEmpty(),
+
+                endTime =
+                    document.getString("endTime")
+                        .orEmpty(),
+
+                periodType =
+                    document.getString("periodType")
+                        ?: "Weekly",
+
+                note =
+                    document.getString("note")
+                        .orEmpty(),
+
+                createdBy =
+                    document.getString("createdBy")
+                        ?: "Admin",
+
+                createdAt =
+                    document.getDate("createdAt")
+            )
+        }
+    }
+
+    // ============================================================
+    // CLASS SCHEDULE -> FIRESTORE
+    // ============================================================
+
     @Exclude
     fun toMap(): Map<String, Any?> {
 
         return mapOf(
 
             "teacherId" to teacherId,
+
             "teacherName" to teacherName,
+
             "teacherAuthUid" to teacherAuthUid,
 
             "className" to className,
 
             "subjectId" to subjectId,
+
             "subjectName" to subjectName,
+
             "courseCode" to courseCode,
 
             "roomNumber" to roomNumber,
 
             "programName" to programName,
+
             "semester" to semester,
+
             "session" to session,
+
             "section" to section,
 
             "date" to date,
+
             "dayName" to dayName,
 
             "startTime" to startTime,
+
             "endTime" to endTime,
 
             "periodType" to periodType,
