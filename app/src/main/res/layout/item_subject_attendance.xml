@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    item_subject_attendance.xml
+    One card per subject on the student's attendance detail screen.
+    Shows: Subject Name, Course Code, Teacher, Present/Total, %, progress
+    bar, and an expandable list of present dates.
+-->
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
+    android:layout_marginVertical="6dp"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardCornerRadius="20dp"
+    app:cardElevation="0dp"
+    app:strokeWidth="0dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_glass_card"
+        android:orientation="vertical"
+        android:padding="18dp"
+        android:clickable="true"
+        android:focusable="true">
+
+        <!-- Top row: subject info + percentage + expand arrow -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvSubjectName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Data Structures &amp; Algorithms"
+                    android:textColor="@color/textPrimary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvCourseCode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="CS-201"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:id="@+id/tvTeacherName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="Taught by: Dr. Ali Khan"
+                    android:textColor="@color/textSecondary"
+                    android:textSize="12sp" />
+
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvPercentage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="91%"
+                android:textColor="@color/colorPrimary"
+                android:textStyle="bold"
+                android:textSize="22sp"
+                android:layout_marginEnd="8dp" />
+
+            <ImageView
+                android:id="@+id/ivExpandArrow"
+                android:layout_width="18dp"
+                android:layout_height="18dp"
+                android:src="@drawable/ic_arrow"
+                android:rotation="0"
+                app:tint="@color/textTertiary" />
+
+        </LinearLayout>
+
+        <!-- Present/Total + progress bar -->
+        <TextView
+            android:id="@+id/tvAttendanceCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            android:text="18 / 20 classes"
+            android:textColor="@color/textTertiary"
+            android:textSize="12sp" />
+
+        <ProgressBar
+            android:id="@+id/progressAttendance"
+            android:layout_width="match_parent"
+            android:layout_height="8dp"
+            android:layout_marginTop="8dp"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:progressDrawable="@drawable/progress_cyan"
+            android:max="100"
+            android:progress="91" />
+
+        <!-- No data state -->
+        <TextView
+            android:id="@+id/tvNoData"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="No attendance recorded yet"
+            android:textColor="@color/textTertiary"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:visibility="gone" />
+
+        <!-- Expandable date history -->
+        <LinearLayout
+            android:id="@+id/dateHistoryContainer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="14dp"
+            android:visibility="gone">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/glassStroke"
+                android:layout_marginBottom="12dp" />
+
+            <TextView
+                android:id="@+id/tvDateHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="✓  Present — 2026-08-10"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp"
+                android:lineSpacingExtra="6dp" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>
