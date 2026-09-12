@@ -7,7 +7,8 @@ import java.util.Calendar
 import java.util.Locale
 
 class ClassScheduleRepository(
-    private val firestore: FirebaseFirestore =
+    private val firestore:
+    FirebaseFirestore =
         FirebaseFirestore.getInstance()
 ) {
 
@@ -32,6 +33,12 @@ class ClassScheduleRepository(
         ) : OpResult()
     }
 
+    /*
+     * ------------------------------------------------------------
+     * TEACHER ASSIGNED CLASSES
+     * ------------------------------------------------------------
+     */
+
     suspend fun getAssignedClasses(
         teacherId: String,
         semester: Int,
@@ -48,7 +55,7 @@ class ClassScheduleRepository(
         val cleanSession =
             session.trim()
 
-        val assignments =
+        val assignmentDocs =
             assignmentRef
                 .whereEqualTo(
                     "teacherId",
@@ -59,31 +66,32 @@ class ClassScheduleRepository(
                 .documents
                 .filter {
 
-                    it.getString("session")
-                        .orEmpty()
-                        .equals(
-                            cleanSession,
-                            true
-                        ) &&
+                    numberField(
+                        it.get("semester")
+                    ) == semester &&
 
-                            numberField(
-                                it.get("semester")
-                            ) == semester
+                            it.getString(
+                                "session"
+                            )
+                                .orEmpty()
+                                .trim()
+                                .equals(
+                                    cleanSession,
+                                    true
+                                )
                 }
 
         val classIds =
-            assignments
+            assignmentDocs
                 .mapNotNull {
-                    it.getString("classId")
-                        ?.takeIf {
-                            it.isNotBlank()
-                        }
+                    it.getString(
+                        "classId"
+                    )
+                        ?.takeIf(
+                            String::isNotBlank
+                        )
                 }
                 .distinct()
-
-        if (classIds.isEmpty()) {
-            return emptyList()
-        }
 
         return classIds
             .mapNotNull { classId ->
@@ -95,45 +103,57 @@ class ClassScheduleRepository(
                         .await()
 
                 if (!doc.exists()) {
-                    null
-                } else {
-
-                    StudentClass(
-
-                        classId =
-                            doc.id,
-
-                        universityName =
-                            doc.getString(
-                                "universityName"
-                            ).orEmpty(),
-
-                        departmentName =
-                            doc.getString(
-                                "departmentName"
-                            ).orEmpty(),
-
-                        programName =
-                            doc.getString(
-                                "programName"
-                            ).orEmpty(),
-
-                        session =
-                            doc.getString(
-                                "session"
-                            ).orEmpty(),
-
-                        section =
-                            doc.getString(
-                                "section"
-                            ).orEmpty(),
-
-                        studentCount =
-                            doc.getLong(
-                                "studentCount"
-                            ) ?: 0L
-                    )
+                    return@mapNotNull null
                 }
+
+                StudentClass(
+
+                    classId =
+                        doc.id,
+
+                    universityName =
+                        doc
+                            .getString(
+                                "universityName"
+                            )
+                            .orEmpty(),
+
+                    departmentName =
+                        doc
+                            .getString(
+                                "departmentName"
+                            )
+                            .orEmpty(),
+
+                    programName =
+                        doc
+                            .getString(
+                                "programName"
+                            )
+                            .orEmpty(),
+
+                    session =
+                        doc
+                            .getString(
+                                "session"
+                            )
+                            .orEmpty()
+                            .ifBlank {
+                                cleanSession
+                            },
+
+                    section =
+                        doc
+                            .getString(
+                                "section"
+                            )
+                            .orEmpty(),
+
+                    studentCount =
+                        doc.getLong(
+                            "studentCount"
+                        ) ?: 0L
+                )
             }
             .sortedWith(
                 compareBy(
@@ -142,6 +162,12 @@ class ClassScheduleRepository(
                 )
             )
     }
+
+    /*
+     * ------------------------------------------------------------
+     * EXACT TEACHER SUBJECTS
+     * ------------------------------------------------------------
+     */
 
     suspend fun getAssignedSubjects(
         teacherId: String,
@@ -168,55 +194,67 @@ class ClassScheduleRepository(
             .documents
             .filter {
 
-                it.getString("classId") ==
-                        classId &&
-
-                        it.getString("session")
-                            .orEmpty()
-                            .equals(
-                                session.trim(),
-                                true
-                            ) &&
+                it.getString(
+                    "classId"
+                ) == classId &&
 
                         numberField(
                             it.get("semester")
-                        ) == semester
+                        ) == semester &&
+
+                        it.getString(
+                            "session"
+                        )
+                            .orEmpty()
+                            .trim()
+                            .equals(
+                                session.trim(),
+                                true
+                            )
             }
             .mapNotNull { doc ->
 
-                val subjectId =
+                val id =
                     doc.getString(
                         "subjectId"
                     )
-                        ?.takeIf {
-                            it.isNotBlank()
-                        }
+                        ?.takeIf(
+                            String::isNotBlank
+                        )
                         ?: return@mapNotNull null
 
                 Subject(
 
                     subjectId =
-                        subjectId,
+                        id,
 
                     subjectName =
-                        doc.getString(
-                            "subjectName"
-                        ).orEmpty(),
+                        doc
+                            .getString(
+                                "subjectName"
+                            )
+                            .orEmpty(),
 
                     courseCode =
-                        doc.getString(
-                            "courseCode"
-                        ).orEmpty(),
+                        doc
+                            .getString(
+                                "courseCode"
+                            )
+                            .orEmpty(),
 
                     programName =
-                        doc.getString(
-                            "programName"
-                        ).orEmpty(),
+                        doc
+                            .getString(
+                                "programName"
+                            )
+                            .orEmpty(),
 
                     departmentName =
-                        doc.getString(
-                            "departmentName"
-                        ).orEmpty(),
+                        doc
+                            .getString(
+                                "departmentName"
+                            )
+                            .orEmpty(),
 
                     semester =
                         semester.toString(),
@@ -225,9 +263,11 @@ class ClassScheduleRepository(
                         teacherId,
 
                     teacherName =
-                        doc.getString(
-                            "teacherName"
-                        ).orEmpty()
+                        doc
+                            .getString(
+                                "teacherName"
+                            )
+                            .orEmpty()
                 )
             }
             .distinctBy {
@@ -241,6 +281,12 @@ class ClassScheduleRepository(
             )
     }
 
+    /*
+     * ------------------------------------------------------------
+     * SAVE SCHEDULE
+     * ------------------------------------------------------------
+     */
+
     suspend fun saveClass(
         classSchedule: ClassSchedule
     ): OpResult {
@@ -248,8 +294,7 @@ class ClassScheduleRepository(
         return try {
 
             if (
-                classSchedule.teacherId
-                    .isBlank()
+                classSchedule.teacherId.isBlank()
             ) {
                 return OpResult.Error(
                     "Teacher ID is missing."
@@ -257,8 +302,7 @@ class ClassScheduleRepository(
             }
 
             if (
-                classSchedule.classId
-                    .isBlank()
+                classSchedule.classId.isBlank()
             ) {
                 return OpResult.Error(
                     "Class is missing."
@@ -266,23 +310,24 @@ class ClassScheduleRepository(
             }
 
             if (
-                classSchedule.subjectId
-                    .isBlank()
+                classSchedule.subjectId.isBlank()
             ) {
                 return OpResult.Error(
-                    "Please select a subject."
+                    "Please select an assigned subject."
                 )
             }
 
             if (
-                classSchedule.session
-                    .isBlank()
+                classSchedule.session.isBlank()
             ) {
                 return OpResult.Error(
                     "Session is required."
                 )
             }
 
+            /*
+             * Final safety check.
+             */
             val exactAssignment =
                 assignmentRef
                     .whereEqualTo(
@@ -304,32 +349,32 @@ class ClassScheduleRepository(
                                 ) ==
                                 classSchedule.subjectId &&
 
+                                numberField(
+                                    it.get("semester")
+                                ) ==
+                                classSchedule.semester &&
+
                                 it.getString(
                                     "session"
                                 )
                                     .orEmpty()
+                                    .trim()
                                     .equals(
                                         classSchedule.session
                                             .trim(),
                                         true
-                                    ) &&
-
-                                numberField(
-                                    it.get("semester")
-                                ) ==
-                                classSchedule.semester
+                                    )
                     }
 
             if (!exactAssignment) {
 
                 return OpResult.Error(
-                    "This teacher is not assigned to this class and subject for the selected semester/session."
+                    "This teacher is not assigned to this exact class and subject for the selected semester/session."
                 )
             }
 
             val ref =
-                classScheduleRef
-                    .document()
+                classScheduleRef.document()
 
             ref.set(
                 classSchedule.toMap()
@@ -369,11 +414,7 @@ class ClassScheduleRepository(
             .sortedWith(
                 compareBy(
                     { it.date },
-                    {
-                        parseTime(
-                            it.startTime
-                        )
-                    }
+                    { parseTime(it.startTime) }
                 )
             )
     }
@@ -398,16 +439,25 @@ class ClassScheduleRepository(
                         ) ||
 
                         (
-                                it.periodType
-                                    .equals(
-                                        "Weekly",
-                                        true
-                                    ) &&
-                                        it.dayName
-                                            .equals(
-                                                todayDayName(),
-                                                true
-                                            )
+                                (
+                                        it.periodType.equals(
+                                            "Weekly",
+                                            true
+                                        ) ||
+                                                it.periodType.equals(
+                                                    "Semester",
+                                                    true
+                                                )
+                                        ) &&
+
+                                        (
+                                                it.dayName.equals(
+                                                    todayDayName(),
+                                                    true
+                                                ) ||
+                                                        it.date ==
+                                                        todayDate()
+                                                )
                                 )
             }
             .sortedBy {
@@ -432,53 +482,49 @@ class ClassScheduleRepository(
 
     suspend fun deleteClass(
         scheduleId: String
-    ): OpResult {
+    ): OpResult = try {
 
-        return try {
+        classScheduleRef
+            .document(scheduleId)
+            .delete()
+            .await()
 
-            classScheduleRef
-                .document(scheduleId)
-                .delete()
-                .await()
+        OpResult.Success(
+            scheduleId
+        )
 
-            OpResult.Success(
-                scheduleId
-            )
+    } catch (e: Exception) {
 
-        } catch (e: Exception) {
-
-            OpResult.Error(
-                e.message
-                    ?: "Failed to delete class."
-            )
-        }
+        OpResult.Error(
+            e.message
+                ?: "Failed to delete class.",
+            e
+        )
     }
 
     suspend fun updateClass(
         scheduleId: String,
         classSchedule: ClassSchedule
-    ): OpResult {
+    ): OpResult = try {
 
-        return try {
-
-            classScheduleRef
-                .document(scheduleId)
-                .set(
-                    classSchedule.toMap()
-                )
-                .await()
-
-            OpResult.Success(
-                scheduleId
+        classScheduleRef
+            .document(scheduleId)
+            .set(
+                classSchedule.toMap()
             )
+            .await()
 
-        } catch (e: Exception) {
+        OpResult.Success(
+            scheduleId
+        )
 
-            OpResult.Error(
-                e.message
-                    ?: "Failed to update class."
-            )
-        }
+    } catch (e: Exception) {
+
+        OpResult.Error(
+            e.message
+                ?: "Failed to update class.",
+            e
+        )
     }
 
     private fun numberField(
@@ -520,9 +566,8 @@ class ClassScheduleRepository(
 
     private fun parseTime(
         time: String
-    ): Long {
-
-        return try {
+    ): Long =
+        try {
 
             SimpleDateFormat(
                 "hh:mm a",
@@ -532,11 +577,8 @@ class ClassScheduleRepository(
                 ?.time
                 ?: Long.MAX_VALUE
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
 
             Long.MAX_VALUE
         }
-    }
 }

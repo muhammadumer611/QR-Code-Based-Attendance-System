@@ -6,6 +6,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -42,7 +43,8 @@ class StudentAttendanceRepository(
             "attendance_records"
         )
 
-    suspend fun getCurrentStudent(): Student {
+    suspend fun getCurrentStudent():
+            Student {
 
         val uid =
             FirebaseAuth
@@ -92,18 +94,18 @@ class StudentAttendanceRepository(
         onError:
             (Exception) -> Unit
     ):
-            com.google.firebase.firestore.ListenerRegistration {
+            com.google.firebase.firestore
+            .ListenerRegistration {
 
-        if (
-            student.classId.isBlank()
-        ) {
+        if (student.classId.isBlank()) {
 
             return sessionsRef
                 .document(
                     "_no_student_class"
                 )
                 .addSnapshotListener {
-                        _, _ ->
+                        _,
+                        _ ->
 
                     onChanged(
                         emptyList()
@@ -122,94 +124,100 @@ class StudentAttendanceRepository(
 
                 if (error != null) {
 
-                    onError(
-                        error
-                    )
+                    onError(error)
 
                     return@addSnapshotListener
                 }
 
-                val now =
-                    System.currentTimeMillis()
-
-                val today =
-                    todayDate()
-
-                val list =
-                    snap
-                        ?.documents
-                        .orEmpty()
-                        .mapNotNull(
-                            ::sessionFromDoc
-                        )
-                        .filter { s ->
-
-                            s.isActive &&
-
-                                    s.status
-                                        .equals(
-                                            "active",
-                                            true
-                                        ) &&
-
-                                    s.date ==
-                                    today &&
-
-                                    s.semester ==
-                                    student.semester &&
-
-                                    s.session
-                                        .equals(
-                                            student.session,
-                                            true
-                                        ) &&
-
-                                    s.section
-                                        .equals(
-                                            student.section,
-                                            true
-                                        ) &&
-
-                                    s.departmentName
-                                        .equals(
-                                            student.departmentName,
-                                            true
-                                        ) &&
-
-                                    s.programName
-                                        .equals(
-                                            student.programName,
-                                            true
-                                        ) &&
-
-                                    (
-                                            s.expiresAt
-                                                ?.time
-                                                ?: 0L
-                                            ) > now
-                        }
-                        .sortedBy(
-                            ::startMillis
-                        )
-
                 onChanged(
-                    list
+                    filterSessionIdentity(
+                        student,
+                        snap?.documents
+                            .orEmpty()
+                            .mapNotNull(
+                                ::sessionFromDoc
+                            )
+                    )
                 )
             }
     }
 
-    /**
-     * Final student-side filter.
+    private fun filterSessionIdentity(
+        student: Student,
+        source: List<AttendanceSession>
+    ): List<AttendanceSession> {
+
+        val now =
+            System.currentTimeMillis()
+
+        val today =
+            todayDate()
+
+        return source
+            .filter { session ->
+
+                session.isActive &&
+
+                        session.status
+                            .equals(
+                                "active",
+                                true
+                            ) &&
+
+                        session.date ==
+                        today &&
+
+                        session.semester ==
+                        student.semester &&
+
+                        session.session
+                            .equals(
+                                student.session,
+                                true
+                            ) &&
+
+                        session.section
+                            .equals(
+                                student.section,
+                                true
+                            ) &&
+
+                        session.departmentName
+                            .equals(
+                                student.departmentName,
+                                true
+                            ) &&
+
+                        session.programName
+                            .equals(
+                                student.programName,
+                                true
+                            ) &&
+
+                        (
+                                session.expiresAt
+                                    ?.time
+                                    ?: 0L
+                                ) > now
+            }
+            .sortedBy(
+                ::startMillis
+            )
+    }
+
+    /*
+     * ------------------------------------------------------------
+     * STUDENT SUBJECT ELIGIBILITY
+     * ------------------------------------------------------------
      *
-     * Student only sees a live attendance if:
+     * Student enrollment only requires subjectId.
      *
-     * Student has explicit enrollment
-     * for that exact Subject + Teacher.
+     * Teacher relation is checked separately.
      */
+
     suspend fun filterEligibleSessions(
         student: Student,
-        sessions:
-        List<AttendanceSession>
+        sessions: List<AttendanceSession>
     ): List<AttendanceSession> {
 
         if (
@@ -230,29 +238,20 @@ class StudentAttendanceRepository(
                 .documents
                 .mapNotNull { doc ->
 
-                    val subjectId =
-                        doc.getString(
-                            "subjectId"
-                        )
-                            ?: return@mapNotNull null
-
-                    val teacherId =
-                        doc.getString(
-                            "teacherId"
-                        )
-                            ?: return@mapNotNull null
-
                     if (
                         doc.getString(
                             "classId"
-                        ) != student.classId
+                        ) !=
+                        student.classId
                     ) {
                         return@mapNotNull null
                     }
 
                     if (
                         numberField(
-                            doc.get("semester")
+                            doc.get(
+                                "semester"
+                            )
                         ) !=
                         student.semester
                     ) {
@@ -285,14 +284,17 @@ class StudentAttendanceRepository(
                         return@mapNotNull null
                     }
 
-                    "${subjectId}__${teacherId}"
+                    doc.getString(
+                        "subjectId"
+                    )
+                        ?.takeIf(
+                            String::isNotBlank
+                        )
                 }
                 .toSet()
 
         return sessions.filter {
-
-            "${it.subjectId}__${it.teacherId}" in
-                    enrolled
+            it.subjectId in enrolled
         }
     }
 
@@ -306,7 +308,7 @@ class StudentAttendanceRepository(
             return emptyList()
         }
 
-        val snap =
+        val snapshot =
             sessionsRef
                 .whereEqualTo(
                     "classId",
@@ -315,67 +317,14 @@ class StudentAttendanceRepository(
                 .get()
                 .await()
 
-        val now =
-            System.currentTimeMillis()
-
-        val today =
-            todayDate()
-
         val sessions =
-            snap
-                .documents
-                .mapNotNull(
-                    ::sessionFromDoc
-                )
-                .filter { s ->
-
-                    s.isActive &&
-
-                            s.status
-                                .equals(
-                                    "active",
-                                    true
-                                ) &&
-
-                            s.date ==
-                            today &&
-
-                            s.semester ==
-                            student.semester &&
-
-                            s.session
-                                .equals(
-                                    student.session,
-                                    true
-                                ) &&
-
-                            s.section
-                                .equals(
-                                    student.section,
-                                    true
-                                ) &&
-
-                            s.departmentName
-                                .equals(
-                                    student.departmentName,
-                                    true
-                                ) &&
-
-                            s.programName
-                                .equals(
-                                    student.programName,
-                                    true
-                                ) &&
-
-                            (
-                                    s.expiresAt
-                                        ?.time
-                                        ?: 0L
-                                    ) > now
-                }
-                .sortedBy(
-                    ::startMillis
-                )
+            filterSessionIdentity(
+                student,
+                snapshot.documents
+                    .mapNotNull(
+                        ::sessionFromDoc
+                    )
+            )
 
         return filterEligibleSessions(
             student,
@@ -383,36 +332,145 @@ class StudentAttendanceRepository(
         )
     }
 
+    /*
+     * ------------------------------------------------------------
+     * TODAY'S CLASS SCHEDULE FOR STUDENT
+     * ------------------------------------------------------------
+     */
+
+    suspend fun getTodayScheduleForStudent(
+        student: Student
+    ): List<ClassSchedule> {
+
+        if (
+            student.classId.isBlank()
+        ) {
+            return emptyList()
+        }
+
+        val today =
+            todayDate()
+
+        val day =
+            todayDayName()
+
+        return schedulesRef
+            .whereEqualTo(
+                "classId",
+                student.classId
+            )
+            .get()
+            .await()
+            .documents
+            .map {
+                ClassSchedule.fromDocument(
+                    it
+                )
+            }
+            .filter { schedule ->
+
+                schedule.semester ==
+                        student.semester &&
+
+                        schedule.session
+                            .equals(
+                                student.session,
+                                true
+                            ) &&
+
+                        schedule.section
+                            .equals(
+                                student.section,
+                                true
+                            ) &&
+
+                        schedule.departmentName
+                            .equals(
+                                student.departmentName,
+                                true
+                            ) &&
+
+                        schedule.programName
+                            .equals(
+                                student.programName,
+                                true
+                            ) &&
+
+                        when {
+
+                            schedule.periodType
+                                .equals(
+                                    "Daily",
+                                    true
+                                ) ->
+                                schedule.date ==
+                                        today
+
+                            schedule.periodType
+                                .equals(
+                                    "Weekly",
+                                    true
+                                ) ->
+                                schedule.dayName
+                                    .equals(
+                                        day,
+                                        true
+                                    ) ||
+                                        schedule.date ==
+                                        today
+
+                            schedule.periodType
+                                .equals(
+                                    "Semester",
+                                    true
+                                ) ->
+                                schedule.dayName
+                                    .equals(
+                                        day,
+                                        true
+                                    ) ||
+                                        schedule.date ==
+                                        today
+
+                            else ->
+                                schedule.date ==
+                                        today
+                        }
+            }
+            .sortedBy(
+                ::scheduleStartMillis
+            )
+    }
+
+    /*
+     * ------------------------------------------------------------
+     * FINAL SAVE ATTENDANCE VALIDATION
+     * ------------------------------------------------------------
+     */
+
     suspend fun markAttendance(
         sessionId: String,
         student: Student
     ) {
 
         if (!student.isActive) {
-
             throw Exception(
                 "Your student account is inactive."
             )
         }
 
-        if (
-            student.classId.isBlank()
-        ) {
-
+        if (student.classId.isBlank()) {
             throw Exception(
                 "Your class is not assigned."
             )
         }
 
-        val sessionDoc =
-            sessionsRef
-                .document(sessionId)
-                .get()
-                .await()
-
         val session =
             sessionFromDoc(
-                sessionDoc
+                sessionsRef
+                    .document(sessionId)
+                    .get()
+                    .await()
             )
                 ?: throw Exception(
                     "Attendance session not found."
@@ -425,7 +483,6 @@ class StudentAttendanceRepository(
                 true
             )
         ) {
-
             throw Exception(
                 "Attendance is no longer open."
             )
@@ -435,7 +492,6 @@ class StudentAttendanceRepository(
             session.date !=
             todayDate()
         ) {
-
             throw Exception(
                 "This attendance session is not for today."
             )
@@ -449,42 +505,41 @@ class StudentAttendanceRepository(
                     ) <=
             System.currentTimeMillis()
         ) {
-
             throw Exception(
                 "Attendance session has expired."
             )
         }
 
+        /*
+         * Exact student class identity.
+         */
+
         if (
             session.classId !=
             student.classId ||
 
-            !session.departmentName
-                .equals(
-                    student.departmentName,
-                    true
-                ) ||
+            !session.departmentName.equals(
+                student.departmentName,
+                true
+            ) ||
 
-            !session.programName
-                .equals(
-                    student.programName,
-                    true
-                ) ||
+            !session.programName.equals(
+                student.programName,
+                true
+            ) ||
 
             session.semester !=
             student.semester ||
 
-            !session.session
-                .equals(
-                    student.session,
-                    true
-                ) ||
+            !session.session.equals(
+                student.session,
+                true
+            ) ||
 
-            !session.section
-                .equals(
-                    student.section,
-                    true
-                )
+            !session.section.equals(
+                student.section,
+                true
+            )
         ) {
 
             throw Exception(
@@ -493,8 +548,7 @@ class StudentAttendanceRepository(
         }
 
         /*
-         * IMPORTANT:
-         * Student MUST have explicit Subject + Teacher enrollment.
+         * Student must be enrolled in this subject.
          */
         val studentEnrollment =
             studentAssignmentsRef
@@ -517,13 +571,10 @@ class StudentAttendanceRepository(
                             ) ==
                             session.subjectId &&
 
-                            doc.getString(
-                                "teacherId"
-                            ) ==
-                            session.teacherId &&
-
                             numberField(
-                                doc.get("semester")
+                                doc.get(
+                                    "semester"
+                                )
                             ) ==
                             session.semester &&
 
@@ -549,23 +600,21 @@ class StudentAttendanceRepository(
         if (!studentEnrollment) {
 
             throw Exception(
-                "You are not assigned to this subject/teacher."
+                "You are not enrolled in this subject."
             )
         }
 
         /*
-         * Verify schedule.
+         * Schedule must match the session.
          */
-        val scheduleDoc =
+
+        val schedule =
             schedulesRef
                 .document(
                     session.scheduleId
                 )
                 .get()
                 .await()
-
-        val schedule =
-            scheduleDoc
                 .takeIf {
                     it.exists()
                 }
@@ -593,8 +642,9 @@ class StudentAttendanceRepository(
         }
 
         /*
-         * Verify teacher.
+         * Teacher must still exist.
          */
+
         val teacherDoc =
             teachersRef
                 .document(
@@ -603,9 +653,7 @@ class StudentAttendanceRepository(
                 .get()
                 .await()
 
-        if (
-            !teacherDoc.exists()
-        ) {
+        if (!teacherDoc.exists()) {
 
             throw Exception(
                 "Teacher profile not found."
@@ -622,6 +670,7 @@ class StudentAttendanceRepository(
         if (
             session.teacherAuthUid
                 .isNotBlank() &&
+
             teacherUid !=
             session.teacherAuthUid
         ) {
@@ -632,8 +681,9 @@ class StudentAttendanceRepository(
         }
 
         /*
-         * Verify teacher -> class -> subject relation.
+         * Teacher must be assigned to exact class + subject.
          */
+
         val teacherAssignment =
             teacherAssignmentsRef
                 .whereEqualTo(
@@ -655,6 +705,13 @@ class StudentAttendanceRepository(
                             ) ==
                             session.subjectId &&
 
+                            numberField(
+                                doc.get(
+                                    "semester"
+                                )
+                            ) ==
+                            session.semester &&
+
                             doc.getString(
                                 "session"
                             )
@@ -662,12 +719,7 @@ class StudentAttendanceRepository(
                                 .equals(
                                     session.session,
                                     true
-                                ) &&
-
-                            numberField(
-                                doc.get("semester")
-                            ) ==
-                            session.semester
+                                )
                 }
 
         if (!teacherAssignment) {
@@ -678,19 +730,24 @@ class StudentAttendanceRepository(
         }
 
         /*
-         * One attendance per student + subject + date.
+         * One attendance per student + subject + day.
          */
+
         val recordId =
-            "${student.studentId}_${session.subjectId}_${todayDate()}"
+            "${student.studentId}_" +
+                    "${session.subjectId}_" +
+                    todayDate()
 
         val ref =
             attendanceRef
                 .document(recordId)
 
-        firestore.runTransaction { tx ->
+        firestore.runTransaction { transaction ->
 
             if (
-                tx.get(ref).exists()
+                transaction
+                    .get(ref)
+                    .exists()
             ) {
 
                 throw IllegalStateException(
@@ -698,7 +755,7 @@ class StudentAttendanceRepository(
                 )
             }
 
-            tx.set(
+            transaction.set(
                 ref,
                 mapOf(
 
@@ -763,8 +820,7 @@ class StudentAttendanceRepository(
     suspend fun isAttendanceAlreadyMarked(
         studentId: String,
         subjectId: String,
-        date: String =
-            todayDate()
+        date: String = todayDate()
     ): Boolean {
 
         return attendanceRef
@@ -777,137 +833,179 @@ class StudentAttendanceRepository(
     }
 
     private fun sessionFromDoc(
-        d: DocumentSnapshot
+        doc: DocumentSnapshot
     ): AttendanceSession? {
 
-        if (
-            !d.exists()
-        ) {
+        if (!doc.exists()) {
             return null
         }
 
         return AttendanceSession(
 
             sessionId =
-                d.id,
+                doc.id,
 
             scheduleId =
-                d.getString(
-                    "scheduleId"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "scheduleId"
+                    )
+                    .orEmpty(),
 
             teacherId =
-                d.getString(
-                    "teacherId"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "teacherId"
+                    )
+                    .orEmpty(),
 
             teacherAuthUid =
-                d.getString(
-                    "teacherAuthUid"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "teacherAuthUid"
+                    )
+                    .orEmpty(),
 
             teacherName =
-                d.getString(
-                    "teacherName"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "teacherName"
+                    )
+                    .orEmpty(),
 
             subjectId =
-                d.getString(
-                    "subjectId"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "subjectId"
+                    )
+                    .orEmpty(),
 
             subjectName =
-                d.getString(
-                    "subjectName"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "subjectName"
+                    )
+                    .orEmpty(),
 
             courseCode =
-                d.getString(
-                    "courseCode"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "courseCode"
+                    )
+                    .orEmpty(),
 
             classId =
-                d.getString(
-                    "classId"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "classId"
+                    )
+                    .orEmpty(),
 
             departmentName =
-                d.getString(
-                    "departmentName"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "departmentName"
+                    )
+                    .orEmpty(),
 
             programName =
-                d.getString(
-                    "programName"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "programName"
+                    )
+                    .orEmpty(),
 
             semester =
                 numberField(
-                    d.get("semester")
+                    doc.get(
+                        "semester"
+                    )
                 ) ?: 1,
 
             session =
-                d.getString(
-                    "session"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "session"
+                    )
+                    .orEmpty(),
 
             section =
-                d.getString(
-                    "section"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "section"
+                    )
+                    .orEmpty(),
 
             className =
-                d.getString(
-                    "className"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "className"
+                    )
+                    .orEmpty(),
 
             roomNumber =
                 numberField(
-                    d.get("roomNumber")
+                    doc.get(
+                        "roomNumber"
+                    )
                 ) ?: 0,
 
             date =
-                d.getString(
-                    "date"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "date"
+                    )
+                    .orEmpty(),
 
             dayName =
-                d.getString(
-                    "dayName"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "dayName"
+                    )
+                    .orEmpty(),
 
             startTime =
-                d.getString(
-                    "startTime"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "startTime"
+                    )
+                    .orEmpty(),
 
             endTime =
-                d.getString(
-                    "endTime"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "endTime"
+                    )
+                    .orEmpty(),
 
             qrPayload =
-                d.getString(
-                    "qrPayload"
-                ).orEmpty(),
+                doc
+                    .getString(
+                        "qrPayload"
+                    )
+                    .orEmpty(),
 
             isActive =
-                d.getBoolean(
-                    "isActive"
-                ) ?: false,
+                doc
+                    .getBoolean(
+                        "isActive"
+                    )
+                    ?: false,
 
             status =
-                d.getString(
-                    "status"
-                ) ?: "active",
+                doc
+                    .getString(
+                        "status"
+                    )
+                    ?: "active",
 
             createdAt =
-                d.getDate(
+                doc.getDate(
                     "createdAt"
                 ),
 
             expiresAt =
-                d.getDate(
+                doc.getDate(
                     "expiresAt"
                 )
         )
@@ -935,8 +1033,7 @@ class StudentAttendanceRepository(
     }
 
     private fun startMillis(
-        session:
-        AttendanceSession
+        session: AttendanceSession
     ): Long {
 
         return try {
@@ -951,22 +1048,43 @@ class StudentAttendanceRepository(
                 ?.time
                 ?: Long.MAX_VALUE
 
-        } catch (
-            _: Exception
-        ) {
+        } catch (_: Exception) {
 
             Long.MAX_VALUE
         }
     }
 
-    private fun todayDate(): String {
+    private fun scheduleStartMillis(
+        schedule: ClassSchedule
+    ): Long {
 
-        return SimpleDateFormat(
+        return try {
+
+            SimpleDateFormat(
+                "hh:mm a",
+                Locale.US
+            )
+                .parse(
+                    schedule.startTime
+                )
+                ?.time
+                ?: Long.MAX_VALUE
+
+        } catch (_: Exception) {
+
+            Long.MAX_VALUE
+        }
+    }
+
+    private fun todayDate(): String =
+        SimpleDateFormat(
             "yyyy-MM-dd",
             Locale.US
-        )
-            .format(
-                Date()
-            )
-    }
+        ).format(Date())
+
+    private fun todayDayName(): String =
+        SimpleDateFormat(
+            "EEEE",
+            Locale.US
+        ).format(Date())
 }

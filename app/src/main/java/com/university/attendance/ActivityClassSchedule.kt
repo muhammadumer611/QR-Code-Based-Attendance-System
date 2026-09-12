@@ -336,16 +336,38 @@ class ActivityClassSchedule : AppCompatActivity() {
         // SESSION
         // ========================================================
 
-        dialogBinding.etSession.setOnFocusChangeListener {
-                _, hasFocus ->
+        dialogBinding.etSession.addTextChangedListener(
+            object : android.text.TextWatcher {
 
-            if (!hasFocus) {
+                override fun beforeTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    count: Int,
+                    after: Int
+                ) = Unit
 
-                loadSubjectsForScheduleDialog(
-                    dialogBinding
-                )
+                override fun onTextChanged(
+                    s: CharSequence?,
+                    start: Int,
+                    before: Int,
+                    count: Int
+                ) {
+                    if (
+                        s?.toString()
+                            ?.trim()
+                            ?.isNotBlank() == true
+                    ) {
+                        loadSubjectsForScheduleDialog(
+                            dialogBinding
+                        )
+                    }
+                }
+
+                override fun afterTextChanged(
+                    s: android.text.Editable?
+                ) = Unit
             }
-        }
+        )
 
         // ========================================================
         // SUBJECT
@@ -442,60 +464,224 @@ class ActivityClassSchedule : AppCompatActivity() {
     private fun loadSubjectsForScheduleDialog(
         dialogBinding: DialogAddClassScheduleBinding
     ) {
-        val teacher = selectedTeacher ?: return
-        val semester = Regex("\\d+").find(dialogBinding.etSemester.text.toString())?.value?.toIntOrNull() ?: return
-        val session = dialogBinding.etSession.text.toString().trim()
-        if (session.isBlank()) return
+
+        val teacher =
+            selectedTeacher
+                ?: return
+
+        val semester =
+            Regex("\\d+")
+                .find(
+                    dialogBinding.etSemester
+                        .text
+                        .toString()
+                )
+                ?.value
+                ?.toIntOrNull()
+                ?: return
+
+        val session =
+            dialogBinding.etSession
+                .text
+                .toString()
+                .trim()
+
+        if (session.isBlank()) {
+            return
+        }
 
         lifecycleScope.launch {
+
             try {
-                dialogBinding.etSubject.isEnabled = false
-                dialogBinding.etClass.isEnabled = false
 
-                val repo = ClassScheduleRepository()
-                val classes = repo.getAssignedClasses(teacher.teacherId, semester, session)
-                val labels = classes.map { "${it.programName} • Section ${it.section}" }
-                dialogBinding.etClass.setAdapter(ArrayAdapter(this@ActivityClassSchedule, android.R.layout.simple_dropdown_item_1line, labels))
+                dialogBinding.etClass
+                    .isEnabled = false
 
-                dialogBinding.etClass.setOnItemClickListener { _, _, position, _ ->
-                    selectedClass = classes.getOrNull(position)
-                    selectedSubject = null
-                    dialogBinding.etSubject.setText("")
-                    selectedClass?.let { loadExactAssignedSubjects(dialogBinding, it, semester, session) }
-                }
-                dialogBinding.etClass.isEnabled = classes.isNotEmpty()
+                dialogBinding.etSubject
+                    .isEnabled = false
+
+                selectedClass = null
+                selectedSubject = null
+                availableSubjects = emptyList()
+
+                dialogBinding.etClass
+                    .setText("", false)
+
+                dialogBinding.etSubject
+                    .setText("", false)
+
+                val repo =
+                    ClassScheduleRepository()
+
+                val classes =
+                    repo.getAssignedClasses(
+                        teacher.teacherId,
+                        semester,
+                        session
+                    )
+
+                val labels =
+                    classes.map {
+
+                        "${it.departmentName} • " +
+                                "${it.programName} • " +
+                                "Section ${it.section} • " +
+                                "${it.studentCount} students"
+                    }
+
+                dialogBinding.etClass
+                    .setAdapter(
+                        ArrayAdapter(
+                            this@ActivityClassSchedule,
+                            android.R.layout
+                                .simple_dropdown_item_1line,
+                            labels
+                        )
+                    )
+
+                dialogBinding.etClass
+                    .setOnItemClickListener {
+                            _,
+                            _,
+                            position,
+                            _ ->
+
+                        selectedClass =
+                            classes.getOrNull(
+                                position
+                            )
+
+                        selectedSubject =
+                            null
+
+                        dialogBinding.etSubject
+                            .setText("", false)
+
+                        selectedClass?.let {
+
+                            loadExactAssignedSubjects(
+                                dialogBinding,
+                                it,
+                                semester,
+                                session
+                            )
+                        }
+                    }
+
+                dialogBinding.etClass
+                    .isEnabled =
+                    classes.isNotEmpty()
 
                 if (classes.isEmpty()) {
-                    dialogBinding.etClass.setText("")
-                    dialogBinding.etSubject.setText("")
-                    Toast.makeText(this@ActivityClassSchedule, "No class assigned to this teacher for this semester/session.", Toast.LENGTH_LONG).show()
-                } else if (selectedClass != null && classes.none { it.classId == selectedClass?.classId }) {
-                    selectedClass = null
-                    dialogBinding.etClass.setText("")
-                    dialogBinding.etSubject.setText("")
+
+                    Toast.makeText(
+                        this@ActivityClassSchedule,
+                        "No class is assigned to this teacher for Semester $semester / Session $session.",
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
+
             } catch (e: Exception) {
-                Toast.makeText(this@ActivityClassSchedule, e.message ?: "Failed to load assigned classes.", Toast.LENGTH_LONG).show()
+
+                Toast.makeText(
+                    this@ActivityClassSchedule,
+                    e.message
+                        ?: "Failed to load assigned classes.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }
 
+
     private fun loadExactAssignedSubjects(
-        dialogBinding: DialogAddClassScheduleBinding,
+        dialogBinding:
+        DialogAddClassScheduleBinding,
         studentClass: StudentClass,
         semester: Int,
         session: String
     ) {
-        val teacher = selectedTeacher ?: return
+
+        val teacher =
+            selectedTeacher
+                ?: return
+
         lifecycleScope.launch {
+
             try {
-                val subjects = ClassScheduleRepository().getAssignedSubjects(teacher.teacherId, studentClass.classId, semester, session)
-                availableSubjects = subjects
-                dialogBinding.etSubject.setAdapter(ArrayAdapter(this@ActivityClassSchedule, android.R.layout.simple_dropdown_item_1line, subjects.map { if (it.courseCode.isNotBlank()) "${it.courseCode} • ${it.subjectName}" else it.subjectName }))
-                dialogBinding.etSubject.isEnabled = subjects.isNotEmpty()
-                if (subjects.isEmpty()) Toast.makeText(this@ActivityClassSchedule, "No subject assigned to this teacher for the selected class.", Toast.LENGTH_LONG).show()
+
+                val subjects =
+                    ClassScheduleRepository()
+                        .getAssignedSubjects(
+                            teacher.teacherId,
+                            studentClass.classId,
+                            semester,
+                            session
+                        )
+
+                availableSubjects =
+                    subjects
+
+                val labels =
+                    subjects.map {
+
+                        if (
+                            it.courseCode
+                                .isNotBlank()
+                        ) {
+
+                            "${it.courseCode} • ${it.subjectName}"
+
+                        } else {
+
+                            it.subjectName
+                        }
+                    }
+
+                dialogBinding.etSubject
+                    .setAdapter(
+                        ArrayAdapter(
+                            this@ActivityClassSchedule,
+                            android.R.layout
+                                .simple_dropdown_item_1line,
+                            labels
+                        )
+                    )
+
+                dialogBinding.etSubject
+                    .setOnItemClickListener {
+                            _,
+                            _,
+                            position,
+                            _ ->
+
+                        selectedSubject =
+                            subjects.getOrNull(
+                                position
+                            )
+                    }
+
+                dialogBinding.etSubject
+                    .isEnabled =
+                    subjects.isNotEmpty()
+
+                if (subjects.isEmpty()) {
+
+                    Toast.makeText(
+                        this@ActivityClassSchedule,
+                        "No subject is assigned to this teacher for the selected class and semester.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
             } catch (e: Exception) {
-                Toast.makeText(this@ActivityClassSchedule, e.message ?: "Failed to load assigned subjects.", Toast.LENGTH_LONG).show()
+
+                Toast.makeText(
+                    this@ActivityClassSchedule,
+                    e.message
+                        ?: "Failed to load assigned subjects.",
+                    Toast.LENGTH_LONG
+                ).show()
             }
         }
     }

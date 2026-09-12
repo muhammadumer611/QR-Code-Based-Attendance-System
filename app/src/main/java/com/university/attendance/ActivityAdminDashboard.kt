@@ -44,6 +44,15 @@ class ActivityAdminDashboard : AppCompatActivity() {
             CardSearchTarget(listOf("manual", "manual update", "edit attendance"), binding.cardManualUpdate),
             CardSearchTarget(listOf("daily", "daily overview", "today"), binding.cardDailyOverview),
             CardSearchTarget(listOf("assign", "assignment", "teacher subject", "assign subjects"), binding.cardTeacherAssignment),
+            CardSearchTarget(
+                listOf(
+                    "student subjects",
+                    "student subject",
+                    "semester enrollment",
+                    "enrollment"
+                ),
+                binding.cardStudentSubjectAssignment
+            ),
             CardSearchTarget(listOf("schedule", "timetable"), binding.cardSchedule),
             CardSearchTarget(listOf("report", "reports", "analytics"), binding.cardReports),
             CardSearchTarget(listOf("total students"), binding.cardTotalStudents),
@@ -129,6 +138,15 @@ class ActivityAdminDashboard : AppCompatActivity() {
 
         binding.cardTeacherAssignment.setOnClickListener {
             startActivity(Intent(this, ActivityTeacherSubjectAssignment::class.java))
+        }
+
+        binding.cardStudentSubjectAssignment.setOnClickListener {
+            startActivity(
+                Intent(
+                    this,
+                    ActivityStudentSubjectAssignment::class.java
+                )
+            )
         }
 
         binding.cardSchedule.setOnClickListener {

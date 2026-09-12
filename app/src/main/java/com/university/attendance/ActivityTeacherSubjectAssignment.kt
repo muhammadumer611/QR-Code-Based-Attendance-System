@@ -1,6 +1,5 @@
 package com.university.attendance
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ArrayAdapter
@@ -10,7 +9,8 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.university.attendance.databinding.ActivityTeacherSubjectAssignmentBinding
 
-class ActivityTeacherSubjectAssignment : AppCompatActivity() {
+class ActivityTeacherSubjectAssignment :
+    AppCompatActivity() {
 
     private lateinit var binding:
             ActivityTeacherSubjectAssignmentBinding
@@ -29,21 +29,19 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
             "Semester $it"
         }
 
+    private var lastClassLoadKey =
+        ""
+
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
-
-        super.onCreate(
-            savedInstanceState
-        )
+        super.onCreate(savedInstanceState)
 
         binding =
             ActivityTeacherSubjectAssignmentBinding
                 .inflate(layoutInflater)
 
-        setContentView(
-            binding.root
-        )
+        setContentView(binding.root)
 
         vm =
             ViewModelProvider(this)[
@@ -74,11 +72,8 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
                 binding.stepTwoContainer.visibility ==
                 View.VISIBLE
             ) {
-
                 showTeachers()
-
             } else {
-
                 finish()
             }
         }
@@ -90,7 +85,7 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
         binding.btnStudentAssignment.setOnClickListener {
 
             startActivity(
-                Intent(
+                android.content.Intent(
                     this,
                     ActivityStudentSubjectAssignment::class.java
                 )
@@ -109,61 +104,65 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
         binding.etAssignmentSemester.setAdapter(
             ArrayAdapter(
                 this,
-                android.R.layout.simple_dropdown_item_1line,
+                android.R.layout
+                    .simple_dropdown_item_1line,
                 semesters
             )
         )
 
         binding.etAssignmentSemester.setOnClickListener {
-            binding.etAssignmentSemester.showDropDown()
+            binding.etAssignmentSemester
+                .showDropDown()
         }
 
-        binding.etAssignmentSemester.setOnItemClickListener {
-                _, _, _, _ ->
+        binding.etAssignmentSemester
+            .setOnItemClickListener {
+                    _,
+                    _,
+                    _,
+                    _ ->
 
-            loadClasses()
-        }
-
-        binding.etAssignmentSession.setOnEditorActionListener {
-                _, _, _ ->
-
-            loadClasses()
-
-            false
-        }
-
-        binding.etAssignmentSession.setOnFocusChangeListener {
-                _, hasFocus ->
-
-            if (!hasFocus) {
-                loadClasses()
+                reloadClasses(
+                    force = true
+                )
             }
-        }
 
-        binding.etAssignmentClass.setOnClickListener {
+        binding.etAssignmentSession
+            .addTextChangedListener(
+                SimpleTextWatcher {
+                    reloadClasses()
+                }
+            )
 
-            if (
-                binding.etAssignmentClass.isEnabled
-            ) {
-                binding.etAssignmentClass.showDropDown()
+        binding.etAssignmentClass
+            .setOnClickListener {
+
+                if (
+                    binding.etAssignmentClass
+                        .isEnabled
+                ) {
+                    binding.etAssignmentClass
+                        .showDropDown()
+                }
             }
-        }
 
-        binding.etAssignmentClass.setOnItemClickListener {
-                _, _, position, _ ->
+        binding.etAssignmentClass
+            .setOnItemClickListener {
+                    _,
+                    _,
+                    position,
+                    _ ->
 
-            val selected =
                 vm.classes.value
                     .orEmpty()
                     .getOrNull(position)
-
-            if (selected != null) {
-                vm.selectClass(selected)
+                    ?.let(vm::selectClass)
             }
-        }
     }
 
-    private fun loadClasses() {
+    private fun reloadClasses(
+        force: Boolean = false
+    ) {
 
         val semester =
             Regex("\\d+")
@@ -183,11 +182,26 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
                 .trim()
 
         if (
-            session.isBlank() ||
-            selectedTeacher == null
+            selectedTeacher == null ||
+            session.isBlank()
         ) {
             return
         }
+
+        val key =
+            "${selectedTeacher!!.teacherId}|" +
+                    "$semester|" +
+                    session
+
+        if (
+            !force &&
+            key == lastClassLoadKey
+        ) {
+            return
+        }
+
+        lastClassLoadKey =
+            key
 
         vm.loadClasses(
             semester,
@@ -206,40 +220,41 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
             teacher
         )
 
-        binding.stepOneContainer.visibility =
-            View.GONE
+        lastClassLoadKey =
+            ""
 
-        binding.stepTwoContainer.visibility =
-            View.VISIBLE
+        binding.stepOneContainer
+            .visibility = View.GONE
+
+        binding.stepTwoContainer
+            .visibility = View.VISIBLE
 
         binding.tvHeaderTitle.text =
             teacher.fullName
                 .ifBlank {
-                    "Teacher"
+                    teacher.email
+                        .ifBlank {
+                            "Teacher"
+                        }
                 }
 
         binding.tvHeaderSubtitle.text =
-            "Assign exact class + subjects"
+            "Teacher → exact semester → class → subjects"
 
-        binding.etAssignmentSemester.setText(
-            "",
-            false
-        )
+        binding.etAssignmentSemester
+            .setText("", false)
 
-        binding.etAssignmentSession.setText(
-            ""
-        )
+        binding.etAssignmentSession
+            .setText("")
 
-        binding.etAssignmentClass.setText(
-            "",
-            false
-        )
+        binding.etAssignmentClass
+            .setText("", false)
 
-        binding.etAssignmentClass.isEnabled =
-            false
+        binding.etAssignmentClass
+            .isEnabled = false
 
-        binding.recyclerSubjects.visibility =
-            View.GONE
+        binding.recyclerSubjects
+            .visibility = View.GONE
 
         binding.tvSelectedCount.text =
             "Select Semester + Session + Class"
@@ -256,22 +271,26 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
         selectedTeacher =
             null
 
-        binding.stepTwoContainer.visibility =
-            View.GONE
+        lastClassLoadKey =
+            ""
 
-        binding.stepOneContainer.visibility =
-            View.VISIBLE
+        binding.stepTwoContainer
+            .visibility = View.GONE
+
+        binding.stepOneContainer
+            .visibility = View.VISIBLE
 
         binding.tvHeaderTitle.text =
             "Teacher Assignment"
 
         binding.tvHeaderSubtitle.text =
-            "Assign a teacher to an exact class and subject"
+            "Assign exact teacher + class + semester + subject"
+
+        vm.selectTeacher(
+            Teacher()
+        )
 
         vm.selectedTeacher =
-            null
-
-        vm.selectedClass =
             null
 
         vm.loadTeachers()
@@ -279,7 +298,9 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
 
     private fun observe() {
 
-        vm.teachers.observe(this) { list ->
+        vm.teachers.observe(
+            this
+        ) { list ->
 
             binding.recyclerTeachers.visibility =
                 if (list.isEmpty()) {
@@ -303,33 +324,46 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
                 }
         }
 
-        vm.classes.observe(this) { list ->
+        vm.classes.observe(
+            this
+        ) { list ->
 
             val labels =
                 list.map {
 
-                    "${it.programName} • Section ${it.section} • ${it.studentCount} students"
+                    "${it.departmentName} • " +
+                            "${it.programName} • " +
+                            "Section ${it.section} • " +
+                            "${it.studentCount} students"
                 }
 
-            binding.etAssignmentClass.setAdapter(
-                ArrayAdapter(
-                    this,
-                    android.R.layout.simple_dropdown_item_1line,
-                    labels
+            binding.etAssignmentClass
+                .setAdapter(
+                    ArrayAdapter(
+                        this,
+                        android.R.layout
+                            .simple_dropdown_item_1line,
+                        labels
+                    )
                 )
-            )
 
-            binding.etAssignmentClass.isEnabled =
+            binding.etAssignmentClass
+                .isEnabled =
                 list.isNotEmpty()
 
             if (list.isNotEmpty()) {
-                binding.etAssignmentClass.showDropDown()
+
+                binding.etAssignmentClass
+                    .showDropDown()
             }
         }
 
-        vm.subjects.observe(this) { list ->
+        vm.subjects.observe(
+            this
+        ) { list ->
 
-            binding.recyclerSubjects.visibility =
+            binding.recyclerSubjects
+                .visibility =
                 if (list.isEmpty()) {
                     View.GONE
                 } else {
@@ -338,7 +372,8 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
 
             subjectAdapter.updateData(
                 list,
-                vm.selectedSubjectIds.value
+                vm.selectedSubjectIds
+                    .value
                     .orEmpty(),
                 selectedTeacher?.teacherId
             )
@@ -356,8 +391,7 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
                 }
 
             subjectAdapter.updateData(
-                vm.subjects.value
-                    .orEmpty(),
+                vm.subjects.value.orEmpty(),
                 selected,
                 selectedTeacher?.teacherId
             )
@@ -370,7 +404,8 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
             binding.progressBar.visibility =
                 if (
                     state is
-                            TeacherSubjectViewModel.UiState.Loading
+                            TeacherSubjectViewModel
+                            .UiState.Loading
                 ) {
                     View.VISIBLE
                 } else {
@@ -379,7 +414,8 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
 
             when (state) {
 
-                is TeacherSubjectViewModel.UiState.Error -> {
+                is TeacherSubjectViewModel
+                .UiState.Error -> {
 
                     Toast.makeText(
                         this,
@@ -388,11 +424,12 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
                     ).show()
                 }
 
-                is TeacherSubjectViewModel.UiState.SaveSuccess -> {
+                is TeacherSubjectViewModel
+                .UiState.SaveSuccess -> {
 
                     Toast.makeText(
                         this,
-                        "Teacher • Class • Subject assignment saved.",
+                        "Teacher • Class • Semester • Subject assignment saved.",
                         Toast.LENGTH_LONG
                     ).show()
 
@@ -403,4 +440,29 @@ class ActivityTeacherSubjectAssignment : AppCompatActivity() {
             }
         }
     }
+}
+
+private class SimpleTextWatcher(
+    private val onChange: () -> Unit
+) : android.text.TextWatcher {
+
+    override fun beforeTextChanged(
+        s: CharSequence?,
+        start: Int,
+        count: Int,
+        after: Int
+    ) = Unit
+
+    override fun onTextChanged(
+        s: CharSequence?,
+        start: Int,
+        before: Int,
+        count: Int
+    ) {
+        onChange()
+    }
+
+    override fun afterTextChanged(
+        s: android.text.Editable?
+    ) = Unit
 }

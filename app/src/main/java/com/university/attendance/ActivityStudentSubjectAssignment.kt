@@ -28,30 +28,21 @@ class ActivityStudentSubjectAssignment :
             Student? = null
 
     private var available:
-            List<TeacherSubjectAssignment> =
-        emptyList()
+            List<Subject> = emptyList()
 
     private val checks =
-        linkedMapOf<
-                String,
-                CheckBox
-                >()
+        linkedMapOf<String, CheckBox>()
 
     override fun onCreate(
         savedInstanceState: Bundle?
     ) {
-
-        super.onCreate(
-            savedInstanceState
-        )
+        super.onCreate(savedInstanceState)
 
         binding =
             ActivityStudentSubjectAssignmentBinding
                 .inflate(layoutInflater)
 
-        setContentView(
-            binding.root
-        )
+        setContentView(binding.root)
 
         binding.btnBack.setOnClickListener {
             finish()
@@ -62,7 +53,10 @@ class ActivityStudentSubjectAssignment :
         }
 
         binding.etStudent.setOnItemClickListener {
-                _, _, position, _ ->
+                _,
+                _,
+                position,
+                _ ->
 
             students
                 .getOrNull(position)
@@ -93,36 +87,34 @@ class ActivityStudentSubjectAssignment :
                 val labels =
                     students.map {
 
-                        "${it.fullName} • ${it.programName} • ${it.session}-${it.section}"
+                        "${it.fullName} • " +
+                                "${it.programName} • " +
+                                "Sem ${it.semester} • " +
+                                "${it.session}-${it.section}"
                     }
 
                 binding.etStudent.setAdapter(
                     ArrayAdapter(
                         this@ActivityStudentSubjectAssignment,
-                        android.R.layout.simple_dropdown_item_1line,
+                        android.R.layout
+                            .simple_dropdown_item_1line,
                         labels
                     )
                 )
 
-                if (
-                    students.isEmpty()
-                ) {
+                if (students.isEmpty()) {
 
-                    Toast.makeText(
-                        this@ActivityStudentSubjectAssignment,
-                        "No active students found.",
-                        Toast.LENGTH_LONG
-                    ).show()
+                    showMessage(
+                        "No active students with a class found."
+                    )
                 }
 
             } catch (e: Exception) {
 
-                Toast.makeText(
-                    this@ActivityStudentSubjectAssignment,
+                showMessage(
                     e.message
-                        ?: "Failed to load students.",
-                    Toast.LENGTH_LONG
-                ).show()
+                        ?: "Failed to load students."
+                )
 
             } finally {
 
@@ -140,7 +132,10 @@ class ActivityStudentSubjectAssignment :
             student
 
         binding.tvStudentInfo.text =
-            "${student.programName} • Semester ${student.semester} • ${student.session}-${student.section}"
+            "${student.departmentName} • " +
+                    "${student.programName} • " +
+                    "Semester ${student.semester} • " +
+                    "${student.session}-${student.section}"
 
         checks.clear()
 
@@ -154,8 +149,12 @@ class ActivityStudentSubjectAssignment :
 
             try {
 
+                /*
+                 * Subjects come directly from
+                 * Subject Management.
+                 */
                 available =
-                    repo.getTeacherSubjectsForStudent(
+                    repo.getSubjectsForStudent(
                         student
                     )
 
@@ -164,17 +163,15 @@ class ActivityStudentSubjectAssignment :
                         student.studentId
                     )
 
-                if (
-                    available.isEmpty()
-                ) {
+                if (available.isEmpty()) {
 
-                    addMessage(
-                        "No teacher-assigned subjects found for this student's exact class and semester."
+                    showMessage(
+                        "No subjects found in Subject Management for this student's department, program and semester."
                     )
 
                 } else {
 
-                    available.forEach { item ->
+                    available.forEach { subject ->
 
                         val row =
                             LinearLayout(
@@ -186,24 +183,29 @@ class ActivityStudentSubjectAssignment :
 
                                 setPadding(
                                     8,
-                                    12,
+                                    10,
                                     8,
-                                    12
+                                    10
                                 )
                             }
 
-                        val checkbox =
+                        val checkBox =
                             CheckBox(
                                 this@ActivityStudentSubjectAssignment
                             ).apply {
 
                                 text =
                                     if (
-                                        item.courseCode.isBlank()
+                                        subject.courseCode
+                                            .isBlank()
                                     ) {
-                                        item.subjectName
+
+                                        subject.subjectName
+
                                     } else {
-                                        "${item.courseCode} • ${item.subjectName}"
+
+                                        "${subject.courseCode} • " +
+                                                subject.subjectName
                                     }
 
                                 textSize =
@@ -211,44 +213,43 @@ class ActivityStudentSubjectAssignment :
 
                                 isChecked =
                                     assigned.contains(
-                                        item.subjectId
+                                        subject.subjectId
                                     )
                             }
 
-                        val teacher =
+                        val meta =
                             TextView(
                                 this@ActivityStudentSubjectAssignment
                             ).apply {
 
                                 text =
-                                    "Teacher: ${item.teacherName.ifBlank { "Not specified" }}"
+                                    "Semester ${student.semester} • " +
+                                            "${subject.creditHours.ifBlank { "3" }} credit hours"
 
                                 textSize =
                                     12f
                             }
 
                         row.addView(
-                            checkbox
+                            checkBox
                         )
 
                         row.addView(
-                            teacher
+                            meta
                         )
 
                         binding.subjectContainer
                             .addView(row)
 
                         checks[
-                            StudentSubjectAssignmentRepository
-                                .key(item)
-                        ] =
-                            checkbox
+                            subject.subjectId
+                        ] = checkBox
                     }
                 }
 
             } catch (e: Exception) {
 
-                addMessage(
+                showMessage(
                     e.message
                         ?: "Failed to load subjects."
                 )
@@ -261,28 +262,26 @@ class ActivityStudentSubjectAssignment :
         }
     }
 
-    private fun addMessage(
+    private fun showMessage(
         message: String
     ) {
 
         binding.subjectContainer
             .removeAllViews()
 
-        binding.subjectContainer
-            .addView(
-                TextView(this).apply {
+        binding.subjectContainer.addView(
+            TextView(this).apply {
 
-                    text =
-                        message
+                text = message
 
-                    setPadding(
-                        8,
-                        20,
-                        8,
-                        20
-                    )
-                }
-            )
+                setPadding(
+                    8,
+                    20,
+                    8,
+                    20
+                )
+            }
+        )
     }
 
     private fun save() {
@@ -307,19 +306,6 @@ class ActivityStudentSubjectAssignment :
                 }
                 .keys
 
-        if (
-            selected.isEmpty()
-        ) {
-
-            Toast.makeText(
-                this,
-                "Select at least one subject.",
-                Toast.LENGTH_SHORT
-            ).show()
-
-            return
-        }
-
         binding.btnSave.isEnabled =
             false
 
@@ -342,7 +328,7 @@ class ActivityStudentSubjectAssignment :
 
                     Toast.makeText(
                         this@ActivityStudentSubjectAssignment,
-                        "${result.count} student subject assignment(s) saved.",
+                        "${result.count} subject(s) enrolled for ${student.fullName}.",
                         Toast.LENGTH_LONG
                     ).show()
                 }

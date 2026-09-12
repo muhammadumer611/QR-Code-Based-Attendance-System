@@ -3,246 +3,138 @@ package com.university.attendance
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
+/** Admin source of truth for Student -> Subject enrollment. */
 class StudentSubjectAssignmentRepository(
-    private val firestore: FirebaseFirestore =
-        FirebaseFirestore.getInstance()
+    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
 ) {
-
-    private val studentsRef =
-        firestore.collection("students")
-
-    private val teacherAssignmentsRef =
-        firestore.collection(
-            "teacherSubjectAssignments"
-        )
-
+    private val studentsRef = firestore.collection("students")
+    private val subjectsRef = firestore.collection("subjects")
     private val studentAssignmentsRef =
-        firestore.collection(
-            "studentSubjectAssignments"
-        )
+        firestore.collection("studentSubjectAssignments")
 
     sealed class Result {
-
-        data class Success(
-            val count: Int
-        ) : Result()
-
-        data class Error(
-            val message: String
-        ) : Result()
+        data class Success(val count: Int) : Result()
+        data class Error(val message: String) : Result()
     }
 
-    suspend fun getStudents(): List<Student> {
-
-        return studentsRef
-            .get()
-            .await()
-            .documents
-            .mapNotNull { doc ->
-
-                doc.toObject(
-                    Student::class.java
-                )?.apply {
-
-                    studentId =
-                        doc.id
-                }
+    suspend fun getStudents(): List<Student> =
+        studentsRef.get().await().documents.mapNotNull { d ->
+            d.toObject(Student::class.java)?.apply {
+                studentId = d.id
             }
+        }
             .filter {
-
                 it.studentId.isNotBlank() &&
                         it.fullName.isNotBlank() &&
-                        it.isActive
+                        it.isActive &&
+                        it.classId.isNotBlank()
             }
             .sortedWith(
                 compareBy(
                     { it.programName },
+                    { it.semester },
                     { it.session },
                     { it.section },
                     { it.fullName }
                 )
             )
-    }
 
     /**
-     * Returns subjects already assigned to a teacher for
-     * the exact student's class.
+     * Gets subjects directly from Subject Management.
+     *
+     * Exact filter:
+     * Department + Program + Semester
+     *
+     * Teacher assignment is NOT required here.
      */
-    suspend fun getTeacherSubjectsForStudent(
-        student: Student
-    ): List<TeacherSubjectAssignment> {
+    suspend fun getSubjectsForStudent(student: Student): List<Subject> {
 
         if (
-            student.classId.isBlank() ||
-            student.session.isBlank()
+            student.departmentName.isBlank() ||
+            student.programName.isBlank()
         ) {
             return emptyList()
         }
 
-        return teacherAssignmentsRef
-            .whereEqualTo(
-                "classId",
-                student.classId
-            )
-            .get()
-            .await()
-            .documents
-            .mapNotNull { doc ->
+        return subjectsRef.get().await().documents.mapNotNull { d ->
 
-                val semester =
-                    numberField(
-                        doc.get("semester")
-                    )
-                        ?: return@mapNotNull null
+            val subjectSemester =
+                numberField(d.get("semester"))
+                    ?: return@mapNotNull null
 
-                if (
-                    semester !=
-                    student.semester
-                ) {
-                    return@mapNotNull null
-                }
+            if (subjectSemester != student.semester) {
+                return@mapNotNull null
+            }
 
-                if (
-                    !doc.getString(
-                        "session"
-                    )
-                        .orEmpty()
-                        .equals(
-                            student.session,
-                            true
-                        )
-                ) {
-                    return@mapNotNull null
-                }
+            val department =
+                d.getString("departmentName")
+                    .orEmpty()
+                    .trim()
 
-                if (
-                    !doc.getString(
-                        "section"
-                    )
-                        .orEmpty()
-                        .equals(
-                            student.section,
-                            true
-                        )
-                ) {
-                    return@mapNotNull null
-                }
+            val program =
+                d.getString("programName")
+                    .orEmpty()
+                    .trim()
 
-                if (
-                    !doc.getString(
-                        "programName"
-                    )
-                        .orEmpty()
-                        .equals(
-                            student.programName,
-                            true
-                        )
-                ) {
-                    return@mapNotNull null
-                }
-
-                if (
-                    !doc.getString(
-                        "departmentName"
-                    )
-                        .orEmpty()
-                        .equals(
-                            student.departmentName,
-                            true
-                        )
-                ) {
-                    return@mapNotNull null
-                }
-
-                TeacherSubjectAssignment(
-
-                    assignmentId =
-                        doc.id,
-
-                    teacherId =
-                        doc.getString(
-                            "teacherId"
-                        ).orEmpty(),
-
-                    teacherName =
-                        doc.getString(
-                            "teacherName"
-                        ).orEmpty(),
-
-                    classId =
-                        doc.getString(
-                            "classId"
-                        ).orEmpty(),
-
-                    className =
-                        doc.getString(
-                            "className"
-                        ).orEmpty(),
-
-                    departmentName =
-                        doc.getString(
-                            "departmentName"
-                        ).orEmpty(),
-
-                    programName =
-                        doc.getString(
-                            "programName"
-                        ).orEmpty(),
-
-                    section =
-                        doc.getString(
-                            "section"
-                        ).orEmpty(),
-
-                    subjectId =
-                        doc.getString(
-                            "subjectId"
-                        ).orEmpty(),
-
-                    subjectName =
-                        doc.getString(
-                            "subjectName"
-                        ).orEmpty(),
-
-                    courseCode =
-                        doc.getString(
-                            "courseCode"
-                        ).orEmpty(),
-
-                    semester =
-                        semester,
-
-                    session =
-                        doc.getString(
-                            "session"
-                        ).orEmpty()
+            if (
+                !department.equals(
+                    student.departmentName.trim(),
+                    true
                 )
+            ) {
+                return@mapNotNull null
             }
-            .filter {
 
-                it.subjectId.isNotBlank() &&
-                        it.teacherId.isNotBlank()
-            }
-            .distinctBy {
-
-                "${it.subjectId}_${it.teacherId}"
-            }
-            .sortedWith(
-                compareBy(
-                    { it.courseCode },
-                    { it.subjectName },
-                    { it.teacherName }
+            if (
+                !program.equals(
+                    student.programName.trim(),
+                    true
                 )
+            ) {
+                return@mapNotNull null
+            }
+
+            Subject(
+                subjectId = d.id,
+                departmentId =
+                    d.getString("departmentId").orEmpty(),
+
+                departmentName =
+                    department,
+
+                programName =
+                    program,
+
+                semester =
+                    subjectSemester.toString(),
+
+                courseCode =
+                    d.getString("courseCode").orEmpty(),
+
+                subjectName =
+                    d.getString("subjectName").orEmpty(),
+
+                creditHours =
+                    when (val value = d.get("creditHours")) {
+                        is Number -> value.toString()
+                        is String -> value
+                        else -> ""
+                    }
             )
+
+        }.sortedWith(
+            compareBy(
+                { it.courseCode },
+                { it.subjectName }
+            )
+        )
     }
 
     suspend fun getAssignedSubjectIds(
         studentId: String
     ): Set<String> {
 
-        if (
-            studentId.isBlank()
-        ) {
+        if (studentId.isBlank()) {
             return emptySet()
         }
 
@@ -255,49 +147,54 @@ class StudentSubjectAssignmentRepository(
             .await()
             .documents
             .mapNotNull {
-
-                it.getString(
-                    "subjectId"
-                )?.takeIf {
-                    it.isNotBlank()
-                }
+                it.getString("subjectId")
+                    ?.takeIf(String::isNotBlank)
             }
             .toSet()
     }
 
     suspend fun saveAssignments(
         student: Student,
-        available:
-        List<TeacherSubjectAssignment>,
-        selectedKeys: Set<String>
+        available: List<Subject>,
+        selectedSubjectIds: Set<String>
     ): Result {
 
         return try {
 
-            if (
-                student.studentId.isBlank()
-            ) {
+            if (student.studentId.isBlank()) {
                 return Result.Error(
                     "Student ID is missing."
                 )
             }
 
-            if (
-                student.classId.isBlank()
-            ) {
+            if (student.classId.isBlank()) {
                 return Result.Error(
                     "Student class is not assigned."
                 )
             }
 
-            if (
-                selectedKeys.isEmpty()
-            ) {
+            if (available.isEmpty()) {
                 return Result.Error(
-                    "Select at least one subject."
+                    "No subjects exist for this student's department, program and semester."
                 )
             }
 
+            val validSubjectIds =
+                available.map { it.subjectId }.toSet()
+
+            if (
+                !selectedSubjectIds.all {
+                    it in validSubjectIds
+                }
+            ) {
+                return Result.Error(
+                    "One or more selected subjects are invalid."
+                )
+            }
+
+            /*
+             * Remove old enrollment for this student.
+             */
             val old =
                 studentAssignmentsRef
                     .whereEqualTo(
@@ -312,22 +209,27 @@ class StudentSubjectAssignmentRepository(
                 firestore.batch()
 
             old.forEach {
-                batch.delete(
-                    it.reference
-                )
+                batch.delete(it.reference)
             }
 
+            /*
+             * Save the newly selected catalogue subjects.
+             *
+             * NOTE:
+             * teacherId is intentionally NOT stored here.
+             *
+             * Teacher assignment is a separate relation.
+             */
             available
                 .filter {
-                    key(it) in selectedKeys
+                    it.subjectId in selectedSubjectIds
                 }
-                .forEach { taught ->
+                .forEach { subject ->
 
                     val id =
                         buildId(
                             student.studentId,
-                            taught.subjectId,
-                            taught.teacherId,
+                            subject.subjectId,
                             student.classId,
                             student.semester,
                             student.session
@@ -336,8 +238,7 @@ class StudentSubjectAssignmentRepository(
                     val model =
                         StudentSubjectAssignment(
 
-                            assignmentId =
-                                id,
+                            assignmentId = id,
 
                             studentId =
                                 student.studentId,
@@ -367,19 +268,13 @@ class StudentSubjectAssignmentRepository(
                                 student.section,
 
                             subjectId =
-                                taught.subjectId,
+                                subject.subjectId,
 
                             subjectName =
-                                taught.subjectName,
+                                subject.subjectName,
 
                             courseCode =
-                                taught.courseCode,
-
-                            teacherId =
-                                taught.teacherId,
-
-                            teacherName =
-                                taught.teacherName
+                                subject.courseCode
                         )
 
                     batch.set(
@@ -389,11 +284,10 @@ class StudentSubjectAssignmentRepository(
                     )
                 }
 
-            batch.commit()
-                .await()
+            batch.commit().await()
 
             Result.Success(
-                selectedKeys.size
+                selectedSubjectIds.size
             )
 
         } catch (e: Exception) {
@@ -428,18 +322,9 @@ class StudentSubjectAssignmentRepository(
 
     companion object {
 
-        fun key(
-            assignment:
-            TeacherSubjectAssignment
-        ): String {
-
-            return "${assignment.subjectId}__${assignment.teacherId}"
-        }
-
         fun buildId(
             studentId: String,
             subjectId: String,
-            teacherId: String,
             classId: String,
             semester: Int,
             session: String
@@ -448,7 +333,6 @@ class StudentSubjectAssignmentRepository(
             return listOf(
                 studentId,
                 subjectId,
-                teacherId,
                 classId,
                 semester,
                 session

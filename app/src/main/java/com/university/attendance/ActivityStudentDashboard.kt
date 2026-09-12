@@ -1,6 +1,5 @@
 package com.university.attendance
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
@@ -20,12 +19,15 @@ class ActivityStudentDashboard :
     private val repository =
         StudentAttendanceRepository()
 
-    private lateinit var adapter:
+    private lateinit var attendanceAdapter:
             ActiveAttendanceAdapter
 
+    private lateinit var scheduleAdapter:
+            StudentTodayClassAdapter
+
     private var listener:
-            com.google.firebase.firestore.ListenerRegistration?
-            = null
+            com.google.firebase.firestore
+            .ListenerRegistration? = null
 
     private var currentStudent:
             Student? = null
@@ -46,36 +48,47 @@ class ActivityStudentDashboard :
             binding.root
         )
 
-        adapter =
+        attendanceAdapter =
             ActiveAttendanceAdapter {
+                saveAttendance(it)
+            }
 
-                    session ->
+        scheduleAdapter =
+            StudentTodayClassAdapter()
 
-                saveAttendance(
-                    session
+        binding.rvActiveAttendance
+            .layoutManager =
+            LinearLayoutManager(this)
+
+        binding.rvActiveAttendance
+            .adapter =
+            attendanceAdapter
+
+        binding.rvTodayClasses
+            .layoutManager =
+            LinearLayoutManager(this)
+
+        binding.rvTodayClasses
+            .adapter =
+            scheduleAdapter
+
+        binding.btnNotifications
+            .setOnClickListener {
+
+                startActivity(
+                    android.content.Intent(
+                        this,
+                        ActivityNotifications::class.java
+                    )
                 )
             }
 
-        binding.rvActiveAttendance.layoutManager =
-            LinearLayoutManager(this)
-
-        binding.rvActiveAttendance.adapter =
-            adapter
-
-        binding.btnNotifications.setOnClickListener {
-
-            startActivity(
-                Intent(
-                    this,
-                    ActivityNotifications::class.java
-                )
-            )
-        }
-
-        binding.btnScanQr.visibility =
+        binding.btnScanQr
+            .visibility =
             View.GONE
 
-        binding.tvScanHint.visibility =
+        binding.tvScanHint
+            .visibility =
             View.GONE
 
         loadStudent()
@@ -86,7 +99,8 @@ class ActivityStudentDashboard :
         if (
             FirebaseAuth
                 .getInstance()
-                .currentUser == null
+                .currentUser ==
+            null
         ) {
 
             finish()
@@ -131,7 +145,8 @@ class ActivityStudentDashboard :
                         )
 
                         if (
-                            student.section.isNotBlank()
+                            student.section
+                                .isNotBlank()
                         ) {
 
                             append(
@@ -140,7 +155,8 @@ class ActivityStudentDashboard :
                         }
 
                         if (
-                            student.regNo.isNotBlank()
+                            student.regNo
+                                .isNotBlank()
                         ) {
 
                             append(
@@ -150,12 +166,12 @@ class ActivityStudentDashboard :
                     }
 
                 binding.tvNextClass.text =
-                    "Class: ${
-                        student.classId
-                            .ifBlank {
-                                "Not assigned"
-                            }
-                    }"
+                    "Class: ${student.programName} • " +
+                            "${student.session}-${student.section}"
+
+                loadTodaySchedule(
+                    student
+                )
 
                 startLiveListener(
                     student
@@ -167,6 +183,51 @@ class ActivityStudentDashboard :
                     this@ActivityStudentDashboard,
                     e.message
                         ?: "Unable to load student profile.",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        }
+    }
+
+    private fun loadTodaySchedule(
+        student: Student
+    ) {
+
+        lifecycleScope.launch {
+
+            try {
+
+                val list =
+                    repository
+                        .getTodayScheduleForStudent(
+                            student
+                        )
+
+                scheduleAdapter
+                    .submitList(list)
+
+                binding.rvTodayClasses
+                    .visibility =
+                    if (list.isEmpty()) {
+                        View.GONE
+                    } else {
+                        View.VISIBLE
+                    }
+
+                binding.tvTodayClassesEmpty
+                    .visibility =
+                    if (list.isEmpty()) {
+                        View.VISIBLE
+                    } else {
+                        View.GONE
+                    }
+
+            } catch (e: Exception) {
+
+                Toast.makeText(
+                    this@ActivityStudentDashboard,
+                    e.message
+                        ?: "Unable to load today's classes.",
                     Toast.LENGTH_LONG
                 ).show()
             }
@@ -213,13 +274,13 @@ class ActivityStudentDashboard :
                     }
                 },
 
-                { e ->
+                { error ->
 
                     runOnUiThread {
 
                         Toast.makeText(
                             this,
-                            e.message
+                            error.message
                                 ?: "Attendance listener failed.",
                             Toast.LENGTH_LONG
                         ).show()
@@ -229,32 +290,31 @@ class ActivityStudentDashboard :
     }
 
     private fun renderSessions(
-        sessions:
-        List<AttendanceSession>
+        sessions: List<AttendanceSession>
     ) {
 
-        adapter.submitList(
-            sessions
-        )
+        attendanceAdapter
+            .submitList(
+                sessions
+            )
 
         val empty =
             sessions.isEmpty()
 
-        binding.rvActiveAttendance.visibility =
+        binding.rvActiveAttendance
+            .visibility =
             if (empty) {
                 View.GONE
             } else {
                 View.VISIBLE
             }
 
-        binding.tvLiveAttendanceEmptyTitle.visibility =
-            if (empty) {
-                View.VISIBLE
-            } else {
-                View.GONE
-            }
+        binding.tvLiveAttendanceEmptyTitle
+            .visibility =
+            View.VISIBLE
 
-        binding.tvLiveAttendanceEmpty.visibility =
+        binding.tvLiveAttendanceEmpty
+            .visibility =
             if (empty) {
                 View.VISIBLE
             } else {
@@ -270,8 +330,7 @@ class ActivityStudentDashboard :
     }
 
     private fun saveAttendance(
-        session:
-        AttendanceSession
+        session: AttendanceSession
     ) {
 
         val student =

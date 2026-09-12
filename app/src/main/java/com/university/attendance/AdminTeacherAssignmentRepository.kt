@@ -4,135 +4,225 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 
 /**
- * Admin source of truth for Teacher -> Class -> Subject assignments.
- *
- * Classes come from `classes`.
- * Subjects come from `subjects`.
- * The actual teacher/class/subject relation is stored in
- * `teacherSubjectAssignments`.
- *
- * We DO NOT store one teacher directly on Subject because the same
- * subject can be taught by different teachers in different classes.
+ * Exact Teacher -> Class -> Semester -> Subject assignment.
  */
 class AdminTeacherAssignmentRepository(
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    private val firestore:
+    FirebaseFirestore =
+        FirebaseFirestore.getInstance()
 ) {
 
-    private val teachersRef = firestore.collection("teachers")
-    private val classesRef = firestore.collection("classes")
-    private val subjectsRef = firestore.collection("subjects")
-    private val assignmentsRef = firestore.collection("teacherSubjectAssignments")
+    private val teachersRef =
+        firestore.collection("teachers")
+
+    private val classesRef =
+        firestore.collection("classes")
+
+    private val studentsRef =
+        firestore.collection("students")
+
+    private val subjectsRef =
+        firestore.collection("subjects")
+
+    private val assignmentsRef =
+        firestore.collection("teacherSubjectAssignments")
 
     sealed class OpResult {
-        object Success : OpResult()
-        data class Error(val message: String) : OpResult()
+
+        object Success :
+            OpResult()
+
+        data class Error(
+            val message: String
+        ) : OpResult()
     }
 
-    suspend fun getAllTeachers(): List<Teacher> {
+    /*
+     * ------------------------------------------------------------
+     * ALL ACTIVE TEACHERS
+     * ------------------------------------------------------------
+     */
+
+    suspend fun getAllTeachers():
+            List<Teacher> {
+
         return teachersRef
             .get()
             .await()
             .documents
             .mapNotNull { doc ->
-                doc.toObject(Teacher::class.java)?.apply {
-                    teacherId = doc.id
+
+                doc.toObject(
+                    Teacher::class.java
+                )?.apply {
+
+                    teacherId =
+                        doc.id
                 }
             }
             .filter {
+
                 it.teacherId.isNotBlank() &&
-                        it.fullName.isNotBlank()
+
+                        (
+                                it.fullName.isNotBlank() ||
+                                        it.email.isNotBlank()
+                                ) &&
+
+                        it.isActive
             }
             .sortedBy {
-                it.fullName.lowercase()
+
+                it.fullName
+                    .ifBlank {
+                        it.email
+                    }
+                    .lowercase()
             }
     }
 
-    /**
-     * Classes are read from the real classes collection.
+    /*
+     * ------------------------------------------------------------
+     * CLASSES FOR SESSION + SEMESTER
+     * ------------------------------------------------------------
      *
-     * We do NOT depend on students collection to discover classes.
+     * Class document itself does not have semester because the
+     * same cohort moves from semester to semester.
+     *
+     * Therefore semester is derived from students.
      */
+
     suspend fun getAllClasses(
         session: String,
         semester: Int
     ): List<StudentClass> {
 
-        val cleanSession = session.trim()
+        val cleanSession =
+            session.trim()
 
         if (cleanSession.isBlank()) {
             return emptyList()
         }
 
-        return classesRef
-            .get()
-            .await()
-            .documents
-            .mapNotNull { doc ->
+        val students =
+            studentsRef
+                .get()
+                .await()
+                .documents
+                .mapNotNull { doc ->
 
-                val docSession =
-                    doc.getString("session")
-                        .orEmpty()
-                        .trim()
+                    doc.toObject(
+                        Student::class.java
+                    )?.apply {
 
-                if (
-                    doc.id.isBlank() ||
-                    !docSession.equals(
-                        cleanSession,
-                        ignoreCase = true
-                    )
-                ) {
+                        studentId =
+                            doc.id
+                    }
+                }
+                .filter {
+
+                    it.isActive &&
+
+                            it.classId.isNotBlank() &&
+
+                            it.semester ==
+                            semester &&
+
+                            it.session
+                                .trim()
+                                .equals(
+                                    cleanSession,
+                                    true
+                                )
+                }
+
+        return students
+            .groupBy {
+                it.classId
+            }
+            .mapNotNull { (classId, roster) ->
+
+                val classDoc =
+                    classesRef
+                        .document(classId)
+                        .get()
+                        .await()
+
+                if (!classDoc.exists()) {
                     return@mapNotNull null
                 }
 
                 StudentClass(
-                    classId = doc.id,
+
+                    classId =
+                        classDoc.id,
 
                     universityName =
-                        doc.getString("universityName")
+                        classDoc
+                            .getString(
+                                "universityName"
+                            )
                             .orEmpty(),
 
                     departmentName =
-                        doc.getString("departmentName")
+                        classDoc
+                            .getString(
+                                "departmentName"
+                            )
                             .orEmpty(),
 
                     programName =
-                        doc.getString("programName")
+                        classDoc
+                            .getString(
+                                "programName"
+                            )
                             .orEmpty(),
 
                     session =
-                        docSession,
+                        classDoc
+                            .getString(
+                                "session"
+                            )
+                            .orEmpty()
+                            .ifBlank {
+                                cleanSession
+                            },
 
                     section =
-                        doc.getString("section")
+                        classDoc
+                            .getString(
+                                "section"
+                            )
                             .orEmpty(),
 
                     studentCount =
-                        doc.getLong("studentCount")
-                            ?: 0L
+                        roster.size.toLong()
                 )
             }
             .sortedWith(
                 compareBy(
+                    { it.departmentName },
                     { it.programName },
                     { it.section }
                 )
             )
     }
 
-    /**
-     * Gets subjects belonging to the selected class/program/department
-     * and selected semester.
+    /*
+     * ------------------------------------------------------------
+     * SUBJECT CATALOGUE
+     * ------------------------------------------------------------
      *
-     * Handles Firestore semester stored as String OR Number.
+     * Exact:
+     * class Department
+     * class Program
+     * selected Semester
      */
+
     suspend fun getSubjectsForClass(
         classId: String,
         semester: Int
     ): List<Subject> {
-
-        if (classId.isBlank()) {
-            return emptyList()
-        }
 
         val classDoc =
             classesRef
@@ -162,44 +252,39 @@ class AdminTeacherAssignmentRepository(
             .documents
             .mapNotNull { doc ->
 
-                val rawSemester =
-                    doc.get("semester")
-
                 val subjectSemester =
-                    when (rawSemester) {
+                    numberField(
+                        doc.get("semester")
+                    )
+                        ?: return@mapNotNull null
 
-                        is Number ->
-                            rawSemester.toInt()
-
-                        is String ->
-                            rawSemester.toIntOrNull()
-                                ?: Regex("\\d+")
-                                    .find(rawSemester)
-                                    ?.value
-                                    ?.toIntOrNull()
-
-                        else ->
-                            null
-                    }
-
-                if (subjectSemester != semester) {
+                if (
+                    subjectSemester !=
+                    semester
+                ) {
                     return@mapNotNull null
                 }
 
                 val subjectProgram =
-                    doc.getString("programName")
+                    doc
+                        .getString(
+                            "programName"
+                        )
                         .orEmpty()
                         .trim()
 
                 val subjectDepartment =
-                    doc.getString("departmentName")
+                    doc
+                        .getString(
+                            "departmentName"
+                        )
                         .orEmpty()
                         .trim()
 
                 if (
                     !subjectProgram.equals(
                         program,
-                        ignoreCase = true
+                        true
                     )
                 ) {
                     return@mapNotNull null
@@ -208,7 +293,7 @@ class AdminTeacherAssignmentRepository(
                 if (
                     !subjectDepartment.equals(
                         department,
-                        ignoreCase = true
+                        true
                     )
                 ) {
                     return@mapNotNull null
@@ -220,7 +305,10 @@ class AdminTeacherAssignmentRepository(
                         doc.id,
 
                     departmentId =
-                        doc.getString("departmentId")
+                        doc
+                            .getString(
+                                "departmentId"
+                            )
                             .orEmpty(),
 
                     departmentName =
@@ -230,20 +318,29 @@ class AdminTeacherAssignmentRepository(
                         subjectProgram,
 
                     semester =
-                        semester.toString(),
+                        subjectSemester
+                            .toString(),
 
                     courseCode =
-                        doc.getString("courseCode")
+                        doc
+                            .getString(
+                                "courseCode"
+                            )
                             .orEmpty(),
 
                     subjectName =
-                        doc.getString("subjectName")
+                        doc
+                            .getString(
+                                "subjectName"
+                            )
                             .orEmpty(),
 
                     creditHours =
                         when (
                             val value =
-                                doc.get("creditHours")
+                                doc.get(
+                                    "creditHours"
+                                )
                         ) {
 
                             is Number ->
@@ -254,15 +351,7 @@ class AdminTeacherAssignmentRepository(
 
                             else ->
                                 ""
-                        },
-
-                    teacherId =
-                        doc.getString("teacherId")
-                            .orEmpty(),
-
-                    teacherName =
-                        doc.getString("teacherName")
-                            .orEmpty()
+                        }
                 )
             }
             .sortedWith(
@@ -273,20 +362,18 @@ class AdminTeacherAssignmentRepository(
             )
     }
 
+    /*
+     * ------------------------------------------------------------
+     * ALREADY ASSIGNED SUBJECTS
+     * ------------------------------------------------------------
+     */
+
     suspend fun getAssignedSubjectIds(
         teacherId: String,
         classId: String,
         semester: Int,
         session: String
     ): Set<String> {
-
-        if (
-            teacherId.isBlank() ||
-            classId.isBlank() ||
-            session.isBlank()
-        ) {
-            return emptySet()
-        }
 
         return assignmentsRef
             .whereEqualTo(
@@ -298,41 +385,47 @@ class AdminTeacherAssignmentRepository(
             .documents
             .filter {
 
-                it.getString("classId") ==
-                        classId &&
-
-                        it.getString("session")
-                            .orEmpty()
-                            .equals(
-                                session.trim(),
-                                ignoreCase = true
-                            ) &&
+                it.getString(
+                    "classId"
+                ) == classId &&
 
                         numberField(
                             it.get("semester")
-                        ) == semester
+                        ) == semester &&
+
+                        it.getString(
+                            "session"
+                        )
+                            .orEmpty()
+                            .trim()
+                            .equals(
+                                session.trim(),
+                                true
+                            )
             }
             .mapNotNull {
 
-                it.getString("subjectId")
-                    ?.takeIf {
-                        it.isNotBlank()
-                    }
+                it.getString(
+                    "subjectId"
+                )
+                    ?.takeIf(
+                        String::isNotBlank
+                    )
             }
             .toSet()
     }
 
-    /**
-     * Saves the exact:
+    /*
+     * ------------------------------------------------------------
+     * SAVE EXACT TEACHER ASSIGNMENT
+     * ------------------------------------------------------------
      *
-     * Teacher
-     * + Class
-     * + Subject
-     * + Semester
-     * + Session
+     * Teacher A can teach MT in Class A.
+     * Teacher B can teach MT in Class B.
      *
-     * relation.
+     * Subject document is NEVER modified.
      */
+
     suspend fun saveAssignment(
         teacher: Teacher,
         selectedClass: StudentClass,
@@ -373,7 +466,9 @@ class AdminTeacherAssignmentRepository(
 
             val validSubjectIds =
                 subjects
-                    .map { it.subjectId }
+                    .map {
+                        it.subjectId
+                    }
                     .toSet()
 
             if (
@@ -382,11 +477,15 @@ class AdminTeacherAssignmentRepository(
                 }
             ) {
                 return OpResult.Error(
-                    "One or more selected subjects do not belong to the selected class/semester."
+                    "Selected subject does not belong to this class/program/semester."
                 )
             }
 
-            val oldAssignments =
+            /*
+             * Delete only this teacher's assignments
+             * for this exact class + semester + session.
+             */
+            val old =
                 assignmentsRef
                     .whereEqualTo(
                         "teacherId",
@@ -397,37 +496,36 @@ class AdminTeacherAssignmentRepository(
                     .documents
                     .filter {
 
-                        it.getString("classId") ==
+                        it.getString(
+                            "classId"
+                        ) ==
                                 selectedClass.classId &&
-
-                                it.getString("session")
-                                    .orEmpty()
-                                    .equals(
-                                        cleanSession,
-                                        ignoreCase = true
-                                    ) &&
 
                                 numberField(
                                     it.get("semester")
-                                ) == semester
+                                ) ==
+                                semester &&
+
+                                it.getString(
+                                    "session"
+                                )
+                                    .orEmpty()
+                                    .trim()
+                                    .equals(
+                                        cleanSession,
+                                        true
+                                    )
                     }
 
             val batch =
                 firestore.batch()
 
-            /*
-             * Delete old assignments for this exact
-             * teacher/class/semester/session.
-             */
-            oldAssignments.forEach {
+            old.forEach {
                 batch.delete(
                     it.reference
                 )
             }
 
-            /*
-             * Re-create selected assignments.
-             */
             subjects
                 .filter {
                     it.subjectId in
@@ -444,7 +542,7 @@ class AdminTeacherAssignmentRepository(
                             subject.subjectId
                         )
 
-                    val assignment =
+                    val model =
                         TeacherSubjectAssignment(
 
                             assignmentId =
@@ -454,13 +552,17 @@ class AdminTeacherAssignmentRepository(
                                 teacher.teacherId,
 
                             teacherName =
-                                teacher.fullName,
+                                teacher.fullName
+                                    .ifBlank {
+                                        teacher.email
+                                    },
 
                             classId =
                                 selectedClass.classId,
 
                             className =
-                                "${selectedClass.programName} • Section ${selectedClass.section}",
+                                "${selectedClass.programName} • " +
+                                        "Section ${selectedClass.section}",
 
                             departmentName =
                                 selectedClass.departmentName,
@@ -492,7 +594,7 @@ class AdminTeacherAssignmentRepository(
                             .document(
                                 assignmentId
                             ),
-                        assignment.toMap()
+                        model.toMap()
                     )
                 }
 
@@ -504,7 +606,7 @@ class AdminTeacherAssignmentRepository(
 
             OpResult.Error(
                 e.message
-                    ?: "Failed to save class/subject assignment."
+                    ?: "Failed to save teacher assignment."
             )
         }
     }
@@ -543,7 +645,7 @@ class AdminTeacherAssignmentRepository(
             return listOf(
                 teacherId,
                 classId,
-                semester.toString(),
+                semester,
                 session,
                 subjectId
             )
