@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+    Highlighted TIME row background.
+    Cyan-tinted glass strip to make the time the visual anchor of the card.
+-->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+
+    <gradient
+        android:type="linear"
+        android:angle="0"
+        android:startColor="#2600E5FF"
+        android:centerColor="#1500E5FF"
+        android:endColor="#0D00E5FF" />
+
+    <corners android:radius="14dp" />
+
+    <stroke
+        android:width="1dp"
+        android:color="#4000E5FF" />
+
+</shape>

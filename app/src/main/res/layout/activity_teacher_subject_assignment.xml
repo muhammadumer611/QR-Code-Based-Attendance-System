@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/backgroundColor">
+
+    <!-- ================= HEADER ================= -->
+
+    <LinearLayout
+        android:id="@+id/headerContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="16dp">
+
+        <ImageView
+            android:id="@+id/btnBackHeader"
+            android:layout_width="42dp"
+            android:layout_height="42dp"
+            android:padding="10dp"
+            android:background="@drawable/bg_icon_circle_glass"
+            android:src="@drawable/ic_arrow"
+            app:tint="@color/textPrimary" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginStart="12dp">
+
+            <TextView
+                android:id="@+id/tvHeaderTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Teacher Assignment"
+                android:textColor="@color/textPrimary"
+                android:textSize="19sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvHeaderSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Assign a teacher to an exact class and subject"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp"
+                android:layout_marginTop="3dp" />
+
+        </LinearLayout>
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+
+    <!-- ================= MAIN CONTENT ================= -->
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+
+        <!-- ================================================= -->
+        <!-- STEP 1 : SELECT TEACHER                           -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/stepOneContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select Teacher"
+                android:textColor="@color/textPrimary"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="First choose the teacher whose exact class and subject assignment you want to manage."
+                android:textColor="@color/textSecondary"
+                android:textSize="13sp"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="12dp" />
+
+
+            <!-- ACTION BUTTONS -->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="10dp">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnRefreshTeachers"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_weight="1"
+                    android:text="Refresh Teachers"
+                    android:textAllCaps="false" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStudentAssignment"
+                    android:layout_width="0dp"
+                    android:layout_height="46dp"
+                    android:layout_weight="1"
+                    android:layout_marginStart="8dp"
+                    android:text="Student Subjects"
+                    android:textAllCaps="false" />
+
+            </LinearLayout>
+
+
+            <!-- EMPTY STATE -->
+
+            <TextView
+                android:id="@+id/tvEmptyState"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="No teachers found. Add a teacher first."
+                android:textColor="@color/textSecondary"
+                android:gravity="center"
+                android:padding="24dp"
+                android:visibility="gone" />
+
+
+            <!-- TEACHERS -->
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerTeachers"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+        </LinearLayout>
+
+
+        <!-- ================================================= -->
+        <!-- STEP 2 : CLASS + SUBJECT ASSIGNMENT               -->
+        <!-- ================================================= -->
+
+        <LinearLayout
+            android:id="@+id/stepTwoContainer"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="16dp"
+            android:visibility="gone">
+
+
+            <!-- SEMESTER -->
+
+            <AutoCompleteTextView
+                android:id="@+id/etAssignmentSemester"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Select Semester"
+                android:inputType="none"
+                android:paddingHorizontal="14dp"
+                android:background="@android:drawable/editbox_background"
+                android:layout_marginBottom="10dp" />
+
+
+            <!-- SESSION -->
+
+            <AutoCompleteTextView
+                android:id="@+id/etAssignmentSession"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Enter Session (e.g. 2022)"
+                android:inputType="text"
+                android:paddingHorizontal="14dp"
+                android:background="@android:drawable/editbox_background"
+                android:layout_marginBottom="10dp" />
+
+
+            <!-- CLASS -->
+
+            <AutoCompleteTextView
+                android:id="@+id/etAssignmentClass"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                android:hint="Select Class / Section"
+                android:inputType="none"
+                android:paddingHorizontal="14dp"
+                android:background="@android:drawable/editbox_background"
+                android:layout_marginBottom="12dp" />
+
+
+            <!-- SUBJECT TITLE -->
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Subjects for selected class"
+                android:textColor="@color/textPrimary"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+
+            <!-- SELECTED COUNT -->
+
+            <TextView
+                android:id="@+id/tvSelectedCount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Select Semester + Session + Class"
+                android:textColor="@color/textSecondary"
+                android:textSize="12sp"
+                android:layout_marginTop="3dp"
+                android:layout_marginBottom="8dp" />
+
+
+            <!-- SUBJECT LIST -->
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerSubjects"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+
+            <!-- SAVE -->
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSaveAssignment"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:text="Save Teacher • Class • Subject"
+                android:textAllCaps="false"
+                android:layout_marginTop="12dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
+
+</LinearLayout>
