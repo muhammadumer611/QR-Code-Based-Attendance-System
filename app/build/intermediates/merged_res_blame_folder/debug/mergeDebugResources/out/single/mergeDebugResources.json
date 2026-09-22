@@ -1,0 +1,710 @@
+[
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_orb_teal.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_orb_teal.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_auth_base.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_auth_base.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_class_schedule.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_class_schedule.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_attendance_class.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_attendance_class.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_schedule_tag.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_schedule_tag.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-xxhdpi_ic_launcher.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-xxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_daily_overview.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_daily_overview.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-mdpi_ic_launcher.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-mdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_arrow_right.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_arrow_right.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_badge_blue.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_badge_blue.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/menu_bottom_menu.xml.flat",
+        "source": "com.university.attendance.app-main-59:/menu/bottom_menu.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_schedule_time.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_schedule_time.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_student_dashboard.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_student_dashboard.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/xml_data_extraction_rules.xml.flat",
+        "source": "com.university.attendance.app-main-59:/xml/data_extraction_rules.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-mdpi_ic_launcher_round.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-mdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/menu_drawer_menu.xml.flat",
+        "source": "com.university.attendance.app-main-59:/menu/drawer_menu.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_attendance_student_list.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_attendance_student_list.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_menu.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_menu.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-xxxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-xxxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-hdpi_ic_launcher_round.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-hdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_back_btn.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_back_btn.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_add_student.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_add_student.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_delete_button.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_delete_button.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_img.png.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/img.png"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_dialog_add_class.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/dialog_add_class.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_gradientheaderbg.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/gradientheaderbg.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_glass_card_cyan.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_glass_card_cyan.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-anydpi-v26_ic_launcher_round.xml.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-anydpi-v26/ic_launcher_round.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_add_teacher.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_add_teacher.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_schedule.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_schedule.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_class_schedule.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_class_schedule.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_warning_banner.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_warning_banner.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_attendance_student.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_attendance_student.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_profile.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_profile.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-hdpi_ic_launcher.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-hdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_attendance_class_list.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_attendance_class_list.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_history.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_history.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_manual_attendance_filter.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_manual_attendance_filter.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-xhdpi_ic_launcher_round.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-xhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_glass_card.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_glass_card.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_dialogsubjectinput.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/dialogsubjectinput.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_class_list_row.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_class_list_row.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_input_field.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_input_field.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-xhdpi_ic_launcher.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-xhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/anim_slide_up_fade.xml.flat",
+        "source": "com.university.attendance.app-main-59:/anim/slide_up_fade.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_app_icon.jpg.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/app_icon.jpg"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_gradient_blue.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_gradient_blue.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_dot_active.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/dot_active.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_student_subject_assignment.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_student_subject_assignment.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_subject.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_subject.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_orb_purple.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_orb_purple.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_attendance.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_attendance.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_teacher.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_teacher.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_delete.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_delete.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_button.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_button.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_subject_accent_bar.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_subject_accent_bar.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_teacher_header.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_teacher_header.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_warning.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_warning.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_department.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_department.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_notificaction.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_notificaction.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_teacher_subject_assignment.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_teacher_subject_assignment.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_teacher_classes.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_teacher_classes.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_manual_attendance_register.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_manual_attendance_register.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_add.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_add.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_attendance_department_list.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_attendance_department_list.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_role_selection.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_role_selection.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_launcher_foreground.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_launcher_foreground.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_search.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_search.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_tag_blue.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_tag_blue.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_attendance_department.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_attendance_department.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_reports.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_reports.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_notes.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_notes.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_assignment.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_assignment.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_class.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_class.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_itemdepartment.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/itemdepartment.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_dashboard_header.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_dashboard_header.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_outline_account_circle_24.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/outline_account_circle_24.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_badge_teal.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_badge_teal.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_teacher_class_detail.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_teacher_class_detail.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_on_boarding_screen.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_on_boarding_screen.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_notification.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_notification.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_circle.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_circle.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_logout.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_logout.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_icon_circle_glass.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_icon_circle_glass.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_shedule.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_shedule.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_itemonboarding.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/itemonboarding.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_student_today_class.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_student_today_class.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_onboard2.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/onboard2.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_search_result.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_search_result.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_active_attendance.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_active_attendance.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_teacher_upcoming_class.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_teacher_upcoming_class.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_orb.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_orb.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_daily_department_header.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_daily_department_header.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_ord_blue.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_ord_blue.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_recent_activity.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_recent_activity.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_today_class.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_today_class.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_dot_inactive.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/dot_inactive.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_itemattendancehistory.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/itemattendancehistory.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_teacher_attendance.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_teacher_attendance.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/menu_menu_student_bottom_nav.xml.flat",
+        "source": "com.university.attendance.app-main-59:/menu/menu_student_bottom_nav.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_badge_purple.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_badge_purple.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_glass_card_glow.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_glass_card_glow.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_search.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_search.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/xml_backup_rules.xml.flat",
+        "source": "com.university.attendance.app-main-59:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_dot_active_blue.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/dot_active_blue.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_nav_header_teacher.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/nav_header_teacher.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_dialog_schedule_upload.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/dialog_schedule_upload.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_reporsts.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_reporsts.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_class_schedule_card.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_class_schedule_card.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_students.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_students.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_tag_teal.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_tag_teal.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_upload.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_upload.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_status_indicator_present.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_status_indicator_present.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_settings.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_settings.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_subject_attendance.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_subject_attendance.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_qr_code.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_qr_code.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_onboard1.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/onboard1.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_attach_file.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/attach_file.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_subject_check_box.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_subject_check_box.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_arrow.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_arrow.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_qr_glow.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_qr_glow.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_pill_present.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_pill_present.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_header_gradient.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_header_gradient.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/color_bottom_nav_color_state.xml.flat",
+        "source": "com.university.attendance.app-main-59:/color/bottom_nav_color_state.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_teacher_dashboard.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_teacher_dashboard.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_launcher_background.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_launcher_background.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_card.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_card.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_arrow_back.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_arrow_back.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_badgie.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_badgie.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_progress_cyan.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/progress_cyan.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_results.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_results.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_admin_profile.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_admin_profile.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_status_dot_present.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_status_dot_present.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_person_placeholder.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_person_placeholder.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-xxxhdpi_ic_launcher.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-xxxhdpi/ic_launcher.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_search_glass.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_search_glass.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_itemsubject.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/itemsubject.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_home.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_home.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_qr_scan.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_qr_scan.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_tag_purple.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_tag_purple.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_status_absent.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_status_absent.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_dialogdepartmentinput.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/dialogdepartmentinput.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_teacher_today_class.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_teacher_today_class.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_subject_management.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_subject_management.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_attendance_roster.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_attendance_roster.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_dot_status_panding.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/dot_status_panding.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_status_present.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_status_present.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_onboard3.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/onboard3.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_nav_header.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/nav_header.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_main.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_main.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_badgee.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_badgee.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/menu_teacher_drawer_menu.xml.flat",
+        "source": "com.university.attendance.app-main-59:/menu/teacher_drawer_menu.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_daily_class_status.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_daily_class_status.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_icon_chip.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_icon_chip.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-xxhdpi/ic_launcher_round.webp"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_icon_circle.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_icon_circle.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_teacher_button.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_teacher_button.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_admin_dashboard.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_admin_dashboard.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/mipmap-anydpi-v26_ic_launcher.xml.flat",
+        "source": "com.university.attendance.app-main-59:/mipmap-anydpi-v26/ic_launcher.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_notifications.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_notifications.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_status_dot_absent.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_status_dot_absent.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_department_management.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_department_management.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_settings.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_settings.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_time.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_time.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_teacher_class.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_teacher_class.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_schedule_note.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_schedule_note.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_daily_session_header.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_daily_session_header.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_subject_card.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_subject_card.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_department_report.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_department_report.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_bg_badge.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/bg_badge.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_notification.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_notification.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_app_icon_qr.png.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/app_icon_qr.png"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_activity_student_attendance_detail.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/activity_student_attendance_detail.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_item_teacher_for_assignment.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/item_teacher_for_assignment.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/layout_dialog_add_class_schedule.xml.flat",
+        "source": "com.university.attendance.app-main-59:/layout/dialog_add_class_schedule.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_edit.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_edit.xml"
+    },
+    {
+        "merged": "com.university.attendance.app-debug-57:/drawable_ic_dashboard.xml.flat",
+        "source": "com.university.attendance.app-main-59:/drawable/ic_dashboard.xml"
+    }
+]

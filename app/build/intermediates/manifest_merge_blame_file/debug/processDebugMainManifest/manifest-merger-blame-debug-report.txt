@@ -1,0 +1,642 @@
+1<?xml version="1.0" encoding="utf-8"?>
+2<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+3    package="com.university.attendance"
+4    android:versionCode="1"
+5    android:versionName="1.0" >
+6
+7    <uses-sdk
+8        android:minSdkVersion="24"
+9        android:targetSdkVersion="36" />
+10
+11    <!--
+12         Required for Firebase Auth / Firestore (login, subject assignment, live
+13         attendance sessions, everything network-related). Without this the app
+14         would compile and install fine but every Firebase call would silently
+15         fail at runtime.
+16    -->
+17    <uses-permission android:name="android.permission.INTERNET" />
+17-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:9:5-67
+17-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:9:22-64
+18    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+18-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:10:5-79
+18-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:10:22-76
+19    <uses-permission android:name="android.permission.WAKE_LOCK" />
+19-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:25:5-68
+19-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:25:22-65
+20    <uses-permission android:name="com.google.android.finsky.permission.BIND_GET_INSTALL_REFERRER_SERVICE" />
+20-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:26:5-110
+20-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:26:22-107
+21    <uses-permission android:name="com.google.android.gms.permission.AD_ID" />
+21-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:25:5-79
+21-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:25:22-76
+22    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_ATTRIBUTION" />
+22-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:26:5-88
+22-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:26:22-85
+23    <uses-permission android:name="android.permission.ACCESS_ADSERVICES_AD_ID" />
+23-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:27:5-82
+23-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:27:22-79
+24    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES" />
+24-->[com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d2577cbc4dccb5178b5e2124e258718e\transformed\recaptcha-18.6.1\AndroidManifest.xml:9:5-98
+24-->[com.google.android.recaptcha:recaptcha:18.6.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d2577cbc4dccb5178b5e2124e258718e\transformed\recaptcha-18.6.1\AndroidManifest.xml:9:22-95
+25
+26    <permission
+26-->[androidx.core:core:1.17.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7ae88343bf61b9005cc40e41ca9498d6\transformed\core-1.17.0\AndroidManifest.xml:22:5-24:47
+27        android:name="com.university.attendance.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION"
+27-->[androidx.core:core:1.17.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7ae88343bf61b9005cc40e41ca9498d6\transformed\core-1.17.0\AndroidManifest.xml:23:9-81
+28        android:protectionLevel="signature" />
+28-->[androidx.core:core:1.17.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7ae88343bf61b9005cc40e41ca9498d6\transformed\core-1.17.0\AndroidManifest.xml:24:9-44
+29
+30    <uses-permission android:name="com.university.attendance.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION" />
+30-->[androidx.core:core:1.17.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7ae88343bf61b9005cc40e41ca9498d6\transformed\core-1.17.0\AndroidManifest.xml:26:5-97
+30-->[androidx.core:core:1.17.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7ae88343bf61b9005cc40e41ca9498d6\transformed\core-1.17.0\AndroidManifest.xml:26:22-94
+31
+32    <application
+32-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:12:5-133:19
+33        android:name="com.university.attendance.AttendanceApp"
+33-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:13:9-38
+34        android:allowBackup="true"
+34-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:14:9-35
+35        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+35-->[androidx.core:core:1.17.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7ae88343bf61b9005cc40e41ca9498d6\transformed\core-1.17.0\AndroidManifest.xml:28:18-86
+36        android:dataExtractionRules="@xml/data_extraction_rules"
+36-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:15:9-65
+37        android:debuggable="true"
+38        android:extractNativeLibs="false"
+39        android:fullBackupContent="@xml/backup_rules"
+39-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:16:9-54
+40        android:icon="@mipmap/ic_launcher"
+40-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:17:9-43
+41        android:label="@string/app_name"
+41-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:18:9-41
+42        android:roundIcon="@mipmap/ic_launcher_round"
+42-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:19:9-54
+43        android:supportsRtl="true"
+43-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:20:9-35
+44        android:testOnly="true"
+45        android:theme="@style/Theme.QRCodeAttendance" >
+45-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:21:9-54
+46        <activity
+46-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:22:9-24:40
+47            android:name="com.university.attendance.ActivityTeacherClasses"
+47-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:23:13-51
+48            android:exported="false" />
+48-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:24:13-37
+49        <activity
+49-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:25:9-27:40
+50            android:name="com.university.attendance.ActivitySettings"
+50-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:26:13-45
+51            android:exported="false" />
+51-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:27:13-37
+52        <activity
+52-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:28:9-30:40
+53            android:name="com.university.attendance.ActivityAdminProfile"
+53-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:29:13-49
+54            android:exported="false" />
+54-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:30:13-37
+55        <activity
+55-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:31:9-33:40
+56            android:name="com.university.attendance.ActivitySubjectManagement"
+56-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:32:13-54
+57            android:exported="false" />
+57-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:33:13-37
+58        <activity
+58-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:34:9-36:40
+59            android:name="com.university.attendance.ActivityAttendanceDepartmentList"
+59-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:35:13-61
+60            android:exported="false" />
+60-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:36:13-37
+61        <activity
+61-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:37:9-39:40
+62            android:name="com.university.attendance.ActivityAttendanceClassList"
+62-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:38:13-56
+63            android:exported="false" />
+63-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:39:13-37
+64        <activity
+64-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:40:9-42:40
+65            android:name="com.university.attendance.ActivityAttendanceStudentList"
+65-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:41:13-58
+66            android:exported="false" />
+66-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:42:13-37
+67        <activity
+67-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:43:9-45:40
+68            android:name="com.university.attendance.ActivityStudentAttendanceDetail"
+68-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:44:13-60
+69            android:exported="false" />
+69-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:45:13-37
+70        <activity
+70-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:46:9-48:40
+71            android:name="com.university.attendance.ActivityManualAttendanceFilter"
+71-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:47:13-59
+72            android:exported="false" />
+72-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:48:13-37
+73        <activity
+73-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:49:9-51:40
+74            android:name="com.university.attendance.ActivityNotifications"
+74-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:50:13-50
+75            android:exported="false" />
+75-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:51:13-37
+76        <activity
+76-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:52:9-54:40
+77            android:name="com.university.attendance.ActivityReports"
+77-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:53:13-44
+78            android:exported="false" />
+78-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:54:13-37
+79        <activity
+79-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:55:9-57:40
+80            android:name="com.university.attendance.ActivitySchedule"
+80-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:56:13-45
+81            android:exported="false" />
+81-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:57:13-37
+82        <activity
+82-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:58:9-60:40
+83            android:name="com.university.attendance.ActivityDailyOverview"
+83-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:59:13-50
+84            android:exported="false" />
+84-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:60:13-37
+85        <activity
+85-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:61:9-63:40
+86            android:name="com.university.attendance.ActivityTeacherSubjectAssignment"
+86-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:62:13-61
+87            android:exported="false" />
+87-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:63:13-37
+88        <activity
+88-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:64:9-66:40
+89            android:name="com.university.attendance.ActivityManualAttendanceRegister"
+89-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:65:13-61
+90            android:exported="false" />
+90-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:66:13-37
+91        <activity
+91-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:67:9-69:40
+92            android:name="com.university.attendance.ActivityDepartmentManagement"
+92-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:68:13-57
+93            android:exported="false" />
+93-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:69:13-37
+94        <activity
+94-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:70:9-72:40
+95            android:name="com.university.attendance.ActivityStudentSubjectAssignment"
+95-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:71:13-61
+96            android:exported="false" />
+96-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:72:13-37
+97        <activity
+97-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:73:9-75:40
+98            android:name="com.university.attendance.ActivityAddTeacher"
+98-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:74:13-47
+99            android:exported="false" />
+99-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:75:13-37
+100        <activity
+100-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:76:9-78:40
+101            android:name="com.university.attendance.ActivityAddStudent"
+101-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:77:13-47
+102            android:exported="false" />
+102-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:78:13-37
+103        <activity
+103-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:79:9-81:40
+104            android:name="com.university.attendance.ActivityTeacherDashboard"
+104-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:80:13-53
+105            android:exported="false" />
+105-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:81:13-37
+106        <activity
+106-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:82:9-84:40
+107            android:name="com.university.attendance.ActivityAdminDashboard"
+107-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:83:13-51
+108            android:exported="false" />
+108-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:84:13-37
+109        <activity
+109-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:85:9-87:40
+110            android:name="com.university.attendance.ActivityStudentDashboard"
+110-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:86:13-53
+111            android:exported="false" />
+111-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:87:13-37
+112        <activity
+112-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:88:9-90:40
+113            android:name="com.university.attendance.ActivityRoleSelection"
+113-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:89:13-50
+114            android:exported="false" />
+114-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:90:13-37
+115        <activity
+115-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:91:9-99:20
+116            android:name="com.university.attendance.ActivityOnBoardingScreen"
+116-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:92:13-53
+117            android:exported="true" >
+117-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:93:13-36
+118            <intent-filter>
+118-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:94:13-98:29
+119                <action android:name="android.intent.action.MAIN" />
+119-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:95:17-69
+119-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:95:25-66
+120
+121                <category android:name="android.intent.category.LAUNCHER" />
+121-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:97:17-77
+121-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:97:27-74
+122            </intent-filter>
+123        </activity>
+124        <activity
+124-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:100:9-102:39
+125            android:name="com.university.attendance.MainActivity"
+125-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:101:13-41
+126            android:exported="true" />
+126-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:102:13-36
+127        <activity
+127-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:103:9-105:58
+128            android:name="com.university.attendance.ActivityAdminSignUp"
+128-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:104:13-48
+129            android:windowSoftInputMode="adjustResize" />
+129-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:105:13-55
+130        <activity
+130-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:106:9-108:58
+131            android:name="com.university.attendance.ActivityAdminSignIn"
+131-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:107:13-48
+132            android:windowSoftInputMode="adjustResize" />
+132-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:108:13-55
+133        <activity
+133-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:109:9-111:58
+134            android:name="com.university.attendance.ActivityTeacherSignUp"
+134-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:110:13-50
+135            android:windowSoftInputMode="adjustResize" />
+135-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:111:13-55
+136        <activity
+136-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:112:9-114:58
+137            android:name="com.university.attendance.ActivityTeacherSignIn"
+137-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:113:13-50
+138            android:windowSoftInputMode="adjustResize" />
+138-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:114:13-55
+139        <activity
+139-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:115:9-117:58
+140            android:name="com.university.attendance.ActivityStudentSignUp"
+140-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:116:13-50
+141            android:windowSoftInputMode="adjustResize" />
+141-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:117:13-55
+142        <activity
+142-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:118:9-120:58
+143            android:name="com.university.attendance.ActivityStudentSignIn"
+143-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:119:13-50
+144            android:windowSoftInputMode="adjustResize" />
+144-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:120:13-55
+145        <activity
+145-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:121:9-124:58
+146            android:name="com.university.attendance.ActivityClassSchedule"
+146-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:122:13-50
+147            android:exported="false"
+147-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:123:13-37
+148            android:windowSoftInputMode="adjustResize" />
+148-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:124:13-55
+149        <activity
+149-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:125:9-128:58
+150            android:name="com.university.attendance.ActivityTeacherClassDetail"
+150-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:126:13-55
+151            android:exported="false"
+151-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:127:13-37
+152            android:windowSoftInputMode="adjustResize" />
+152-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:128:13-55
+153        <activity
+153-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:129:9-132:58
+154            android:name="com.university.attendance.ActivityTeacherAttendance"
+154-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:130:13-54
+155            android:exported="false"
+155-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:131:13-37
+156            android:windowSoftInputMode="adjustResize" />
+156-->C:\Users\Asif Computer\Downloads\QR-Code-Based-Attendance-System-FIXED (1)\QR-Code-Based-Attendance-System-main\app\src\main\AndroidManifest.xml:132:13-55
+157        <activity
+157-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:29:9-46:20
+158            android:name="com.google.firebase.auth.internal.GenericIdpActivity"
+158-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:30:13-80
+159            android:excludeFromRecents="true"
+159-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:31:13-46
+160            android:exported="true"
+160-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:32:13-36
+161            android:launchMode="singleTask"
+161-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:33:13-44
+162            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+162-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:34:13-72
+163            <intent-filter>
+163-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:35:13-45:29
+164                <action android:name="android.intent.action.VIEW" />
+164-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:36:17-69
+164-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:36:25-66
+165
+166                <category android:name="android.intent.category.DEFAULT" />
+166-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:38:17-76
+166-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:38:27-73
+167                <category android:name="android.intent.category.BROWSABLE" />
+167-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:39:17-78
+167-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:39:27-75
+168
+169                <data
+169-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:41:17-44:51
+170                    android:host="firebase.auth"
+170-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:42:21-49
+171                    android:path="/"
+171-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:43:21-37
+172                    android:scheme="genericidp" />
+172-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:44:21-48
+173            </intent-filter>
+174        </activity>
+175        <activity
+175-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:47:9-64:20
+176            android:name="com.google.firebase.auth.internal.RecaptchaActivity"
+176-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:48:13-79
+177            android:excludeFromRecents="true"
+177-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:49:13-46
+178            android:exported="true"
+178-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:50:13-36
+179            android:launchMode="singleTask"
+179-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:51:13-44
+180            android:theme="@android:style/Theme.Translucent.NoTitleBar" >
+180-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:52:13-72
+181            <intent-filter>
+181-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:53:13-63:29
+182                <action android:name="android.intent.action.VIEW" />
+182-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:36:17-69
+182-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:36:25-66
+183
+184                <category android:name="android.intent.category.DEFAULT" />
+184-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:38:17-76
+184-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:38:27-73
+185                <category android:name="android.intent.category.BROWSABLE" />
+185-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:39:17-78
+185-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:39:27-75
+186
+187                <data
+187-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:41:17-44:51
+188                    android:host="firebase.auth"
+188-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:42:21-49
+189                    android:path="/"
+189-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:43:21-37
+190                    android:scheme="recaptcha" />
+190-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:44:21-48
+191            </intent-filter>
+192        </activity>
+193
+194        <service
+194-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:66:9-72:19
+195            android:name="com.google.firebase.components.ComponentDiscoveryService"
+195-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:67:13-84
+196            android:directBootAware="true"
+196-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:32:13-43
+197            android:exported="false" >
+197-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:68:13-37
+198            <meta-data
+198-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:69:13-71:85
+199                android:name="com.google.firebase.components:com.google.firebase.auth.FirebaseAuthRegistrar"
+199-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:70:17-109
+200                android:value="com.google.firebase.components.ComponentRegistrar" />
+200-->[com.google.firebase:firebase-auth:24.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa35cc12a38c34eb4b2dc148e3b8f79a\transformed\firebase-auth-24.0.1\AndroidManifest.xml:71:17-82
+201            <meta-data
+201-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ca61e4a98f926a369c67e50fc52f94c4\transformed\firebase-firestore-26.0.2\AndroidManifest.xml:17:13-19:85
+202                android:name="com.google.firebase.components:com.google.firebase.firestore.FirebaseFirestoreKtxRegistrar"
+202-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ca61e4a98f926a369c67e50fc52f94c4\transformed\firebase-firestore-26.0.2\AndroidManifest.xml:18:17-122
+203                android:value="com.google.firebase.components.ComponentRegistrar" />
+203-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ca61e4a98f926a369c67e50fc52f94c4\transformed\firebase-firestore-26.0.2\AndroidManifest.xml:19:17-82
+204            <meta-data
+204-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ca61e4a98f926a369c67e50fc52f94c4\transformed\firebase-firestore-26.0.2\AndroidManifest.xml:20:13-22:85
+205                android:name="com.google.firebase.components:com.google.firebase.firestore.FirestoreRegistrar"
+205-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ca61e4a98f926a369c67e50fc52f94c4\transformed\firebase-firestore-26.0.2\AndroidManifest.xml:21:17-111
+206                android:value="com.google.firebase.components.ComponentRegistrar" />
+206-->[com.google.firebase:firebase-firestore:26.0.2] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ca61e4a98f926a369c67e50fc52f94c4\transformed\firebase-firestore-26.0.2\AndroidManifest.xml:22:17-82
+207            <meta-data
+207-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:33:13-35:85
+208                android:name="com.google.firebase.components:com.google.firebase.analytics.connector.internal.AnalyticsConnectorRegistrar"
+208-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:34:17-139
+209                android:value="com.google.firebase.components.ComponentRegistrar" />
+209-->[com.google.android.gms:play-services-measurement-api:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\0b170317ccb11bdc24d1191a788582b9\transformed\play-services-measurement-api-23.0.0\AndroidManifest.xml:35:17-82
+210            <meta-data
+210-->[com.google.firebase:firebase-storage:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c8a9359da30012aae57265e5a2f83b45\transformed\firebase-storage-22.0.1\AndroidManifest.xml:30:13-32:85
+211                android:name="com.google.firebase.components:com.google.firebase.storage.FirebaseStorageKtxRegistrar"
+211-->[com.google.firebase:firebase-storage:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c8a9359da30012aae57265e5a2f83b45\transformed\firebase-storage-22.0.1\AndroidManifest.xml:31:17-118
+212                android:value="com.google.firebase.components.ComponentRegistrar" />
+212-->[com.google.firebase:firebase-storage:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c8a9359da30012aae57265e5a2f83b45\transformed\firebase-storage-22.0.1\AndroidManifest.xml:32:17-82
+213            <meta-data
+213-->[com.google.firebase:firebase-storage:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c8a9359da30012aae57265e5a2f83b45\transformed\firebase-storage-22.0.1\AndroidManifest.xml:33:13-35:85
+214                android:name="com.google.firebase.components:com.google.firebase.storage.StorageRegistrar"
+214-->[com.google.firebase:firebase-storage:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c8a9359da30012aae57265e5a2f83b45\transformed\firebase-storage-22.0.1\AndroidManifest.xml:34:17-107
+215                android:value="com.google.firebase.components.ComponentRegistrar" />
+215-->[com.google.firebase:firebase-storage:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c8a9359da30012aae57265e5a2f83b45\transformed\firebase-storage-22.0.1\AndroidManifest.xml:35:17-82
+216            <meta-data
+216-->[com.google.firebase:firebase-installations:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6f772bcf0b2eb441b86ceec96663f8d1\transformed\firebase-installations-19.0.1\AndroidManifest.xml:15:13-17:85
+217                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsKtxRegistrar"
+217-->[com.google.firebase:firebase-installations:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6f772bcf0b2eb441b86ceec96663f8d1\transformed\firebase-installations-19.0.1\AndroidManifest.xml:16:17-130
+218                android:value="com.google.firebase.components.ComponentRegistrar" />
+218-->[com.google.firebase:firebase-installations:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6f772bcf0b2eb441b86ceec96663f8d1\transformed\firebase-installations-19.0.1\AndroidManifest.xml:17:17-82
+219            <meta-data
+219-->[com.google.firebase:firebase-installations:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6f772bcf0b2eb441b86ceec96663f8d1\transformed\firebase-installations-19.0.1\AndroidManifest.xml:18:13-20:85
+220                android:name="com.google.firebase.components:com.google.firebase.installations.FirebaseInstallationsRegistrar"
+220-->[com.google.firebase:firebase-installations:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6f772bcf0b2eb441b86ceec96663f8d1\transformed\firebase-installations-19.0.1\AndroidManifest.xml:19:17-127
+221                android:value="com.google.firebase.components.ComponentRegistrar" />
+221-->[com.google.firebase:firebase-installations:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6f772bcf0b2eb441b86ceec96663f8d1\transformed\firebase-installations-19.0.1\AndroidManifest.xml:20:17-82
+222            <meta-data
+222-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:35:13-37:85
+223                android:name="com.google.firebase.components:com.google.firebase.FirebaseCommonKtxRegistrar"
+223-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:36:17-109
+224                android:value="com.google.firebase.components.ComponentRegistrar" />
+224-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:37:17-82
+225            <meta-data
+225-->[com.google.firebase:firebase-appcheck:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa908f049e8609344ec78d8f65f5d3d0\transformed\firebase-appcheck-19.0.1\AndroidManifest.xml:25:13-27:85
+226                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckKtxRegistrar"
+226-->[com.google.firebase:firebase-appcheck:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa908f049e8609344ec78d8f65f5d3d0\transformed\firebase-appcheck-19.0.1\AndroidManifest.xml:26:17-120
+227                android:value="com.google.firebase.components.ComponentRegistrar" />
+227-->[com.google.firebase:firebase-appcheck:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa908f049e8609344ec78d8f65f5d3d0\transformed\firebase-appcheck-19.0.1\AndroidManifest.xml:27:17-82
+228            <meta-data
+228-->[com.google.firebase:firebase-appcheck:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa908f049e8609344ec78d8f65f5d3d0\transformed\firebase-appcheck-19.0.1\AndroidManifest.xml:28:13-30:85
+229                android:name="com.google.firebase.components:com.google.firebase.appcheck.FirebaseAppCheckRegistrar"
+229-->[com.google.firebase:firebase-appcheck:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa908f049e8609344ec78d8f65f5d3d0\transformed\firebase-appcheck-19.0.1\AndroidManifest.xml:29:17-117
+230                android:value="com.google.firebase.components.ComponentRegistrar" />
+230-->[com.google.firebase:firebase-appcheck:19.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\aa908f049e8609344ec78d8f65f5d3d0\transformed\firebase-appcheck-19.0.1\AndroidManifest.xml:30:17-82
+231        </service>
+232
+233        <receiver
+233-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:29:9-33:20
+234            android:name="com.google.android.gms.measurement.AppMeasurementReceiver"
+234-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:30:13-85
+235            android:enabled="true"
+235-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:31:13-35
+236            android:exported="false" >
+236-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:32:13-37
+237        </receiver>
+238
+239        <service
+239-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:35:9-38:40
+240            android:name="com.google.android.gms.measurement.AppMeasurementService"
+240-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:36:13-84
+241            android:enabled="true"
+241-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:37:13-35
+242            android:exported="false" />
+242-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:38:13-37
+243        <service
+243-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:39:9-43:72
+244            android:name="com.google.android.gms.measurement.AppMeasurementJobService"
+244-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:40:13-87
+245            android:enabled="true"
+245-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:41:13-35
+246            android:exported="false"
+246-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:42:13-37
+247            android:permission="android.permission.BIND_JOB_SERVICE" />
+247-->[com.google.android.gms:play-services-measurement:23.0.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\cbbee149ad7d70a6b0482167299ac1a1\transformed\play-services-measurement-23.0.0\AndroidManifest.xml:43:13-69
+248        <service
+248-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:24:9-32:19
+249            android:name="androidx.credentials.playservices.CredentialProviderMetadataHolder"
+249-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:25:13-94
+250            android:enabled="true"
+250-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:26:13-35
+251            android:exported="false" >
+251-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:27:13-37
+252            <meta-data
+252-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:29:13-31:104
+253                android:name="androidx.credentials.CREDENTIAL_PROVIDER_KEY"
+253-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:30:17-76
+254                android:value="androidx.credentials.playservices.CredentialProviderPlayServicesImpl" />
+254-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:31:17-101
+255        </service>
+256
+257        <activity
+257-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:34:9-41:20
+258            android:name="androidx.credentials.playservices.HiddenActivity"
+258-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:35:13-76
+259            android:configChanges="orientation|screenSize|screenLayout|keyboardHidden"
+259-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:36:13-87
+260            android:enabled="true"
+260-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:37:13-35
+261            android:exported="false"
+261-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:38:13-37
+262            android:fitsSystemWindows="true"
+262-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:39:13-45
+263            android:theme="@style/Theme.Hidden" >
+263-->[androidx.credentials:credentials-play-services-auth:1.2.0-rc01] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\d1dc0b54cccb2d177de1070f7acfb1bc\transformed\credentials-play-services-auth-1.2.0-rc01\AndroidManifest.xml:40:13-48
+264        </activity>
+265        <activity
+265-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:23:9-27:75
+266            android:name="com.google.android.gms.auth.api.signin.internal.SignInHubActivity"
+266-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:24:13-93
+267            android:excludeFromRecents="true"
+267-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:25:13-46
+268            android:exported="false"
+268-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:26:13-37
+269            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+269-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:27:13-72
+270        <!--
+271            Service handling Google Sign-In user revocation. For apps that do not integrate with
+272            Google Sign-In, this service will never be started.
+273        -->
+274        <service
+274-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:33:9-37:51
+275            android:name="com.google.android.gms.auth.api.signin.RevocationBoundService"
+275-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:34:13-89
+276            android:exported="true"
+276-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:35:13-36
+277            android:permission="com.google.android.gms.auth.api.signin.permission.REVOCATION_NOTIFICATION"
+277-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:36:13-107
+278            android:visibleToInstantApps="true" />
+278-->[com.google.android.gms:play-services-auth:20.7.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\196a4600be0197bdaf2745fc8b3d2227\transformed\play-services-auth-20.7.0\AndroidManifest.xml:37:13-48
+279
+280        <provider
+280-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:23:9-28:39
+281            android:name="com.google.firebase.provider.FirebaseInitProvider"
+281-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:24:13-77
+282            android:authorities="com.university.attendance.firebaseinitprovider"
+282-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:25:13-72
+283            android:directBootAware="true"
+283-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:26:13-43
+284            android:exported="false"
+284-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:27:13-37
+285            android:initOrder="100" />
+285-->[com.google.firebase:firebase-common:22.0.1] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\835d902c74ab937caa90be2c7cfa284b\transformed\firebase-common-22.0.1\AndroidManifest.xml:28:13-36
+286        <provider
+286-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\8fa6675be12b3b0c4adf2f3ff401ac60\transformed\emoji2-1.3.0\AndroidManifest.xml:24:9-32:20
+287            android:name="androidx.startup.InitializationProvider"
+287-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\8fa6675be12b3b0c4adf2f3ff401ac60\transformed\emoji2-1.3.0\AndroidManifest.xml:25:13-67
+288            android:authorities="com.university.attendance.androidx-startup"
+288-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\8fa6675be12b3b0c4adf2f3ff401ac60\transformed\emoji2-1.3.0\AndroidManifest.xml:26:13-68
+289            android:exported="false" >
+289-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\8fa6675be12b3b0c4adf2f3ff401ac60\transformed\emoji2-1.3.0\AndroidManifest.xml:27:13-37
+290            <meta-data
+290-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\8fa6675be12b3b0c4adf2f3ff401ac60\transformed\emoji2-1.3.0\AndroidManifest.xml:29:13-31:52
+291                android:name="androidx.emoji2.text.EmojiCompatInitializer"
+291-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\8fa6675be12b3b0c4adf2f3ff401ac60\transformed\emoji2-1.3.0\AndroidManifest.xml:30:17-75
+292                android:value="androidx.startup" />
+292-->[androidx.emoji2:emoji2:1.3.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\8fa6675be12b3b0c4adf2f3ff401ac60\transformed\emoji2-1.3.0\AndroidManifest.xml:31:17-49
+293            <meta-data
+293-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7f42fc57910aa85b3f5244efad9e9fb1\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:29:13-31:52
+294                android:name="androidx.lifecycle.ProcessLifecycleInitializer"
+294-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7f42fc57910aa85b3f5244efad9e9fb1\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:30:17-78
+295                android:value="androidx.startup" />
+295-->[androidx.lifecycle:lifecycle-process:2.8.4] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\7f42fc57910aa85b3f5244efad9e9fb1\transformed\lifecycle-process-2.8.4\AndroidManifest.xml:31:17-49
+296            <meta-data
+296-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:29:13-31:52
+297                android:name="androidx.profileinstaller.ProfileInstallerInitializer"
+297-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:30:17-85
+298                android:value="androidx.startup" />
+298-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:31:17-49
+299        </provider>
+300
+301        <activity
+301-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\e84507309c1e1e2808a705b271be4ea1\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:9-173
+302            android:name="com.google.android.gms.common.api.GoogleApiActivity"
+302-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\e84507309c1e1e2808a705b271be4ea1\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:19-85
+303            android:exported="false"
+303-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\e84507309c1e1e2808a705b271be4ea1\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:146-170
+304            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+304-->[com.google.android.gms:play-services-base:18.5.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\e84507309c1e1e2808a705b271be4ea1\transformed\play-services-base-18.5.0\AndroidManifest.xml:5:86-145
+305
+306        <uses-library
+306-->[androidx.privacysandbox.ads:ads-adservices:1.1.0-beta11] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c2a6828034decad9c7696fd9bc78a1d3\transformed\ads-adservices-1.1.0-beta11\AndroidManifest.xml:23:9-25:40
+307            android:name="android.ext.adservices"
+307-->[androidx.privacysandbox.ads:ads-adservices:1.1.0-beta11] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c2a6828034decad9c7696fd9bc78a1d3\transformed\ads-adservices-1.1.0-beta11\AndroidManifest.xml:24:13-50
+308            android:required="false" />
+308-->[androidx.privacysandbox.ads:ads-adservices:1.1.0-beta11] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\c2a6828034decad9c7696fd9bc78a1d3\transformed\ads-adservices-1.1.0-beta11\AndroidManifest.xml:25:13-37
+309
+310        <meta-data
+310-->[com.google.android.gms:play-services-basement:18.8.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6fba19fde39a2087c04fde5510e43c8a\transformed\play-services-basement-18.8.0\AndroidManifest.xml:21:9-23:69
+311            android:name="com.google.android.gms.version"
+311-->[com.google.android.gms:play-services-basement:18.8.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6fba19fde39a2087c04fde5510e43c8a\transformed\play-services-basement-18.8.0\AndroidManifest.xml:22:13-58
+312            android:value="@integer/google_play_services_version" />
+312-->[com.google.android.gms:play-services-basement:18.8.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\6fba19fde39a2087c04fde5510e43c8a\transformed\play-services-basement-18.8.0\AndroidManifest.xml:23:13-66
+313
+314        <receiver
+314-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:34:9-52:20
+315            android:name="androidx.profileinstaller.ProfileInstallReceiver"
+315-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:35:13-76
+316            android:directBootAware="false"
+316-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:36:13-44
+317            android:enabled="true"
+317-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:37:13-35
+318            android:exported="true"
+318-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:38:13-36
+319            android:permission="android.permission.DUMP" >
+319-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:39:13-57
+320            <intent-filter>
+320-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:40:13-42:29
+321                <action android:name="androidx.profileinstaller.action.INSTALL_PROFILE" />
+321-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:17-91
+321-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:41:25-88
+322            </intent-filter>
+323            <intent-filter>
+323-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:43:13-45:29
+324                <action android:name="androidx.profileinstaller.action.SKIP_FILE" />
+324-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:17-85
+324-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:44:25-82
+325            </intent-filter>
+326            <intent-filter>
+326-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:46:13-48:29
+327                <action android:name="androidx.profileinstaller.action.SAVE_PROFILE" />
+327-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:17-88
+327-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:47:25-85
+328            </intent-filter>
+329            <intent-filter>
+329-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:49:13-51:29
+330                <action android:name="androidx.profileinstaller.action.BENCHMARK_OPERATION" />
+330-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:17-95
+330-->[androidx.profileinstaller:profileinstaller:1.4.0] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\ed4554610379c54c7acc26c650f25d13\transformed\profileinstaller-1.4.0\AndroidManifest.xml:50:25-92
+331            </intent-filter>
+332        </receiver> <!-- The activities will be merged into the manifest of the hosting app. -->
+333        <activity
+333-->[com.google.android.play:core-common:2.0.3] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\4a185c6dac658abe26e752a8d2a76d1a\transformed\core-common-2.0.3\AndroidManifest.xml:14:9-18:65
+334            android:name="com.google.android.play.core.common.PlayCoreDialogWrapperActivity"
+334-->[com.google.android.play:core-common:2.0.3] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\4a185c6dac658abe26e752a8d2a76d1a\transformed\core-common-2.0.3\AndroidManifest.xml:15:13-93
+335            android:exported="false"
+335-->[com.google.android.play:core-common:2.0.3] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\4a185c6dac658abe26e752a8d2a76d1a\transformed\core-common-2.0.3\AndroidManifest.xml:16:13-37
+336            android:stateNotNeeded="true"
+336-->[com.google.android.play:core-common:2.0.3] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\4a185c6dac658abe26e752a8d2a76d1a\transformed\core-common-2.0.3\AndroidManifest.xml:17:13-42
+337            android:theme="@style/Theme.PlayCore.Transparent" />
+337-->[com.google.android.play:core-common:2.0.3] C:\Users\Asif Computer\.gradle\caches\8.13\transforms\4a185c6dac658abe26e752a8d2a76d1a\transformed\core-common-2.0.3\AndroidManifest.xml:18:13-62
+338    </application>
+339
+340</manifest>
