@@ -764,7 +764,7 @@ QR-Code-Based-Attendance-System/
 │
 ├── gradle/
 │
-├── screenshots/
+├── Screenshots/
 │   ├── Admin Dashboard 1.png
 │   ├── Admin Dashboard 2.png
 │   ├── Admin Login.png
