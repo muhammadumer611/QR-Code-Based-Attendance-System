@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "110149526630",
+    "project_id": "kings-hostel-management",
+    "storage_bucket": "kings-hostel-management.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:110149526630:android:69572ddf3aca0d1b3879a7",
+        "android_client_info": {
+          "package_name": "com.university.attendance"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBB6vhy6q0GDg9UXKtJTuoJ5BdncYqKWlg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
